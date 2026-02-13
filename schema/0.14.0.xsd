@@ -49,23 +49,34 @@
                 <xs:element ref="text"/>
             </xs:choice>
             <xs:attribute name="id" type="xs:string" use="optional"/>
-            <xs:attribute name="padding-top" type="xs:float" use="optional"/>
-            <xs:attribute name="padding-right" type="xs:float" use="optional"/>
-            <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
-            <xs:attribute name="padding-left" type="xs:float" use="optional"/>
+            <xs:attribute name="padding" type="xs:float" use="optional">
+                <xs:annotation><xs:appinfo>struct:Padding shorthand</xs:appinfo></xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="padding-top" type="xs:float" use="optional">
+                <xs:annotation><xs:appinfo>struct:Padding field:top</xs:appinfo></xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="padding-right" type="xs:float" use="optional">
+                <xs:annotation><xs:appinfo>struct:Padding field:right</xs:appinfo></xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="padding-bottom" type="xs:float" use="optional">
+                <xs:annotation><xs:appinfo>struct:Padding field:bottom</xs:appinfo></xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="padding-left" type="xs:float" use="optional">
+                <xs:annotation><xs:appinfo>struct:Padding field:left</xs:appinfo></xs:annotation>
+            </xs:attribute>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
-            <xs:attribute name="max_width" type="xs:float" use="optional"/>
-            <xs:attribute name="max_height" type="xs:float" use="optional"/>
-            <xs:attribute name="center_x" type="Length" use="optional"/>
-            <xs:attribute name="center_y" type="Length" use="optional"/>
+            <xs:attribute name="max-width" type="xs:float" use="optional"/>
+            <xs:attribute name="max-height" type="xs:float" use="optional"/>
+            <xs:attribute name="center-x" type="Length" use="optional"/>
+            <xs:attribute name="center-y" type="Length" use="optional"/>
             <xs:attribute name="center" type="Length" use="optional"/>
-            <xs:attribute name="align_left" type="Length" use="optional"/>
-            <xs:attribute name="align_right" type="Length" use="optional"/>
-            <xs:attribute name="align_top" type="Length" use="optional"/>
-            <xs:attribute name="align_bottom" type="Length" use="optional"/>
-            <xs:attribute name="align_x" type="Horizontal" use="optional"/>
-            <xs:attribute name="align_y" type="Vertical" use="optional"/>
+            <xs:attribute name="align-left" type="Length" use="optional"/>
+            <xs:attribute name="align-right" type="Length" use="optional"/>
+            <xs:attribute name="align-top" type="Length" use="optional"/>
+            <xs:attribute name="align-bottom" type="Length" use="optional"/>
+            <xs:attribute name="align-x" type="Horizontal" use="optional"/>
+            <xs:attribute name="align-y" type="Vertical" use="optional"/>
             <xs:attribute name="clip" type="xs:boolean" use="optional"/>
         </xs:complexType>
     </xs:element>

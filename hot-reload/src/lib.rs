@@ -5,13 +5,53 @@ use std::sync::{LazyLock, Mutex};
 use std::time::SystemTime;
 
 use iced::widget;
-use iced::{Element, Subscription};
+use iced::{Color, Element, Length, Padding, Subscription};
 use iced_layout_core::Node;
+
+fn build_padding(p: &iced_layout_core::Padding) -> Option<Padding> {
+    if p.top.is_none() && p.right.is_none() && p.bottom.is_none() && p.left.is_none() {
+        return None;
+    }
+    let mut pad = Padding::ZERO;
+    if let Some(v) = p.top { pad.top = v; }
+    if let Some(v) = p.right { pad.right = v; }
+    if let Some(v) = p.bottom { pad.bottom = v; }
+    if let Some(v) = p.left { pad.left = v; }
+    Some(pad)
+}
+
+fn build_length(l: &iced_layout_core::Length) -> Length {
+    match l {
+        iced_layout_core::Length::Fill => Length::Fill,
+        iced_layout_core::Length::FillPortion(v) => Length::FillPortion(*v),
+        iced_layout_core::Length::Shrink => Length::Shrink,
+        iced_layout_core::Length::Fixed(v) => Length::Fixed(*v),
+    }
+}
+
+fn build_color(c: &iced_layout_core::Color) -> Color {
+    Color { r: c.r, g: c.g, b: c.b, a: c.a }
+}
 
 fn build<'a, Message: 'a>(node: &Node) -> Element<'a, Message> {
     match node {
-        Node::Text(content) => widget::text(content.clone()).into(),
-        Node::Container { id, children } => {
+        Node::Text { content, attrs } => {
+            let mut t = widget::text(content.clone());
+            if let Some(size) = attrs.size {
+                t = t.size(size);
+            }
+            if let Some(ref w) = attrs.width {
+                t = t.width(build_length(w));
+            }
+            if let Some(ref h) = attrs.height {
+                t = t.height(build_length(h));
+            }
+            if let Some(ref c) = attrs.color {
+                t = t.color(build_color(c));
+            }
+            t.into()
+        }
+        Node::Container { id, padding, children } => {
             assert_eq!(
                 children.len(),
                 1,
@@ -19,7 +59,10 @@ fn build<'a, Message: 'a>(node: &Node) -> Element<'a, Message> {
                 children.len()
             );
             let child = build::<Message>(&children[0]);
-            let c = widget::container(child);
+            let mut c = widget::container(child);
+            if let Some(pad) = build_padding(padding) {
+                c = c.padding(pad);
+            }
             if let Some(id_val) = id {
                 c.id(id_val.clone()).into()
             } else {
