@@ -1,0 +1,14 @@
+[package]
+name = "iced-layout-macro"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+iced-layout-core = { path = "../core" }
+iced-layout-xml = { path = "../xml" }
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "2", features = ["full"] }

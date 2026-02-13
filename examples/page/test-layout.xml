@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../schema/0.14.0.xsd">
+    <container id="test" width="50" height="20">
+        <text>hello 111 123213</text>
+    </container>
+</layout>

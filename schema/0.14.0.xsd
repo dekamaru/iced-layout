@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="LengthKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="fill"/>
+            <xs:enumeration value="shrink"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="LengthFunction">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="fill-portion\(.+\)"/>
+            <xs:pattern value="fixed\(.+\)"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Length">
+        <xs:union memberTypes="xs:float LengthKeyword LengthFunction"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="HorizontalKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Horizontal">
+        <xs:union memberTypes="HorizontalKeyword"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="VerticalKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="top"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="bottom"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Vertical">
+        <xs:union memberTypes="VerticalKeyword"/>
+    </xs:simpleType>
+
+    <xs:element name="container">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="1">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+            </xs:choice>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="padding-top" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-right" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-left" type="xs:float" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="max_width" type="xs:float" use="optional"/>
+            <xs:attribute name="max_height" type="xs:float" use="optional"/>
+            <xs:attribute name="center_x" type="Length" use="optional"/>
+            <xs:attribute name="center_y" type="Length" use="optional"/>
+            <xs:attribute name="center" type="Length" use="optional"/>
+            <xs:attribute name="align_left" type="Length" use="optional"/>
+            <xs:attribute name="align_right" type="Length" use="optional"/>
+            <xs:attribute name="align_top" type="Length" use="optional"/>
+            <xs:attribute name="align_bottom" type="Length" use="optional"/>
+            <xs:attribute name="align_x" type="Horizontal" use="optional"/>
+            <xs:attribute name="align_y" type="Vertical" use="optional"/>
+            <xs:attribute name="clip" type="xs:boolean" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="text">
+        <xs:complexType mixed="true">
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="color" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="layout">
+        <xs:complexType>
+            <xs:choice>
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

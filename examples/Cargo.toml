@@ -1,0 +1,14 @@
+[workspace]
+
+[package]
+name = "iced-layout-examples"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "demo"
+path = "src/demo.rs"
+
+[dependencies]
+iced-layout = { path = "..", features = ["hot-reload"] }
+iced = "0.14"

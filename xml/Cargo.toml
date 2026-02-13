@@ -1,0 +1,8 @@
+[package]
+name = "iced-layout-xml"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+iced-layout-core = { path = "../core" }
+quick-xml = "0.37"
