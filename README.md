@@ -4,6 +4,7 @@
 - [ ] Checkbox "checked" in styles
 - [ ] Macro optimize styles compilation (reuse compiled styles with .clone())
 - [ ] Support fonts
+- [ ] Support "icon" attributes
 - [x] State access
 - [x] Callbacks (buttons)
 - [ ] render-if condition
@@ -16,7 +17,7 @@
 - [x] Checkbox (widget/src/checkbox.rs)
 - [x] Column (widget/src/column.rs)
 - [ ] ComboBox (widget/src/combo_box.rs)
-- [ ] Container (widget/src/container.rs)
+- [x] Container (widget/src/container.rs)
 - [ ] Float (widget/src/float.rs)
 - [ ] Grid (widget/src/grid.rs)
 - [ ] MouseArea (widget/src/mouse_area.rs)
