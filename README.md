@@ -1,6 +1,9 @@
 # iced-layout
 
-# Roadmap
+# TODO
+- [ ] Checkbox "checked" in styles
+- [ ] Macro optimize styles compilation (reuse compiled styles with .clone())
+- [ ] Support fonts
 - [x] State access
 - [x] Callbacks (buttons)
 - [ ] render-if condition
