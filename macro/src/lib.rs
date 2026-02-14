@@ -6,7 +6,8 @@ use std::path::PathBuf;
 
 use iced_layout_core::{
     BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, Color, ContainerStyle, Horizontal,
-    Length, LineHeight, Node, Padding, Shaping, TextAlignment, TextStyle, Vertical, Wrapping,
+    Length, LineHeight, Node, Padding, Shaping, TextAlignment, TextInputStyle, TextInputStyleFields,
+    TextStyle, Vertical, Wrapping,
 };
 use quote::quote;
 use syn::{LitStr, parse_macro_input};
@@ -224,6 +225,7 @@ struct StyleMaps<'a> {
     text: HashMap<&'a str, &'a TextStyle>,
     button: HashMap<&'a str, &'a ButtonStyle>,
     checkbox: HashMap<&'a str, &'a CheckboxStyle>,
+    text_input: HashMap<&'a str, &'a TextInputStyle>,
 }
 
 fn generate_checkbox_style_closure(s: &CheckboxStyle) -> proc_macro2::TokenStream {
@@ -352,6 +354,105 @@ fn generate_button_style_closure(bs: &ButtonStyle) -> proc_macro2::TokenStream {
         opt.as_ref().map(|fields| {
             let merged = merge_button_fields(&bs.base, fields);
             let style = generate_button_fields_tokens(&merged);
+            quote! { #status_token => #style }
+        })
+    })
+    .collect();
+
+    if status_overrides.is_empty() {
+        quote! {
+            |_theme, _status| #base_style
+        }
+    } else {
+        quote! {
+            |_theme, status| match status {
+                #(#status_overrides,)*
+                _ => #base_style
+            }
+        }
+    }
+}
+
+fn generate_text_input_fields_tokens(fields: &TextInputStyleFields) -> proc_macro2::TokenStream {
+    let background = match &fields.background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
+    };
+
+    let border_color = match &fields.border_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color::TRANSPARENT },
+    };
+    let border_width = fields.border_width.unwrap_or(0.0);
+    let border_radius = generate_border_radius(&fields.border_radius);
+
+    let icon_color = match &fields.icon_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color::BLACK },
+    };
+    let placeholder_color = match &fields.placeholder_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color { r: 0.4, g: 0.4, b: 0.4, a: 1.0 } },
+    };
+    let value_color = match &fields.value_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color::BLACK },
+    };
+    let selection_color = match &fields.selection_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color { r: 0.0, g: 0.0, b: 1.0, a: 0.3 } },
+    };
+
+    quote! {
+        iced::widget::text_input::Style {
+            background: #background,
+            border: iced::Border {
+                color: #border_color,
+                width: #border_width,
+                radius: #border_radius,
+            },
+            icon: #icon_color,
+            placeholder: #placeholder_color,
+            value: #value_color,
+            selection: #selection_color,
+        }
+    }
+}
+
+fn merge_text_input_fields(base: &TextInputStyleFields, overlay: &TextInputStyleFields) -> TextInputStyleFields {
+    TextInputStyleFields {
+        background_color: overlay.background_color.or(base.background_color),
+        border_color: overlay.border_color.or(base.border_color),
+        border_width: overlay.border_width.or(base.border_width),
+        border_radius: BorderRadius {
+            top_left: overlay.border_radius.top_left.or(base.border_radius.top_left),
+            top_right: overlay.border_radius.top_right.or(base.border_radius.top_right),
+            bottom_right: overlay.border_radius.bottom_right.or(base.border_radius.bottom_right),
+            bottom_left: overlay.border_radius.bottom_left.or(base.border_radius.bottom_left),
+        },
+        icon_color: overlay.icon_color.or(base.icon_color),
+        placeholder_color: overlay.placeholder_color.or(base.placeholder_color),
+        value_color: overlay.value_color.or(base.value_color),
+        selection_color: overlay.selection_color.or(base.selection_color),
+    }
+}
+
+fn generate_text_input_style_closure(tis: &TextInputStyle) -> proc_macro2::TokenStream {
+    let base_style = generate_text_input_fields_tokens(&tis.base);
+
+    let status_overrides: Vec<_> = [
+        (&tis.active, quote! { iced::widget::text_input::Status::Active }),
+        (&tis.hovered, quote! { iced::widget::text_input::Status::Hovered }),
+        (&tis.disabled, quote! { iced::widget::text_input::Status::Disabled }),
+    ]
+    .into_iter()
+    .filter_map(|(opt, status_token)| {
+        opt.as_ref().map(|fields| {
+            let merged = merge_text_input_fields(&tis.base, fields);
+            let style = generate_text_input_fields_tokens(&merged);
             quote! { #status_token => #style }
         })
     })
@@ -565,6 +666,84 @@ fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             }
             expr
         }
+        Node::TextInput {
+            placeholder, value, id, secure, on_input,
+            on_submit, on_submit_maybe, on_paste,
+            width, padding, size, line_height, align_x, style,
+        } => {
+            let value_field: syn::Expr = syn::parse_str(&format!("&self.{}", value))
+                .unwrap_or_else(|e| panic!("invalid value field path \"{}\": {}", value, e));
+            let mut expr = quote! { iced::widget::text_input(#placeholder, #value_field) };
+            if let Some(id_val) = id {
+                expr = quote! { #expr.id(#id_val) };
+            }
+            if let Some(s) = secure {
+                expr = quote! { #expr.secure(#s) };
+            }
+            if let Some(val) = on_input {
+                if val.contains("::") {
+                    let msg: syn::Expr = syn::parse_str(val)
+                        .unwrap_or_else(|e| panic!("invalid on-input expression \"{}\": {}", val, e));
+                    expr = quote! { #expr.on_input(#msg) };
+                } else {
+                    let method: syn::Ident = syn::parse_str(val)
+                        .unwrap_or_else(|e| panic!("invalid on-input method name \"{}\": {}", val, e));
+                    expr = quote! { #expr.on_input(|s| self.#method(s)) };
+                }
+            }
+            if let Some(val) = on_submit {
+                if val.contains("::") {
+                    let msg: syn::Expr = syn::parse_str(val)
+                        .unwrap_or_else(|e| panic!("invalid on-submit expression \"{}\": {}", val, e));
+                    expr = quote! { #expr.on_submit(#msg) };
+                } else {
+                    let method: syn::Ident = syn::parse_str(val)
+                        .unwrap_or_else(|e| panic!("invalid on-submit method name \"{}\": {}", val, e));
+                    expr = quote! { #expr.on_submit(self.#method()) };
+                }
+            }
+            if let Some(val) = on_submit_maybe {
+                let method: syn::Ident = syn::parse_str(val)
+                    .unwrap_or_else(|e| panic!("invalid on-submit-maybe method name \"{}\": {}", val, e));
+                expr = quote! { #expr.on_submit_maybe(self.#method()) };
+            }
+            if let Some(val) = on_paste {
+                if val.contains("::") {
+                    let msg: syn::Expr = syn::parse_str(val)
+                        .unwrap_or_else(|e| panic!("invalid on-paste expression \"{}\": {}", val, e));
+                    expr = quote! { #expr.on_paste(#msg) };
+                } else {
+                    let method: syn::Ident = syn::parse_str(val)
+                        .unwrap_or_else(|e| panic!("invalid on-paste method name \"{}\": {}", val, e));
+                    expr = quote! { #expr.on_paste(|s| self.#method(s)) };
+                }
+            }
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(padding_expr) = generate_padding(padding) {
+                expr = quote! { #expr.padding(#padding_expr) };
+            }
+            if let Some(s) = size {
+                expr = quote! { #expr.size(#s) };
+            }
+            if let Some(lh) = line_height {
+                let lh = generate_line_height(lh);
+                expr = quote! { #expr.line_height(#lh) };
+            }
+            if let Some(h) = align_x {
+                let h = generate_horizontal(h);
+                expr = quote! { #expr.align_x(#h) };
+            }
+            if let Some(style_name) = style {
+                let tis = styles.text_input.get(style_name.as_str())
+                    .unwrap_or_else(|| panic!("unknown text-input style: \"{}\"", style_name));
+                let style_closure = generate_text_input_style_closure(tis);
+                expr = quote! { #expr.style(#style_closure) };
+            }
+            expr
+        }
         Node::Checkbox {
             label, is_checked, on_toggle, on_toggle_maybe,
             size, width, spacing, text_size, text_line_height,
@@ -658,6 +837,7 @@ pub fn layout(input: TokenStream) -> TokenStream {
         text: layout.text_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         button: layout.button_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         checkbox: layout.checkbox_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        text_input: layout.text_input_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
     };
 
     let tokens = generate(&layout.root, &style_maps);

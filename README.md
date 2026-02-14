@@ -38,7 +38,7 @@ Rendering XML layouts in iced.rs!
 - [x] Stack (widget/src/stack.rs)
 - [x] Text (core/src/widget/text.rs — type alias)
 - [ ] TextEditor (widget/src/text_editor.rs)
-- [ ] TextInput (widget/src/text_input.rs)
+- [x] TextInput (widget/src/text_input.rs)
 - [ ] Themer (widget/src/themer.rs)
 - [ ] Toggler (widget/src/toggler.rs)
 - [ ] Tooltip (widget/src/tooltip.rs)

@@ -137,11 +137,32 @@ pub struct CheckboxStyle {
     pub text_color: Option<Color>,
 }
 
+#[derive(Default)]
+pub struct TextInputStyleFields {
+    pub background_color: Option<Color>,
+    pub border_color: Option<Color>,
+    pub border_width: Option<f32>,
+    pub border_radius: BorderRadius,
+    pub icon_color: Option<Color>,
+    pub placeholder_color: Option<Color>,
+    pub value_color: Option<Color>,
+    pub selection_color: Option<Color>,
+}
+
+#[derive(Default)]
+pub struct TextInputStyle {
+    pub base: TextInputStyleFields,
+    pub active: Option<TextInputStyleFields>,
+    pub hovered: Option<TextInputStyleFields>,
+    pub disabled: Option<TextInputStyleFields>,
+}
+
 pub struct Layout {
     pub container_styles: Vec<(String, ContainerStyle)>,
     pub text_styles: Vec<(String, TextStyle)>,
     pub button_styles: Vec<(String, ButtonStyle)>,
     pub checkbox_styles: Vec<(String, CheckboxStyle)>,
+    pub text_input_styles: Vec<(String, TextInputStyle)>,
     pub root: Node,
 }
 
@@ -196,6 +217,22 @@ pub enum Node {
     Space {
         width: Option<Length>,
         height: Option<Length>,
+    },
+    TextInput {
+        placeholder: String,
+        value: String,
+        id: Option<String>,
+        secure: Option<bool>,
+        on_input: Option<String>,
+        on_submit: Option<String>,
+        on_submit_maybe: Option<String>,
+        on_paste: Option<String>,
+        width: Option<Length>,
+        padding: Padding,
+        size: Option<f32>,
+        line_height: Option<LineHeight>,
+        align_x: Option<Horizontal>,
+        style: Option<String>,
     },
     Checkbox {
         label: String,
