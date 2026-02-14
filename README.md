@@ -2,14 +2,15 @@
 
 # Roadmap
 - [x] State access
-- [ ] Callbacks (buttons)
+- [x] Callbacks (buttons)
 - [ ] render-if condition
 - [ ] Loops
-- [ ] Styling
+- [x] Styling
+  - [ ] Background gradient
 - [ ] Custom defined widgets
-- [ ] Button (widget/src/button.rs)
+- [x] Button (widget/src/button.rs)
 - [ ] Checkbox (widget/src/checkbox.rs)
-- [ ] Column (widget/src/column.rs)
+- [x] Column (widget/src/column.rs)
 - [ ] ComboBox (widget/src/combo_box.rs)
 - [ ] Container (widget/src/container.rs)
 - [ ] Float (widget/src/float.rs)
@@ -21,7 +22,7 @@
 - [ ] ProgressBar (widget/src/progress_bar.rs)
 - [ ] Radio (widget/src/radio.rs)
 - [ ] Responsive (widget/src/responsive.rs)
-- [ ] Row (widget/src/row.rs)
+- [x] Row (widget/src/row.rs)
 - [ ] Rule (widget/src/rule.rs)
 - [ ] Scrollable (widget/src/scrollable.rs)
 - [ ] Sensor (widget/src/sensor.rs)

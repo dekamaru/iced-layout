@@ -1,9 +1,10 @@
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
+use std::collections::HashMap;
 use std::path::PathBuf;
 
-use iced_layout_core::{Color, Length, Node, Padding};
+use iced_layout_core::{BorderRadius, ButtonStyle, ButtonStyleFields, Color, ContainerStyle, Horizontal, Length, Node, Padding, TextStyle, Vertical};
 use quote::quote;
 use syn::{LitStr, parse_macro_input};
 
@@ -104,9 +105,194 @@ fn generate_text_arg(content: &str) -> proc_macro2::TokenStream {
     quote! { format!(#fmt_str, #(#args),*) }
 }
 
-fn generate(node: &Node) -> proc_macro2::TokenStream {
+fn generate_horizontal(h: &Horizontal) -> proc_macro2::TokenStream {
+    match h {
+        Horizontal::Left => quote! { iced::alignment::Horizontal::Left },
+        Horizontal::Center => quote! { iced::alignment::Horizontal::Center },
+        Horizontal::Right => quote! { iced::alignment::Horizontal::Right },
+    }
+}
+
+fn generate_vertical(v: &Vertical) -> proc_macro2::TokenStream {
+    match v {
+        Vertical::Top => quote! { iced::alignment::Vertical::Top },
+        Vertical::Center => quote! { iced::alignment::Vertical::Center },
+        Vertical::Bottom => quote! { iced::alignment::Vertical::Bottom },
+    }
+}
+
+fn generate_container_style(s: &ContainerStyle) -> proc_macro2::TokenStream {
+    let text_color = match &s.text_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { Some(#c) }
+        }
+        None => quote! { None },
+    };
+
+    let background = match &s.background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { Some(iced::Background::Color(#c)) }
+        }
+        None => quote! { None },
+    };
+
+    let border_color = match &s.border_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color::TRANSPARENT },
+    };
+    let border_width = s.border_width.unwrap_or(0.0);
+    let border_radius = generate_border_radius(&s.border_radius);
+
+    let shadow_color = match &s.shadow_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color::TRANSPARENT },
+    };
+    let shadow_ox = s.shadow_offset_x.unwrap_or(0.0);
+    let shadow_oy = s.shadow_offset_y.unwrap_or(0.0);
+    let shadow_blur = s.shadow_blur_radius.unwrap_or(0.0);
+
+    let snap = s.snap.unwrap_or(false);
+
+    quote! {
+        |_theme| iced::widget::container::Style {
+            text_color: #text_color,
+            background: #background,
+            border: iced::Border {
+                color: #border_color,
+                width: #border_width,
+                radius: #border_radius,
+            },
+            shadow: iced::Shadow {
+                color: #shadow_color,
+                offset: iced::Vector::new(#shadow_ox, #shadow_oy),
+                blur_radius: #shadow_blur,
+            },
+            snap: #snap,
+        }
+    }
+}
+
+fn generate_border_radius(br: &BorderRadius) -> proc_macro2::TokenStream {
+    let tl = br.top_left.unwrap_or(0.0);
+    let tr = br.top_right.unwrap_or(0.0);
+    let brr = br.bottom_right.unwrap_or(0.0);
+    let bl = br.bottom_left.unwrap_or(0.0);
+    quote! { iced::border::Radius { top_left: #tl, top_right: #tr, bottom_right: #brr, bottom_left: #bl } }
+}
+
+struct StyleMaps<'a> {
+    container: HashMap<&'a str, &'a ContainerStyle>,
+    text: HashMap<&'a str, &'a TextStyle>,
+    button: HashMap<&'a str, &'a ButtonStyle>,
+}
+
+fn generate_button_fields_tokens(fields: &ButtonStyleFields) -> proc_macro2::TokenStream {
+    let background = match &fields.background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { Some(iced::Background::Color(#c)) }
+        }
+        None => quote! { None },
+    };
+
+    let text_color = match &fields.text_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color::BLACK },
+    };
+
+    let border_color = match &fields.border_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color::TRANSPARENT },
+    };
+    let border_width = fields.border_width.unwrap_or(0.0);
+    let border_radius = generate_border_radius(&fields.border_radius);
+
+    let shadow_color = match &fields.shadow_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color::TRANSPARENT },
+    };
+    let shadow_ox = fields.shadow_offset_x.unwrap_or(0.0);
+    let shadow_oy = fields.shadow_offset_y.unwrap_or(0.0);
+    let shadow_blur = fields.shadow_blur_radius.unwrap_or(0.0);
+    let snap = fields.snap.unwrap_or(false);
+
+    quote! {
+        iced::widget::button::Style {
+            background: #background,
+            text_color: #text_color,
+            border: iced::Border {
+                color: #border_color,
+                width: #border_width,
+                radius: #border_radius,
+            },
+            shadow: iced::Shadow {
+                color: #shadow_color,
+                offset: iced::Vector::new(#shadow_ox, #shadow_oy),
+                blur_radius: #shadow_blur,
+            },
+            snap: #snap,
+        }
+    }
+}
+
+fn merge_button_fields(base: &ButtonStyleFields, overlay: &ButtonStyleFields) -> ButtonStyleFields {
+    ButtonStyleFields {
+        text_color: overlay.text_color.or(base.text_color),
+        background_color: overlay.background_color.or(base.background_color),
+        border_color: overlay.border_color.or(base.border_color),
+        border_width: overlay.border_width.or(base.border_width),
+        border_radius: BorderRadius {
+            top_left: overlay.border_radius.top_left.or(base.border_radius.top_left),
+            top_right: overlay.border_radius.top_right.or(base.border_radius.top_right),
+            bottom_right: overlay.border_radius.bottom_right.or(base.border_radius.bottom_right),
+            bottom_left: overlay.border_radius.bottom_left.or(base.border_radius.bottom_left),
+        },
+        shadow_color: overlay.shadow_color.or(base.shadow_color),
+        shadow_offset_x: overlay.shadow_offset_x.or(base.shadow_offset_x),
+        shadow_offset_y: overlay.shadow_offset_y.or(base.shadow_offset_y),
+        shadow_blur_radius: overlay.shadow_blur_radius.or(base.shadow_blur_radius),
+        snap: overlay.snap.or(base.snap),
+    }
+}
+
+fn generate_button_style_closure(bs: &ButtonStyle) -> proc_macro2::TokenStream {
+    let base_style = generate_button_fields_tokens(&bs.base);
+
+    let status_overrides: Vec<_> = [
+        (&bs.active, quote! { iced::widget::button::Status::Active }),
+        (&bs.hovered, quote! { iced::widget::button::Status::Hovered }),
+        (&bs.pressed, quote! { iced::widget::button::Status::Pressed }),
+        (&bs.disabled, quote! { iced::widget::button::Status::Disabled }),
+    ]
+    .into_iter()
+    .filter_map(|(opt, status_token)| {
+        opt.as_ref().map(|fields| {
+            let merged = merge_button_fields(&bs.base, fields);
+            let style = generate_button_fields_tokens(&merged);
+            quote! { #status_token => #style }
+        })
+    })
+    .collect();
+
+    if status_overrides.is_empty() {
+        quote! {
+            |_theme, _status| #base_style
+        }
+    } else {
+        quote! {
+            |_theme, status| match status {
+                #(#status_overrides,)*
+                _ => #base_style
+            }
+        }
+    }
+}
+
+fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
     match node {
-        Node::Text { content, attrs } => {
+        Node::Text { content, style, attrs } => {
             let text_arg = generate_text_arg(content);
             let mut expr = quote! { iced::widget::text(#text_arg) };
             if let Some(size) = attrs.size {
@@ -120,15 +306,21 @@ fn generate(node: &Node) -> proc_macro2::TokenStream {
                 let h = generate_length(h);
                 expr = quote! { #expr.height(#h) };
             }
-            if let Some(ref c) = attrs.color {
+            // Inline color wins over style color
+            let effective_color = attrs.color.as_ref().or_else(|| {
+                style.as_ref().and_then(|name| {
+                    styles.text.get(name.as_str()).and_then(|ts| ts.color.as_ref())
+                })
+            });
+            if let Some(c) = effective_color {
                 let c = generate_color(c);
                 expr = quote! { #expr.color(#c) };
             }
             expr
         }
-        Node::Container { id, padding, children } => {
+        Node::Container { id, style, padding, children } => {
             assert_eq!(children.len(), 1, "<container> must have exactly 1 child element, found {}", children.len());
-            let child = generate(&children[0]);
+            let child = generate(&children[0], styles);
             let mut expr = quote! { iced::widget::container(#child) };
 
             if let Some(padding_expr) = generate_padding(padding) {
@@ -136,6 +328,119 @@ fn generate(node: &Node) -> proc_macro2::TokenStream {
             }
             if let Some(id_val) = id {
                 expr = quote! { #expr.id(#id_val) };
+            }
+            if let Some(style_name) = style {
+                let cs = styles.container.get(style_name.as_str())
+                    .unwrap_or_else(|| panic!("unknown container style: \"{}\"", style_name));
+                let style_closure = generate_container_style(cs);
+                expr = quote! { #expr.style(#style_closure) };
+            }
+            expr
+        }
+        Node::Row { spacing, padding, width, height, align_y, clip, children } => {
+            let child_tokens: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
+            let mut expr = quote! { iced::widget::row![#(#child_tokens),*] };
+            if let Some(s) = spacing {
+                expr = quote! { #expr.spacing(#s) };
+            }
+            if let Some(padding_expr) = generate_padding(padding) {
+                expr = quote! { #expr.padding(#padding_expr) };
+            }
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(h) = height {
+                let h = generate_length(h);
+                expr = quote! { #expr.height(#h) };
+            }
+            if let Some(v) = align_y {
+                let v = generate_vertical(v);
+                expr = quote! { #expr.align_y(#v) };
+            }
+            if let Some(c) = clip {
+                expr = quote! { #expr.clip(#c) };
+            }
+            expr
+        }
+        Node::Column { spacing, padding, width, height, max_width, align_x, clip, children } => {
+            let child_tokens: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
+            let mut expr = quote! { iced::widget::column![#(#child_tokens),*] };
+            if let Some(s) = spacing {
+                expr = quote! { #expr.spacing(#s) };
+            }
+            if let Some(padding_expr) = generate_padding(padding) {
+                expr = quote! { #expr.padding(#padding_expr) };
+            }
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(h) = height {
+                let h = generate_length(h);
+                expr = quote! { #expr.height(#h) };
+            }
+            if let Some(mw) = max_width {
+                expr = quote! { #expr.max_width(#mw) };
+            }
+            if let Some(h) = align_x {
+                let h = generate_horizontal(h);
+                expr = quote! { #expr.align_x(#h) };
+            }
+            if let Some(c) = clip {
+                expr = quote! { #expr.clip(#c) };
+            }
+            expr
+        }
+        Node::Button { style, padding, width, height, clip, on_press, on_press_with, on_press_maybe, children } => {
+            assert!(children.len() <= 1, "<button> must have at most 1 child element, found {}", children.len());
+            let child = if children.is_empty() {
+                quote! { iced::widget::text("") }
+            } else {
+                generate(&children[0], styles)
+            };
+            let mut expr = quote! { iced::widget::button(#child) };
+
+            if let Some(padding_expr) = generate_padding(padding) {
+                expr = quote! { #expr.padding(#padding_expr) };
+            }
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(h) = height {
+                let h = generate_length(h);
+                expr = quote! { #expr.height(#h) };
+            }
+            if let Some(c) = clip {
+                expr = quote! { #expr.clip(#c) };
+            }
+            if let Some(style_name) = style {
+                let bs = styles.button.get(style_name.as_str())
+                    .unwrap_or_else(|| panic!("unknown button style: \"{}\"", style_name));
+                let style_closure = generate_button_style_closure(bs);
+                expr = quote! { #expr.style(#style_closure) };
+            }
+            if let Some(val) = on_press {
+                if val.contains("::") {
+                    let msg: syn::Expr = syn::parse_str(val)
+                        .unwrap_or_else(|e| panic!("invalid on-press expression \"{}\": {}", val, e));
+                    expr = quote! { #expr.on_press(#msg) };
+                } else {
+                    let method: syn::Ident = syn::parse_str(val)
+                        .unwrap_or_else(|e| panic!("invalid on-press method name \"{}\": {}", val, e));
+                    expr = quote! { #expr.on_press(self.#method()) };
+                }
+            }
+            if let Some(val) = on_press_with {
+                let method: syn::Ident = syn::parse_str(val)
+                    .unwrap_or_else(|e| panic!("invalid on-press-with method name \"{}\": {}", val, e));
+                expr = quote! { #expr.on_press_with(|| self.#method()) };
+            }
+            if let Some(val) = on_press_maybe {
+                let method: syn::Ident = syn::parse_str(val)
+                    .unwrap_or_else(|e| panic!("invalid on-press-maybe method name \"{}\": {}", val, e));
+                expr = quote! { #expr.on_press_maybe(self.#method()) };
             }
             expr
         }
@@ -164,8 +469,15 @@ pub fn layout(input: TokenStream) -> TokenStream {
         panic!("failed to read {}: {}", file_path.display(), e)
     });
 
-    let root = iced_layout_xml::parse(&xml);
-    let tokens = generate(&root);
+    let layout = iced_layout_xml::parse(&xml);
+
+    let style_maps = StyleMaps {
+        container: layout.container_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        text: layout.text_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        button: layout.button_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+    };
+
+    let tokens = generate(&layout.root, &style_maps);
 
     let expanded = quote! { #tokens.into() };
     expanded.into()
