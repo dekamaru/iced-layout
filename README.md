@@ -1,5 +1,7 @@
 # iced-layout
 
+Rendering XML layouts in iced.rs!
+
 # TODO
 - [ ] Checkbox "checked" in styles
 - [ ] Macro optimize styles compilation (reuse compiled styles with .clone())
@@ -32,7 +34,7 @@
 - [ ] Scrollable (widget/src/scrollable.rs)
 - [ ] Sensor (widget/src/sensor.rs)
 - [ ] Slider (widget/src/slider.rs)
-- [ ] Space (widget/src/space.rs)
+- [x] Space (widget/src/space.rs)
 - [x] Stack (widget/src/stack.rs)
 - [x] Text (core/src/widget/text.rs — type alias)
 - [ ] TextEditor (widget/src/text_editor.rs)

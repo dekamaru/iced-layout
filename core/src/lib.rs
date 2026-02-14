@@ -193,6 +193,10 @@ pub enum Node {
         clip: Option<bool>,
         children: Vec<Node>,
     },
+    Space {
+        width: Option<Length>,
+        height: Option<Length>,
+    },
     Checkbox {
         label: String,
         is_checked: String,

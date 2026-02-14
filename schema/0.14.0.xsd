@@ -101,6 +101,7 @@
                 <xs:element ref="button"/>
                 <xs:element ref="stack"/>
                 <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
             </xs:choice>
             <xs:attribute name="id" type="xs:string" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -147,6 +148,7 @@
                 <xs:element ref="button"/>
                 <xs:element ref="stack"/>
                 <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
             </xs:choice>
             <xs:attribute name="spacing" type="xs:float" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -170,6 +172,7 @@
                 <xs:element ref="button"/>
                 <xs:element ref="stack"/>
                 <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
             </xs:choice>
             <xs:attribute name="spacing" type="xs:float" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -194,6 +197,7 @@
                 <xs:element ref="button"/>
                 <xs:element ref="stack"/>
                 <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
             </xs:choice>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
@@ -219,6 +223,7 @@
                 <xs:element ref="button"/>
                 <xs:element ref="stack"/>
                 <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
             </xs:choice>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
@@ -238,6 +243,12 @@
             <xs:attribute name="text-shaping" type="Shaping" use="optional"/>
             <xs:attribute name="text-wrapping" type="Wrapping" use="optional"/>
             <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="space">
+        <xs:complexType>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="container-style">
@@ -390,6 +401,7 @@
                 <xs:element ref="button"/>
                 <xs:element ref="stack"/>
                 <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
             </xs:choice>
         </xs:complexType>
     </xs:element>

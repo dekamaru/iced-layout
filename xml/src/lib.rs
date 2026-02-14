@@ -667,6 +667,19 @@ fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                         children,
                     };
                 }
+                b"space" => {
+                    let width = parse_length_attr(&e, b"width");
+                    let height = parse_length_attr(&e, b"height");
+                    // consume closing </space> tag
+                    loop {
+                        match reader.read_event().expect("failed to read XML") {
+                            Event::End(end) if end.name().as_ref() == b"space" => break,
+                            Event::Text(_) | Event::Comment(_) => continue,
+                            other => panic!("expected </space>, found {:?}", other),
+                        }
+                    }
+                    return Node::Space { width, height };
+                }
                 b"checkbox" => {
                     let is_checked = parse_string_attr(&e, b"is-checked")
                         .expect("<checkbox> requires an 'is-checked' attribute");
@@ -721,6 +734,17 @@ fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     attrs: TextAttrs::default(),
                 }
             }
+            Event::Empty(e) => match e.name().as_ref() {
+                b"space" => {
+                    let width = parse_length_attr(&e, b"width");
+                    let height = parse_length_attr(&e, b"height");
+                    return Node::Space { width, height };
+                }
+                other => panic!(
+                    "unsupported self-closing tag: {}",
+                    String::from_utf8_lossy(other)
+                ),
+            },
             Event::Text(_) | Event::Comment(_) | Event::Decl(_) => continue,
             Event::Eof => panic!("unexpected end of XML"),
             _ => continue,

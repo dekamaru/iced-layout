@@ -553,6 +553,18 @@ fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             }
             expr
         }
+        Node::Space { width, height } => {
+            let mut expr = quote! { iced::widget::Space::new() };
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(h) = height {
+                let h = generate_length(h);
+                expr = quote! { #expr.height(#h) };
+            }
+            expr
+        }
         Node::Checkbox {
             label, is_checked, on_toggle, on_toggle_maybe,
             size, width, spacing, text_size, text_line_height,

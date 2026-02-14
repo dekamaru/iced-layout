@@ -15,6 +15,7 @@
                         <text width="fill">qweqwewqe</text>
                     </container>
                 </column>
+                <space width="20"/>
                 <column width="fill">
                     <row spacing="10">
                         <button on-press="Message::OnButtonClick">
