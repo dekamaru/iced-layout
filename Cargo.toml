@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "core", "xml", "macro", "hot-reload"]
+members = [".", "core", "xml", "macro"]
 exclude = ["examples"]
 
 [package]
@@ -7,11 +7,7 @@ name = "iced-layout"
 version = "0.1.0"
 edition = "2024"
 
-[features]
-hot-reload = ["dep:iced-layout-hot-reload"]
-
 [dependencies]
 iced-layout-core = { path = "core" }
 iced-layout-xml = { path = "xml" }
 iced-layout-macro = { path = "macro" }
-iced-layout-hot-reload = { path = "hot-reload", optional = true }

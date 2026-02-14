@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../schema/0.14.0.xsd">
     <container id="test" padding="10">
-        <text color="#ffaabb" size="32">Hello world!</text>
+        <text color="#ffaabb" size="32">${my_variable}</text>
     </container>
 </layout>

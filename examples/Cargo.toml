@@ -10,5 +10,5 @@ name = "demo"
 path = "src/demo.rs"
 
 [dependencies]
-iced-layout = { path = "..", features = ["hot-reload"] }
+iced-layout = { path = ".." }
 iced = "0.14"
