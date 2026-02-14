@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "iced-layout"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "iced-layout-core",
  "iced-layout-macro",
@@ -13,11 +13,11 @@ dependencies = [
 
 [[package]]
 name = "iced-layout-core"
-version = "0.1.0"
+version = "0.0.1"
 
 [[package]]
 name = "iced-layout-macro"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "iced-layout-core",
  "iced-layout-xml",
@@ -28,7 +28,7 @@ dependencies = [
 
 [[package]]
 name = "iced-layout-xml"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "iced-layout-core",
  "quick-xml",

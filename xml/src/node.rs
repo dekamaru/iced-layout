@@ -1,0 +1,178 @@
+use iced_layout_core::Node;
+use quick_xml::events::Event;
+use quick_xml::Reader;
+
+use crate::attr::*;
+
+fn parse_children(reader: &mut Reader<&[u8]>) -> Vec<Node> {
+    let mut children = Vec::new();
+    loop {
+        let child = parse_node(reader);
+        match child {
+            Node::Text { ref content, .. } if content.is_empty() => break,
+            _ => children.push(child),
+        }
+    }
+    children
+}
+
+pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
+    loop {
+        let (e, has_closing_tag) = match reader.read_event().expect("failed to read XML") {
+            Event::Start(e) => (e.into_owned(), true),
+            Event::Empty(e) => (e.into_owned(), false),
+            Event::End(_) => {
+                return Node::Text {
+                    content: String::new(),
+                    style: None,
+                    attrs: Default::default(),
+                }
+            }
+            Event::Text(_) | Event::Comment(_) | Event::Decl(_) => continue,
+            Event::Eof => panic!("unexpected end of XML"),
+            _ => continue,
+        };
+
+        let tag = e.name().as_ref().to_vec();
+        return match tag.as_slice() {
+            b"container" => {
+                let id = parse_string_attr(&e, b"id");
+                let style = parse_string_attr(&e, b"style");
+                let padding = parse_padding(&e);
+                let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
+                Node::Container { id, style, padding, children }
+            }
+            b"text" => {
+                let style = parse_string_attr(&e, b"style");
+                let attrs = parse_text_attrs(&e);
+                let mut content = String::new();
+                if has_closing_tag {
+                    loop {
+                        match reader.read_event().expect("failed to read XML") {
+                            Event::Text(e) => {
+                                content.push_str(
+                                    &e.unescape().expect("failed to unescape text"),
+                                );
+                            }
+                            Event::End(e) if e.name().as_ref() == b"text" => break,
+                            _ => {}
+                        }
+                    }
+                }
+                Node::Text { content, style, attrs }
+            }
+            b"row" => {
+                let spacing = parse_f32_attr(&e, b"spacing");
+                let padding = parse_padding(&e);
+                let width = parse_length_attr(&e, b"width");
+                let height = parse_length_attr(&e, b"height");
+                let align_y = parse_vertical_attr(&e, b"align-y");
+                let clip = parse_bool_attr(&e, b"clip");
+                let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
+                Node::Row { spacing, padding, width, height, align_y, clip, children }
+            }
+            b"column" => {
+                let spacing = parse_f32_attr(&e, b"spacing");
+                let padding = parse_padding(&e);
+                let width = parse_length_attr(&e, b"width");
+                let height = parse_length_attr(&e, b"height");
+                let max_width = parse_f32_attr(&e, b"max-width");
+                let align_x = parse_horizontal_attr(&e, b"align-x");
+                let clip = parse_bool_attr(&e, b"clip");
+                let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
+                Node::Column { spacing, padding, width, height, max_width, align_x, clip, children }
+            }
+            b"button" => {
+                let style = parse_string_attr(&e, b"style");
+                let padding = parse_padding(&e);
+                let width = parse_length_attr(&e, b"width");
+                let height = parse_length_attr(&e, b"height");
+                let clip = parse_bool_attr(&e, b"clip");
+                let on_press = parse_string_attr(&e, b"on-press");
+                let on_press_with = parse_string_attr(&e, b"on-press-with");
+                let on_press_maybe = parse_string_attr(&e, b"on-press-maybe");
+                let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
+                Node::Button { style, padding, width, height, clip, on_press, on_press_with, on_press_maybe, children }
+            }
+            b"stack" => {
+                let width = parse_length_attr(&e, b"width");
+                let height = parse_length_attr(&e, b"height");
+                let clip = parse_bool_attr(&e, b"clip");
+                let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
+                Node::Stack { width, height, clip, children }
+            }
+            b"space" => {
+                let width = parse_length_attr(&e, b"width");
+                let height = parse_length_attr(&e, b"height");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"space");
+                }
+                Node::Space { width, height }
+            }
+            b"text-input" => {
+                let placeholder = parse_string_attr(&e, b"placeholder")
+                    .expect("<text-input> requires a 'placeholder' attribute");
+                let value = parse_string_attr(&e, b"value")
+                    .expect("<text-input> requires a 'value' attribute");
+                let id = parse_string_attr(&e, b"id");
+                let secure = parse_bool_attr(&e, b"secure");
+                let on_input = parse_string_attr(&e, b"on-input");
+                let on_submit = parse_string_attr(&e, b"on-submit");
+                let on_submit_maybe = parse_string_attr(&e, b"on-submit-maybe");
+                let on_paste = parse_string_attr(&e, b"on-paste");
+                let width = parse_length_attr(&e, b"width");
+                let padding = parse_padding(&e);
+                let size = parse_f32_attr(&e, b"size");
+                let line_height = parse_line_height_attr(&e, b"line-height");
+                let align_x = parse_horizontal_attr(&e, b"align-x");
+                let style = parse_string_attr(&e, b"style");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"text-input");
+                }
+                Node::TextInput {
+                    placeholder, value, id, secure, on_input,
+                    on_submit, on_submit_maybe, on_paste,
+                    width, padding, size, line_height, align_x, style,
+                }
+            }
+            b"checkbox" => {
+                let is_checked = parse_string_attr(&e, b"is-checked")
+                    .expect("<checkbox> requires an 'is-checked' attribute");
+                let on_toggle = parse_string_attr(&e, b"on-toggle");
+                let on_toggle_maybe = parse_string_attr(&e, b"on-toggle-maybe");
+                let size = parse_f32_attr(&e, b"size");
+                let width = parse_length_attr(&e, b"width");
+                let spacing = parse_f32_attr(&e, b"spacing");
+                let text_size = parse_f32_attr(&e, b"text-size");
+                let text_line_height = parse_line_height_attr(&e, b"text-line-height");
+                let text_shaping = parse_shaping_attr(&e, b"text-shaping");
+                let text_wrapping = parse_wrapping_attr(&e, b"text-wrapping");
+                let style = parse_string_attr(&e, b"style");
+
+                let mut label = String::new();
+                if has_closing_tag {
+                    loop {
+                        match reader.read_event().expect("failed to read XML") {
+                            Event::Text(t) => {
+                                label.push_str(
+                                    &t.unescape().expect("failed to unescape text"),
+                                );
+                            }
+                            Event::End(end) if end.name().as_ref() == b"checkbox" => break,
+                            _ => {}
+                        }
+                    }
+                }
+                Node::Checkbox {
+                    label, is_checked, on_toggle, on_toggle_maybe,
+                    size, width, spacing, text_size, text_line_height,
+                    text_shaping, text_wrapping, style,
+                }
+            }
+            other => panic!(
+                "unsupported tag: {}",
+                String::from_utf8_lossy(other)
+            ),
+        };
+    }
+}
