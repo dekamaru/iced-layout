@@ -41,6 +41,56 @@
         <xs:union memberTypes="VerticalKeyword"/>
     </xs:simpleType>
 
+    <xs:simpleType name="LineHeightFunction">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="relative\(.+\)"/>
+            <xs:pattern value="absolute\(.+\)"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="LineHeight">
+        <xs:union memberTypes="LineHeightFunction"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="AlignmentKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="default"/>
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+            <xs:enumeration value="justified"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Alignment">
+        <xs:union memberTypes="AlignmentKeyword"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="ShapingKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto"/>
+            <xs:enumeration value="basic"/>
+            <xs:enumeration value="advanced"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Shaping">
+        <xs:union memberTypes="ShapingKeyword"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="WrappingKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="none"/>
+            <xs:enumeration value="word"/>
+            <xs:enumeration value="glyph"/>
+            <xs:enumeration value="word-or-glyph"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Wrapping">
+        <xs:union memberTypes="WrappingKeyword"/>
+    </xs:simpleType>
+
     <xs:element name="container">
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="1">
@@ -49,6 +99,8 @@
                 <xs:element ref="row"/>
                 <xs:element ref="column"/>
                 <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
             </xs:choice>
             <xs:attribute name="id" type="xs:string" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -76,8 +128,11 @@
     <xs:element name="text">
         <xs:complexType mixed="true">
             <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="line-height" type="LineHeight" use="optional"/>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="align-x" type="Alignment" use="optional"/>
+            <xs:attribute name="align-y" type="Vertical" use="optional"/>
             <xs:attribute name="style" type="xs:string" use="optional"/>
             <xs:attribute name="color" type="xs:string" use="optional"/>
         </xs:complexType>
@@ -90,6 +145,8 @@
                 <xs:element ref="row"/>
                 <xs:element ref="column"/>
                 <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
             </xs:choice>
             <xs:attribute name="spacing" type="xs:float" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -111,6 +168,8 @@
                 <xs:element ref="row"/>
                 <xs:element ref="column"/>
                 <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
             </xs:choice>
             <xs:attribute name="spacing" type="xs:float" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -133,6 +192,8 @@
                 <xs:element ref="row"/>
                 <xs:element ref="column"/>
                 <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
             </xs:choice>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
@@ -145,6 +206,37 @@
             <xs:attribute name="on-press-with" type="xs:string" use="optional"/>
             <xs:attribute name="on-press-maybe" type="xs:string" use="optional"/>
             <xs:attribute name="clip" type="xs:boolean" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="stack">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+            </xs:choice>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="clip" type="xs:boolean" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="checkbox">
+        <xs:complexType mixed="true">
+            <xs:attribute name="is-checked" type="xs:string" use="required"/>
+            <xs:attribute name="on-toggle" type="xs:string" use="optional"/>
+            <xs:attribute name="on-toggle-maybe" type="xs:string" use="optional"/>
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="spacing" type="xs:float" use="optional"/>
+            <xs:attribute name="text-size" type="xs:float" use="optional"/>
+            <xs:attribute name="text-line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="text-shaping" type="Shaping" use="optional"/>
+            <xs:attribute name="text-wrapping" type="Wrapping" use="optional"/>
             <xs:attribute name="style" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
@@ -272,6 +364,22 @@
             <xs:attribute name="snap" type="xs:boolean" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="checkbox-style">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="icon-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="text-color" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="root">
         <xs:complexType>
             <xs:choice>
@@ -280,6 +388,8 @@
                 <xs:element ref="row"/>
                 <xs:element ref="column"/>
                 <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
             </xs:choice>
         </xs:complexType>
     </xs:element>
@@ -289,6 +399,7 @@
                 <xs:element ref="container-style"/>
                 <xs:element ref="text-style"/>
                 <xs:element ref="button-style"/>
+                <xs:element ref="checkbox-style"/>
             </xs:choice>
         </xs:complexType>
     </xs:element>

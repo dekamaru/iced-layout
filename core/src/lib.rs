@@ -36,11 +36,44 @@ pub enum Vertical {
     Bottom,
 }
 
+#[derive(Clone, Copy)]
+pub enum LineHeight {
+    Relative(f32),
+    Absolute(f32),
+}
+
+#[derive(Clone, Copy)]
+pub enum TextAlignment {
+    Default,
+    Left,
+    Center,
+    Right,
+    Justified,
+}
+
+#[derive(Clone, Copy)]
+pub enum Shaping {
+    Auto,
+    Basic,
+    Advanced,
+}
+
+#[derive(Clone, Copy)]
+pub enum Wrapping {
+    None,
+    Word,
+    Glyph,
+    WordOrGlyph,
+}
+
 #[derive(Default)]
 pub struct TextAttrs {
     pub size: Option<f32>,
+    pub line_height: Option<LineHeight>,
     pub width: Option<Length>,
     pub height: Option<Length>,
+    pub align_x: Option<TextAlignment>,
+    pub align_y: Option<Vertical>,
     pub color: Option<Color>,
 }
 
@@ -94,10 +127,21 @@ pub struct ButtonStyle {
     pub disabled: Option<ButtonStyleFields>,
 }
 
+#[derive(Default)]
+pub struct CheckboxStyle {
+    pub background_color: Option<Color>,
+    pub icon_color: Option<Color>,
+    pub border_color: Option<Color>,
+    pub border_width: Option<f32>,
+    pub border_radius: BorderRadius,
+    pub text_color: Option<Color>,
+}
+
 pub struct Layout {
     pub container_styles: Vec<(String, ContainerStyle)>,
     pub text_styles: Vec<(String, TextStyle)>,
     pub button_styles: Vec<(String, ButtonStyle)>,
+    pub checkbox_styles: Vec<(String, CheckboxStyle)>,
     pub root: Node,
 }
 
@@ -142,5 +186,25 @@ pub enum Node {
         on_press_with: Option<String>,
         on_press_maybe: Option<String>,
         children: Vec<Node>,
+    },
+    Stack {
+        width: Option<Length>,
+        height: Option<Length>,
+        clip: Option<bool>,
+        children: Vec<Node>,
+    },
+    Checkbox {
+        label: String,
+        is_checked: String,
+        on_toggle: Option<String>,
+        on_toggle_maybe: Option<String>,
+        size: Option<f32>,
+        width: Option<Length>,
+        spacing: Option<f32>,
+        text_size: Option<f32>,
+        text_line_height: Option<LineHeight>,
+        text_shaping: Option<Shaping>,
+        text_wrapping: Option<Wrapping>,
+        style: Option<String>,
     },
 }

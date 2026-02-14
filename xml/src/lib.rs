@@ -1,6 +1,7 @@
 use iced_layout_core::{
-    BorderRadius, ButtonStyle, ButtonStyleFields, Color, ContainerStyle, Horizontal, Layout,
-    Length, Node, Padding, TextAttrs, TextStyle, Vertical,
+    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, Color, ContainerStyle, Horizontal,
+    Layout, Length, LineHeight, Node, Padding, Shaping, TextAlignment, TextAttrs, TextStyle,
+    Vertical, Wrapping,
 };
 use quick_xml::events::BytesStart;
 use quick_xml::events::Event;
@@ -174,11 +175,64 @@ fn parse_padding(e: &BytesStart) -> Padding {
     }
 }
 
+fn parse_line_height_attr(e: &BytesStart, name: &[u8]) -> Option<LineHeight> {
+    parse_string_attr(e, name).map(|s| {
+        if s.starts_with("relative(") && s.ends_with(')') {
+            let inner = &s["relative(".len()..s.len() - 1];
+            let v: f32 = inner
+                .parse()
+                .unwrap_or_else(|e| panic!("invalid relative line-height value: {e}"));
+            LineHeight::Relative(v)
+        } else if s.starts_with("absolute(") && s.ends_with(')') {
+            let inner = &s["absolute(".len()..s.len() - 1];
+            let v: f32 = inner
+                .parse()
+                .unwrap_or_else(|e| panic!("invalid absolute line-height value: {e}"));
+            LineHeight::Absolute(v)
+        } else {
+            panic!("invalid line-height \"{s}\", expected relative(N) or absolute(N)")
+        }
+    })
+}
+
+fn parse_text_alignment_attr(e: &BytesStart, name: &[u8]) -> Option<TextAlignment> {
+    parse_string_attr(e, name).map(|s| match s.as_str() {
+        "default" => TextAlignment::Default,
+        "left" => TextAlignment::Left,
+        "center" => TextAlignment::Center,
+        "right" => TextAlignment::Right,
+        "justified" => TextAlignment::Justified,
+        _ => panic!("invalid text alignment: {}", s),
+    })
+}
+
+fn parse_shaping_attr(e: &BytesStart, name: &[u8]) -> Option<Shaping> {
+    parse_string_attr(e, name).map(|s| match s.as_str() {
+        "auto" => Shaping::Auto,
+        "basic" => Shaping::Basic,
+        "advanced" => Shaping::Advanced,
+        _ => panic!("invalid shaping: {}", s),
+    })
+}
+
+fn parse_wrapping_attr(e: &BytesStart, name: &[u8]) -> Option<Wrapping> {
+    parse_string_attr(e, name).map(|s| match s.as_str() {
+        "none" => Wrapping::None,
+        "word" => Wrapping::Word,
+        "glyph" => Wrapping::Glyph,
+        "word-or-glyph" => Wrapping::WordOrGlyph,
+        _ => panic!("invalid wrapping: {}", s),
+    })
+}
+
 fn parse_text_attrs(e: &BytesStart) -> TextAttrs {
     TextAttrs {
         size: parse_f32_attr(e, b"size"),
+        line_height: parse_line_height_attr(e, b"line-height"),
         width: parse_length_attr(e, b"width"),
         height: parse_length_attr(e, b"height"),
+        align_x: parse_text_alignment_attr(e, b"align-x"),
+        align_y: parse_vertical_attr(e, b"align-y"),
         color: parse_color_attr(e, b"color"),
     }
 }
@@ -294,10 +348,24 @@ fn parse_button_style(e: &BytesStart, reader: &mut Reader<&[u8]>) -> (String, Bu
     (id, style)
 }
 
+fn parse_checkbox_style(e: &BytesStart) -> (String, CheckboxStyle) {
+    let id = parse_string_attr(e, b"id").expect("<checkbox-style> requires an 'id' attribute");
+    let style = CheckboxStyle {
+        background_color: parse_color_attr(e, b"background-color"),
+        icon_color: parse_color_attr(e, b"icon-color"),
+        border_color: parse_color_attr(e, b"border-color"),
+        border_width: parse_f32_attr(e, b"border-width"),
+        border_radius: parse_border_radius(e),
+        text_color: parse_color_attr(e, b"text-color"),
+    };
+    (id, style)
+}
+
 struct ParsedStyles {
     container: Vec<(String, ContainerStyle)>,
     text: Vec<(String, TextStyle)>,
     button: Vec<(String, ButtonStyle)>,
+    checkbox: Vec<(String, CheckboxStyle)>,
 }
 
 fn consume_closing_tag(reader: &mut Reader<&[u8]>, tag: &[u8]) {
@@ -318,6 +386,7 @@ fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
     let mut container_styles = Vec::new();
     let mut text_styles = Vec::new();
     let mut button_styles = Vec::new();
+    let mut checkbox_styles = Vec::new();
 
     loop {
         match reader.read_event().expect("failed to read XML") {
@@ -333,8 +402,11 @@ fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                         consume_closing_tag(reader, &tag);
                     }
                     b"button-style" => {
-                        // parse_button_style consumes children + closing tag itself
                         button_styles.push(parse_button_style(&e, reader));
+                    }
+                    b"checkbox-style" => {
+                        checkbox_styles.push(parse_checkbox_style(&e));
+                        consume_closing_tag(reader, &tag);
                     }
                     other => panic!(
                         "unexpected element in <styles>: {}",
@@ -346,12 +418,12 @@ fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                 b"container-style" => container_styles.push(parse_container_style(&e)),
                 b"text-style" => text_styles.push(parse_text_style(&e)),
                 b"button-style" => {
-                    // Empty <button-style/> — base only, no status children
                     let id = parse_string_attr(&e, b"id")
                         .expect("<button-style> requires an 'id' attribute");
                     let base = parse_button_style_fields(&e);
                     button_styles.push((id, ButtonStyle { base, ..Default::default() }));
                 }
+                b"checkbox-style" => checkbox_styles.push(parse_checkbox_style(&e)),
                 other => panic!(
                     "unexpected element in <styles>: {}",
                     String::from_utf8_lossy(other)
@@ -367,6 +439,7 @@ fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
         container: container_styles,
         text: text_styles,
         button: button_styles,
+        checkbox: checkbox_styles,
     }
 }
 
@@ -385,6 +458,7 @@ pub fn parse(xml: &str) -> Layout {
         container: Vec::new(),
         text: Vec::new(),
         button: Vec::new(),
+        checkbox: Vec::new(),
     };
     let mut root = None;
 
@@ -411,7 +485,7 @@ pub fn parse(xml: &str) -> Layout {
                     String::from_utf8_lossy(other)
                 ),
             },
-            Event::Empty(e) if e.name().as_ref() == b"styles" => {
+            Event::Empty(_e) if _e.name().as_ref() == b"styles" => {
                 // empty <styles/> — no styles defined
             }
             Event::End(e) if e.name().as_ref() == b"layout" => break,
@@ -424,6 +498,7 @@ pub fn parse(xml: &str) -> Layout {
         container_styles: styles.container,
         text_styles: styles.text,
         button_styles: styles.button,
+        checkbox_styles: styles.checkbox,
         root: root.expect("<layout> must contain a <root> element"),
     }
 }
@@ -567,6 +642,71 @@ fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                         on_press_with,
                         on_press_maybe,
                         children,
+                    };
+                }
+                b"stack" => {
+                    let width = parse_length_attr(&e, b"width");
+                    let height = parse_length_attr(&e, b"height");
+                    let clip = parse_bool_attr(&e, b"clip");
+
+                    let mut children = Vec::new();
+                    loop {
+                        let child = parse_node(reader);
+                        match child {
+                            Node::Text {
+                                ref content,
+                                ..
+                            } if content.is_empty() => break,
+                            _ => children.push(child),
+                        }
+                    }
+                    return Node::Stack {
+                        width,
+                        height,
+                        clip,
+                        children,
+                    };
+                }
+                b"checkbox" => {
+                    let is_checked = parse_string_attr(&e, b"is-checked")
+                        .expect("<checkbox> requires an 'is-checked' attribute");
+                    let on_toggle = parse_string_attr(&e, b"on-toggle");
+                    let on_toggle_maybe = parse_string_attr(&e, b"on-toggle-maybe");
+                    let size = parse_f32_attr(&e, b"size");
+                    let width = parse_length_attr(&e, b"width");
+                    let spacing = parse_f32_attr(&e, b"spacing");
+                    let text_size = parse_f32_attr(&e, b"text-size");
+                    let text_line_height = parse_line_height_attr(&e, b"text-line-height");
+                    let text_shaping = parse_shaping_attr(&e, b"text-shaping");
+                    let text_wrapping = parse_wrapping_attr(&e, b"text-wrapping");
+                    let style = parse_string_attr(&e, b"style");
+
+                    // mixed content: read label text
+                    let mut label = String::new();
+                    loop {
+                        match reader.read_event().expect("failed to read XML") {
+                            Event::Text(t) => {
+                                label.push_str(
+                                    &t.unescape().expect("failed to unescape text"),
+                                );
+                            }
+                            Event::End(end) if end.name().as_ref() == b"checkbox" => break,
+                            _ => {}
+                        }
+                    }
+                    return Node::Checkbox {
+                        label,
+                        is_checked,
+                        on_toggle,
+                        on_toggle_maybe,
+                        size,
+                        width,
+                        spacing,
+                        text_size,
+                        text_line_height,
+                        text_shaping,
+                        text_wrapping,
+                        style,
                     };
                 }
                 other => panic!(

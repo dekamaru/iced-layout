@@ -5,11 +5,12 @@
 - [x] Callbacks (buttons)
 - [ ] render-if condition
 - [ ] Loops
+- [ ] Components
 - [x] Styling
   - [ ] Background gradient
 - [ ] Custom defined widgets
 - [x] Button (widget/src/button.rs)
-- [ ] Checkbox (widget/src/checkbox.rs)
+- [x] Checkbox (widget/src/checkbox.rs)
 - [x] Column (widget/src/column.rs)
 - [ ] ComboBox (widget/src/combo_box.rs)
 - [ ] Container (widget/src/container.rs)
@@ -28,7 +29,7 @@
 - [ ] Sensor (widget/src/sensor.rs)
 - [ ] Slider (widget/src/slider.rs)
 - [ ] Space (widget/src/space.rs)
-- [ ] Stack (widget/src/stack.rs)
+- [x] Stack (widget/src/stack.rs)
 - [x] Text (core/src/widget/text.rs — type alias)
 - [ ] TextEditor (widget/src/text_editor.rs)
 - [ ] TextInput (widget/src/text_input.rs)

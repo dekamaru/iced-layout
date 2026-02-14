@@ -4,7 +4,10 @@ use proc_macro::TokenStream;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use iced_layout_core::{BorderRadius, ButtonStyle, ButtonStyleFields, Color, ContainerStyle, Horizontal, Length, Node, Padding, TextStyle, Vertical};
+use iced_layout_core::{
+    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, Color, ContainerStyle, Horizontal,
+    Length, LineHeight, Node, Padding, Shaping, TextAlignment, TextStyle, Vertical, Wrapping,
+};
 use quote::quote;
 use syn::{LitStr, parse_macro_input};
 
@@ -121,6 +124,40 @@ fn generate_vertical(v: &Vertical) -> proc_macro2::TokenStream {
     }
 }
 
+fn generate_line_height(lh: &LineHeight) -> proc_macro2::TokenStream {
+    match lh {
+        LineHeight::Relative(v) => quote! { iced::widget::text::LineHeight::Relative(#v) },
+        LineHeight::Absolute(v) => quote! { iced::widget::text::LineHeight::Absolute(iced::Pixels(#v)) },
+    }
+}
+
+fn generate_text_alignment(a: &TextAlignment) -> proc_macro2::TokenStream {
+    match a {
+        TextAlignment::Default => quote! { iced::widget::text::Alignment::Default },
+        TextAlignment::Left => quote! { iced::widget::text::Alignment::Left },
+        TextAlignment::Center => quote! { iced::widget::text::Alignment::Center },
+        TextAlignment::Right => quote! { iced::widget::text::Alignment::Right },
+        TextAlignment::Justified => quote! { iced::widget::text::Alignment::Justified },
+    }
+}
+
+fn generate_shaping(s: &Shaping) -> proc_macro2::TokenStream {
+    match s {
+        Shaping::Auto => quote! { iced::widget::text::Shaping::Auto },
+        Shaping::Basic => quote! { iced::widget::text::Shaping::Basic },
+        Shaping::Advanced => quote! { iced::widget::text::Shaping::Advanced },
+    }
+}
+
+fn generate_wrapping(w: &Wrapping) -> proc_macro2::TokenStream {
+    match w {
+        Wrapping::None => quote! { iced::widget::text::Wrapping::None },
+        Wrapping::Word => quote! { iced::widget::text::Wrapping::Word },
+        Wrapping::Glyph => quote! { iced::widget::text::Wrapping::Glyph },
+        Wrapping::WordOrGlyph => quote! { iced::widget::text::Wrapping::WordOrGlyph },
+    }
+}
+
 fn generate_container_style(s: &ContainerStyle) -> proc_macro2::TokenStream {
     let text_color = match &s.text_color {
         Some(c) => {
@@ -186,6 +223,50 @@ struct StyleMaps<'a> {
     container: HashMap<&'a str, &'a ContainerStyle>,
     text: HashMap<&'a str, &'a TextStyle>,
     button: HashMap<&'a str, &'a ButtonStyle>,
+    checkbox: HashMap<&'a str, &'a CheckboxStyle>,
+}
+
+fn generate_checkbox_style_closure(s: &CheckboxStyle) -> proc_macro2::TokenStream {
+    let background = match &s.background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
+    };
+
+    let icon_color = match &s.icon_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color::BLACK },
+    };
+
+    let border_color = match &s.border_color {
+        Some(c) => generate_color(c),
+        None => quote! { iced::Color::TRANSPARENT },
+    };
+    let border_width = s.border_width.unwrap_or(0.0);
+    let border_radius = generate_border_radius(&s.border_radius);
+
+    let text_color = match &s.text_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { Some(#c) }
+        }
+        None => quote! { None },
+    };
+
+    quote! {
+        |_theme, _status| iced::widget::checkbox::Style {
+            background: #background,
+            icon_color: #icon_color,
+            border: iced::Border {
+                color: #border_color,
+                width: #border_width,
+                radius: #border_radius,
+            },
+            text_color: #text_color,
+        }
+    }
 }
 
 fn generate_button_fields_tokens(fields: &ButtonStyleFields) -> proc_macro2::TokenStream {
@@ -298,6 +379,10 @@ fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             if let Some(size) = attrs.size {
                 expr = quote! { #expr.size(#size) };
             }
+            if let Some(ref lh) = attrs.line_height {
+                let lh = generate_line_height(lh);
+                expr = quote! { #expr.line_height(#lh) };
+            }
             if let Some(ref w) = attrs.width {
                 let w = generate_length(w);
                 expr = quote! { #expr.width(#w) };
@@ -305,6 +390,14 @@ fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             if let Some(ref h) = attrs.height {
                 let h = generate_length(h);
                 expr = quote! { #expr.height(#h) };
+            }
+            if let Some(ref a) = attrs.align_x {
+                let a = generate_text_alignment(a);
+                expr = quote! { #expr.align_x(#a) };
+            }
+            if let Some(ref v) = attrs.align_y {
+                let v = generate_vertical(v);
+                expr = quote! { #expr.align_y(#v) };
             }
             // Inline color wins over style color
             let effective_color = attrs.color.as_ref().or_else(|| {
@@ -444,6 +537,83 @@ fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             }
             expr
         }
+        Node::Stack { width, height, clip, children } => {
+            let child_tokens: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
+            let mut expr = quote! { iced::widget::stack![#(#child_tokens),*] };
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(h) = height {
+                let h = generate_length(h);
+                expr = quote! { #expr.height(#h) };
+            }
+            if let Some(c) = clip {
+                expr = quote! { #expr.clip(#c) };
+            }
+            expr
+        }
+        Node::Checkbox {
+            label, is_checked, on_toggle, on_toggle_maybe,
+            size, width, spacing, text_size, text_line_height,
+            text_shaping, text_wrapping, style,
+        } => {
+            let is_checked_field: syn::Expr = syn::parse_str(&format!("self.{}", is_checked))
+                .unwrap_or_else(|e| panic!("invalid is-checked field path \"{}\": {}", is_checked, e));
+            let mut expr = quote! { iced::widget::checkbox(#is_checked_field) };
+            if !label.is_empty() {
+                let label_arg = generate_text_arg(label);
+                expr = quote! { #expr.label(#label_arg) };
+            }
+            if let Some(val) = on_toggle {
+                if val.contains("::") {
+                    let msg: syn::Expr = syn::parse_str(val)
+                        .unwrap_or_else(|e| panic!("invalid on-toggle expression \"{}\": {}", val, e));
+                    expr = quote! { #expr.on_toggle(#msg) };
+                } else {
+                    let method: syn::Ident = syn::parse_str(val)
+                        .unwrap_or_else(|e| panic!("invalid on-toggle method name \"{}\": {}", val, e));
+                    expr = quote! { #expr.on_toggle(|checked| self.#method(checked)) };
+                }
+            }
+            if let Some(val) = on_toggle_maybe {
+                let method: syn::Ident = syn::parse_str(val)
+                    .unwrap_or_else(|e| panic!("invalid on-toggle-maybe method name \"{}\": {}", val, e));
+                expr = quote! { #expr.on_toggle_maybe(self.#method()) };
+            }
+            if let Some(s) = size {
+                expr = quote! { #expr.size(#s) };
+            }
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(s) = spacing {
+                expr = quote! { #expr.spacing(#s) };
+            }
+            if let Some(ts) = text_size {
+                expr = quote! { #expr.text_size(#ts) };
+            }
+            if let Some(lh) = text_line_height {
+                let lh = generate_line_height(lh);
+                expr = quote! { #expr.text_line_height(#lh) };
+            }
+            if let Some(sh) = text_shaping {
+                let sh = generate_shaping(sh);
+                expr = quote! { #expr.text_shaping(#sh) };
+            }
+            if let Some(wr) = text_wrapping {
+                let wr = generate_wrapping(wr);
+                expr = quote! { #expr.text_wrapping(#wr) };
+            }
+            if let Some(style_name) = style {
+                let cs = styles.checkbox.get(style_name.as_str())
+                    .unwrap_or_else(|| panic!("unknown checkbox style: \"{}\"", style_name));
+                let style_closure = generate_checkbox_style_closure(cs);
+                expr = quote! { #expr.style(#style_closure) };
+            }
+            expr
+        }
     }
 }
 
@@ -475,6 +645,7 @@ pub fn layout(input: TokenStream) -> TokenStream {
         container: layout.container_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         text: layout.text_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         button: layout.button_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        checkbox: layout.checkbox_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
     };
 
     let tokens = generate(&layout.root, &style_maps);
