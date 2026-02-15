@@ -1,11 +1,11 @@
 # TODO
 - [ ] Checkbox "checked" in styles
-- [ ] Macro optimize styles compilation (reuse compiled styles with .clone())
+- [x] Macro optimize styles compilation (reuse compiled styles with .clone())
 - [ ] Support fonts
 - [ ] Support "icon" attributes
 - [x] State access
 - [x] Callbacks (buttons)
-- [ ] render-if condition
+- [x] If conditions
 - [ ] Loops
 - [ ] Components
 - [x] Styling

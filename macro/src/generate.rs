@@ -3,14 +3,27 @@ use quote::quote;
 
 use crate::StyleMaps;
 use crate::interpolation::generate_text_arg;
-use crate::style::{
-    generate_button_style_closure, generate_checkbox_style_closure,
-    generate_container_style, generate_text_input_style_closure,
-};
+use crate::style_var_name;
 use crate::types::{
     generate_horizontal, generate_length, generate_line_height, generate_padding,
     generate_shaping, generate_text_alignment, generate_vertical, generate_wrapping,
 };
+
+pub enum Generated {
+    Widget(proc_macro2::TokenStream),
+    Optional(proc_macro2::TokenStream),
+}
+
+impl Generated {
+    pub fn into_widget(self) -> proc_macro2::TokenStream {
+        match self {
+            Generated::Widget(ts) => ts,
+            Generated::Optional(_) => panic!(
+                "<if> without <false> branch cannot be used as a single child (e.g. inside <container> or <button>)"
+            ),
+        }
+    }
+}
 
 /// Describes how a method-name handler is called.
 enum HandlerStyle {
@@ -53,7 +66,48 @@ fn generate_event_handler(
     }
 }
 
-pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
+fn generate_condition(condition: &str) -> proc_macro2::TokenStream {
+    let stripped = condition.trim();
+    if let Some(inner) = stripped.strip_prefix('!') {
+        let inner = inner.trim();
+        let expr: syn::Expr = syn::parse_str(&format!("self.{}", inner))
+            .unwrap_or_else(|e| panic!("invalid condition \"{}\": {}", condition, e));
+        quote! { !#expr }
+    } else {
+        let expr: syn::Expr = syn::parse_str(&format!("self.{}", stripped))
+            .unwrap_or_else(|e| panic!("invalid condition \"{}\": {}", condition, e));
+        quote! { #expr }
+    }
+}
+
+/// Generates a block expression that builds a multi-child container using `let` rebinding.
+/// For `Generated::Widget` children, uses `.push()`.
+/// For `Generated::Optional` children, uses conditional push to avoid adding empty elements.
+fn generate_children_block(
+    constructor: proc_macro2::TokenStream,
+    children: &[Generated],
+) -> proc_macro2::TokenStream {
+    let mut stmts = vec![quote! { let __w = #constructor; }];
+    for child in children {
+        match child {
+            Generated::Widget(ts) => {
+                stmts.push(quote! { let __w = __w.push(#ts); });
+            }
+            Generated::Optional(ts) => {
+                stmts.push(quote! {
+                    let __w = { let __opt: Option<iced::Element<'_, _>> = #ts; if let Some(__child) = __opt { __w.push(__child) } else { __w } };
+                });
+            }
+        }
+    }
+    quote! { { #(#stmts)* __w } }
+}
+
+fn has_optional(children: &[Generated]) -> bool {
+    children.iter().any(|c| matches!(c, Generated::Optional(_)))
+}
+
+pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
     match node {
         Node::Text {
             content,
@@ -95,7 +149,7 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
                 let c = crate::types::generate_color(c);
                 expr = quote! { #expr.color(#c) };
             }
-            expr
+            Generated::Widget(expr)
         }
         Node::Container {
             id,
@@ -109,7 +163,7 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
                 "<container> must have exactly 1 child element, found {}",
                 children.len()
             );
-            let child = generate(&children[0], styles);
+            let child = generate(&children[0], styles).into_widget();
             let mut expr = quote! { iced::widget::container(#child) };
 
             if let Some(padding_expr) = generate_padding(padding) {
@@ -119,14 +173,15 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
                 expr = quote! { #expr.id(#id_val) };
             }
             if let Some(style_name) = style {
-                let cs = styles
-                    .container
-                    .get(style_name.as_str())
-                    .unwrap_or_else(|| panic!("unknown container style: \"{}\"", style_name));
-                let style_closure = generate_container_style(cs);
-                expr = quote! { #expr.style(#style_closure) };
+                assert!(
+                    styles.container.contains_key(style_name.as_str()),
+                    "unknown container style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("container", style_name);
+                expr = quote! { #expr.style(#var) };
             }
-            expr
+            Generated::Widget(expr)
         }
         Node::Row {
             spacing,
@@ -137,8 +192,16 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             clip,
             children,
         } => {
-            let child_tokens: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
-            let mut expr = quote! { iced::widget::row![#(#child_tokens),*] };
+            let generated_children: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
+            let mut expr = if has_optional(&generated_children) {
+                generate_children_block(quote! { iced::widget::Row::new() }, &generated_children)
+            } else {
+                let child_tokens: Vec<_> = generated_children.into_iter().map(|c| match c {
+                    Generated::Widget(ts) => ts,
+                    _ => unreachable!(),
+                }).collect();
+                quote! { iced::widget::row![#(#child_tokens),*] }
+            };
             if let Some(s) = spacing {
                 expr = quote! { #expr.spacing(#s) };
             }
@@ -160,7 +223,7 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             if let Some(c) = clip {
                 expr = quote! { #expr.clip(#c) };
             }
-            expr
+            Generated::Widget(expr)
         }
         Node::Column {
             spacing,
@@ -172,8 +235,16 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             clip,
             children,
         } => {
-            let child_tokens: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
-            let mut expr = quote! { iced::widget::column![#(#child_tokens),*] };
+            let generated_children: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
+            let mut expr = if has_optional(&generated_children) {
+                generate_children_block(quote! { iced::widget::Column::new() }, &generated_children)
+            } else {
+                let child_tokens: Vec<_> = generated_children.into_iter().map(|c| match c {
+                    Generated::Widget(ts) => ts,
+                    _ => unreachable!(),
+                }).collect();
+                quote! { iced::widget::column![#(#child_tokens),*] }
+            };
             if let Some(s) = spacing {
                 expr = quote! { #expr.spacing(#s) };
             }
@@ -198,7 +269,7 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             if let Some(c) = clip {
                 expr = quote! { #expr.clip(#c) };
             }
-            expr
+            Generated::Widget(expr)
         }
         Node::Button {
             style,
@@ -219,7 +290,7 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             let child = if children.is_empty() {
                 quote! { iced::widget::text("") }
             } else {
-                generate(&children[0], styles)
+                generate(&children[0], styles).into_widget()
             };
             let mut expr = quote! { iced::widget::button(#child) };
 
@@ -238,12 +309,13 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
                 expr = quote! { #expr.clip(#c) };
             }
             if let Some(style_name) = style {
-                let bs = styles
-                    .button
-                    .get(style_name.as_str())
-                    .unwrap_or_else(|| panic!("unknown button style: \"{}\"", style_name));
-                let style_closure = generate_button_style_closure(bs);
-                expr = quote! { #expr.style(#style_closure) };
+                assert!(
+                    styles.button.contains_key(style_name.as_str()),
+                    "unknown button style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("button", style_name);
+                expr = quote! { #expr.style(#var) };
             }
             if let Some(val) = on_press {
                 let handler =
@@ -268,7 +340,7 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
                 );
                 expr = quote! { #expr #handler };
             }
-            expr
+            Generated::Widget(expr)
         }
         Node::Stack {
             width,
@@ -276,8 +348,16 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             clip,
             children,
         } => {
-            let child_tokens: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
-            let mut expr = quote! { iced::widget::stack![#(#child_tokens),*] };
+            let generated_children: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
+            let mut expr = if has_optional(&generated_children) {
+                generate_children_block(quote! { iced::widget::Stack::new() }, &generated_children)
+            } else {
+                let child_tokens: Vec<_> = generated_children.into_iter().map(|c| match c {
+                    Generated::Widget(ts) => ts,
+                    _ => unreachable!(),
+                }).collect();
+                quote! { iced::widget::stack![#(#child_tokens),*] }
+            };
             if let Some(w) = width {
                 let w = generate_length(w);
                 expr = quote! { #expr.width(#w) };
@@ -289,7 +369,7 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
             if let Some(c) = clip {
                 expr = quote! { #expr.clip(#c) };
             }
-            expr
+            Generated::Widget(expr)
         }
         Node::Space { width, height } => {
             let mut expr = quote! { iced::widget::Space::new() };
@@ -301,7 +381,7 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
                 let h = generate_length(h);
                 expr = quote! { #expr.height(#h) };
             }
-            expr
+            Generated::Widget(expr)
         }
         Node::TextInput {
             placeholder,
@@ -383,14 +463,15 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
                 expr = quote! { #expr.align_x(#h) };
             }
             if let Some(style_name) = style {
-                let tis = styles
-                    .text_input
-                    .get(style_name.as_str())
-                    .unwrap_or_else(|| panic!("unknown text-input style: \"{}\"", style_name));
-                let style_closure = generate_text_input_style_closure(tis);
-                expr = quote! { #expr.style(#style_closure) };
+                assert!(
+                    styles.text_input.contains_key(style_name.as_str()),
+                    "unknown text-input style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("text_input", style_name);
+                expr = quote! { #expr.style(#var) };
             }
-            expr
+            Generated::Widget(expr)
         }
         Node::Checkbox {
             label,
@@ -459,14 +540,44 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> proc_macro2::TokenStream {
                 expr = quote! { #expr.text_wrapping(#wr) };
             }
             if let Some(style_name) = style {
-                let cs = styles
-                    .checkbox
-                    .get(style_name.as_str())
-                    .unwrap_or_else(|| panic!("unknown checkbox style: \"{}\"", style_name));
-                let style_closure = generate_checkbox_style_closure(cs);
-                expr = quote! { #expr.style(#style_closure) };
+                assert!(
+                    styles.checkbox.contains_key(style_name.as_str()),
+                    "unknown checkbox style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("checkbox", style_name);
+                expr = quote! { #expr.style(#var) };
             }
-            expr
+            Generated::Widget(expr)
+        }
+        Node::If {
+            condition,
+            true_branch,
+            false_branch,
+        } => {
+            let cond = generate_condition(condition);
+            let true_expr = generate(true_branch, styles).into_widget();
+
+            match false_branch {
+                Some(false_node) => {
+                    let false_expr = generate(false_node, styles).into_widget();
+                    Generated::Widget(quote! {
+                        {
+                            let __if_result: iced::Element<'_, _> = if #cond {
+                                (#true_expr).into()
+                            } else {
+                                (#false_expr).into()
+                            };
+                            __if_result
+                        }
+                    })
+                }
+                None => {
+                    Generated::Optional(quote! {
+                        if #cond { Some((#true_expr).into()) } else { None }
+                    })
+                }
+            }
         }
     }
 }

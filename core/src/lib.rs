@@ -248,4 +248,9 @@ pub enum Node {
         text_wrapping: Option<Wrapping>,
         style: Option<String>,
     },
+    If {
+        condition: String,
+        true_branch: Box<Node>,
+        false_branch: Option<Box<Node>>,
+    },
 }

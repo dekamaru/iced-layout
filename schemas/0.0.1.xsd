@@ -103,6 +103,7 @@
                 <xs:element ref="checkbox"/>
                 <xs:element ref="space"/>
                 <xs:element ref="text-input"/>
+                <xs:element ref="if"/>
             </xs:choice>
             <xs:attribute name="id" type="xs:string" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -151,6 +152,7 @@
                 <xs:element ref="checkbox"/>
                 <xs:element ref="space"/>
                 <xs:element ref="text-input"/>
+                <xs:element ref="if"/>
             </xs:choice>
             <xs:attribute name="spacing" type="xs:float" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -176,6 +178,7 @@
                 <xs:element ref="checkbox"/>
                 <xs:element ref="space"/>
                 <xs:element ref="text-input"/>
+                <xs:element ref="if"/>
             </xs:choice>
             <xs:attribute name="spacing" type="xs:float" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -202,6 +205,7 @@
                 <xs:element ref="checkbox"/>
                 <xs:element ref="space"/>
                 <xs:element ref="text-input"/>
+                <xs:element ref="if"/>
             </xs:choice>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
@@ -229,6 +233,7 @@
                 <xs:element ref="checkbox"/>
                 <xs:element ref="space"/>
                 <xs:element ref="text-input"/>
+                <xs:element ref="if"/>
             </xs:choice>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
@@ -276,6 +281,45 @@
             <xs:attribute name="line-height" type="LineHeight" use="optional"/>
             <xs:attribute name="align-x" type="Horizontal" use="optional"/>
             <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="if">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="true" minOccurs="1">
+                    <xs:complexType>
+                        <xs:choice>
+                            <xs:element ref="container"/>
+                            <xs:element ref="text"/>
+                            <xs:element ref="row"/>
+                            <xs:element ref="column"/>
+                            <xs:element ref="button"/>
+                            <xs:element ref="stack"/>
+                            <xs:element ref="checkbox"/>
+                            <xs:element ref="space"/>
+                            <xs:element ref="text-input"/>
+                            <xs:element ref="if"/>
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="false" minOccurs="0">
+                    <xs:complexType>
+                        <xs:choice>
+                            <xs:element ref="container"/>
+                            <xs:element ref="text"/>
+                            <xs:element ref="row"/>
+                            <xs:element ref="column"/>
+                            <xs:element ref="button"/>
+                            <xs:element ref="stack"/>
+                            <xs:element ref="checkbox"/>
+                            <xs:element ref="space"/>
+                            <xs:element ref="text-input"/>
+                            <xs:element ref="if"/>
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+            </xs:all>
+            <xs:attribute name="condition" type="xs:string" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="container-style">
@@ -501,6 +545,7 @@
                 <xs:element ref="checkbox"/>
                 <xs:element ref="space"/>
                 <xs:element ref="text-input"/>
+                <xs:element ref="if"/>
             </xs:choice>
         </xs:complexType>
     </xs:element>

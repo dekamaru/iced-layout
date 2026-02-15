@@ -12,8 +12,13 @@ use std::path::PathBuf;
 use iced_layout_core::{
     ButtonStyle, CheckboxStyle, ContainerStyle, TextInputStyle, TextStyle,
 };
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::{LitStr, parse_macro_input};
+
+use crate::style::{
+    generate_button_style_closure, generate_checkbox_style_closure,
+    generate_container_style, generate_text_input_style_closure,
+};
 
 pub(crate) struct StyleMaps<'a> {
     pub container: HashMap<&'a str, &'a ContainerStyle>,
@@ -21,6 +26,14 @@ pub(crate) struct StyleMaps<'a> {
     pub button: HashMap<&'a str, &'a ButtonStyle>,
     pub checkbox: HashMap<&'a str, &'a CheckboxStyle>,
     pub text_input: HashMap<&'a str, &'a TextInputStyle>,
+}
+
+pub(crate) fn style_var_name(prefix: &str, name: &str) -> syn::Ident {
+    let sanitized: String = name
+        .chars()
+        .map(|c| if c.is_alphanumeric() { c } else { '_' })
+        .collect();
+    format_ident!("__style_{}_{}", prefix, sanitized)
 }
 
 /// Reads an XML layout file at compile time and generates iced widget code.
@@ -54,8 +67,35 @@ pub fn layout(input: TokenStream) -> TokenStream {
         text_input: layout.text_input_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
     };
 
-    let tokens = generate::generate(&layout.root, &style_maps);
+    let mut style_bindings = Vec::new();
 
-    let expanded = quote! { #tokens.into() };
+    for (name, cs) in &style_maps.container {
+        let var = style_var_name("container", name);
+        let closure = generate_container_style(cs);
+        style_bindings.push(quote! { let #var = #closure; });
+    }
+    for (name, bs) in &style_maps.button {
+        let var = style_var_name("button", name);
+        let closure = generate_button_style_closure(bs);
+        style_bindings.push(quote! { let #var = #closure; });
+    }
+    for (name, cs) in &style_maps.checkbox {
+        let var = style_var_name("checkbox", name);
+        let closure = generate_checkbox_style_closure(cs);
+        style_bindings.push(quote! { let #var = #closure; });
+    }
+    for (name, tis) in &style_maps.text_input {
+        let var = style_var_name("text_input", name);
+        let closure = generate_text_input_style_closure(tis);
+        style_bindings.push(quote! { let #var = #closure; });
+    }
+
+    let tokens = generate::generate(&layout.root, &style_maps).into_widget();
+
+    let expanded = if style_bindings.is_empty() {
+        quote! { #tokens.into() }
+    } else {
+        quote! { { #(#style_bindings)* #tokens.into() } }
+    };
     expanded.into()
 }

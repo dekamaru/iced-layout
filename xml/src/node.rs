@@ -169,6 +169,58 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     text_shaping, text_wrapping, style,
                 }
             }
+            b"if" => {
+                let condition = parse_string_attr(&e, b"condition")
+                    .expect("<if> requires a 'condition' attribute");
+                assert!(has_closing_tag, "<if> must have a closing tag");
+
+                let mut true_branch: Option<Node> = None;
+                let mut false_branch: Option<Node> = None;
+
+                loop {
+                    match reader.read_event().expect("failed to read XML") {
+                        Event::Start(inner) => {
+                            let inner_tag = inner.name().as_ref().to_vec();
+                            match inner_tag.as_slice() {
+                                b"true" => {
+                                    assert!(true_branch.is_none(), "<if> must have exactly one <true> element");
+                                    let child = parse_node(reader);
+                                    assert!(
+                                        !matches!(child, Node::Text { ref content, .. } if content.is_empty()),
+                                        "<true> must contain exactly 1 child element"
+                                    );
+                                    consume_closing_tag(reader, b"true");
+                                    true_branch = Some(child);
+                                }
+                                b"false" => {
+                                    assert!(false_branch.is_none(), "<if> must have at most one <false> element");
+                                    let child = parse_node(reader);
+                                    assert!(
+                                        !matches!(child, Node::Text { ref content, .. } if content.is_empty()),
+                                        "<false> must contain exactly 1 child element"
+                                    );
+                                    consume_closing_tag(reader, b"false");
+                                    false_branch = Some(child);
+                                }
+                                other => panic!(
+                                    "<if> may only contain <true> and <false>, found <{}>",
+                                    String::from_utf8_lossy(other)
+                                ),
+                            }
+                        }
+                        Event::End(end) if end.name().as_ref() == b"if" => break,
+                        Event::Text(_) | Event::Comment(_) => continue,
+                        _ => continue,
+                    }
+                }
+
+                let true_branch = true_branch.expect("<if> must contain a <true> element");
+                Node::If {
+                    condition,
+                    true_branch: Box::new(true_branch),
+                    false_branch: false_branch.map(Box::new),
+                }
+            }
             other => panic!(
                 "unsupported tag: {}",
                 String::from_utf8_lossy(other)
