@@ -1,0 +1,49 @@
+# TODO
+- [ ] Checkbox "checked" in styles
+- [ ] Macro optimize styles compilation (reuse compiled styles with .clone())
+- [ ] Support fonts
+- [ ] Support "icon" attributes
+- [x] State access
+- [x] Callbacks (buttons)
+- [ ] render-if condition
+- [ ] Loops
+- [ ] Components
+- [x] Styling
+    - [ ] Background gradient
+- [ ] Custom defined widgets
+- [x] Button (widget/src/button.rs)
+- [x] Checkbox (widget/src/checkbox.rs)
+- [x] Column (widget/src/column.rs)
+- [ ] ComboBox (widget/src/combo_box.rs)
+- [x] Container (widget/src/container.rs)
+- [ ] Float (widget/src/float.rs)
+- [ ] Grid (widget/src/grid.rs)
+- [ ] MouseArea (widget/src/mouse_area.rs)
+- [ ] PaneGrid (widget/src/pane_grid.rs)
+- [ ] PickList (widget/src/pick_list.rs)
+- [ ] Pin (widget/src/pin.rs)
+- [ ] ProgressBar (widget/src/progress_bar.rs)
+- [ ] Radio (widget/src/radio.rs)
+- [ ] Responsive (widget/src/responsive.rs)
+- [x] Row (widget/src/row.rs)
+- [ ] Rule (widget/src/rule.rs)
+- [ ] Scrollable (widget/src/scrollable.rs)
+- [ ] Sensor (widget/src/sensor.rs)
+- [ ] Slider (widget/src/slider.rs)
+- [x] Space (widget/src/space.rs)
+- [x] Stack (widget/src/stack.rs)
+- [x] Text (core/src/widget/text.rs — type alias)
+- [ ] TextEditor (widget/src/text_editor.rs)
+- [x] TextInput (widget/src/text_input.rs)
+- [ ] Themer (widget/src/themer.rs)
+- [ ] Toggler (widget/src/toggler.rs)
+- [ ] Tooltip (widget/src/tooltip.rs)
+- [ ] VerticalSlider (widget/src/vertical_slider.rs)
+
+## Feature-gated:
+- [ ] Shader (widget/src/shader.rs — wgpu)
+- [ ] Svg (widget/src/svg.rs — svg)
+- [ ] Image (widget/src/image.rs — image)
+- [ ] Canvas (widget/src/canvas.rs — canvas)
+- [ ] QRCode (widget/src/qr_code.rs — qr_code)
+- [ ] Markdown (widget/src/markdown.rs — markdown)
