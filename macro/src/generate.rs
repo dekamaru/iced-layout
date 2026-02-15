@@ -9,9 +9,26 @@ use crate::types::{
     generate_shaping, generate_text_alignment, generate_vertical, generate_wrapping,
 };
 
+#[derive(Clone, Default)]
+pub struct GenerateContext {
+    pub local_vars: Vec<String>,
+}
+
+pub fn resolve_field_path(path: &str, ctx: &GenerateContext) -> syn::Expr {
+    let first_segment = path.split('.').next().unwrap_or(path);
+    if ctx.local_vars.iter().any(|v| v == first_segment) {
+        syn::parse_str(path)
+            .unwrap_or_else(|e| panic!("invalid field path \"{}\": {}", path, e))
+    } else {
+        syn::parse_str(&format!("self.{}", path))
+            .unwrap_or_else(|e| panic!("invalid field path \"{}\": {}", path, e))
+    }
+}
+
 pub enum Generated {
     Widget(proc_macro2::TokenStream),
     Optional(proc_macro2::TokenStream),
+    Multi(proc_macro2::TokenStream),
 }
 
 impl Generated {
@@ -20,6 +37,9 @@ impl Generated {
             Generated::Widget(ts) => ts,
             Generated::Optional(_) => panic!(
                 "<if> without <false> branch cannot be used as a single child (e.g. inside <container> or <button>)"
+            ),
+            Generated::Multi(_) => panic!(
+                "<foreach> cannot be used as a single child (e.g. inside <container> or <button>)"
             ),
         }
     }
@@ -66,16 +86,14 @@ fn generate_event_handler(
     }
 }
 
-fn generate_condition(condition: &str) -> proc_macro2::TokenStream {
+fn generate_condition(condition: &str, ctx: &GenerateContext) -> proc_macro2::TokenStream {
     let stripped = condition.trim();
     if let Some(inner) = stripped.strip_prefix('!') {
         let inner = inner.trim();
-        let expr: syn::Expr = syn::parse_str(&format!("self.{}", inner))
-            .unwrap_or_else(|e| panic!("invalid condition \"{}\": {}", condition, e));
+        let expr = resolve_field_path(inner, ctx);
         quote! { !#expr }
     } else {
-        let expr: syn::Expr = syn::parse_str(&format!("self.{}", stripped))
-            .unwrap_or_else(|e| panic!("invalid condition \"{}\": {}", condition, e));
+        let expr = resolve_field_path(stripped, ctx);
         quote! { #expr }
     }
 }
@@ -83,6 +101,7 @@ fn generate_condition(condition: &str) -> proc_macro2::TokenStream {
 /// Generates a block expression that builds a multi-child container using `let` rebinding.
 /// For `Generated::Widget` children, uses `.push()`.
 /// For `Generated::Optional` children, uses conditional push to avoid adding empty elements.
+/// For `Generated::Multi` children, uses `.extend()` with the iterator mapped to `.into()`.
 fn generate_children_block(
     constructor: proc_macro2::TokenStream,
     children: &[Generated],
@@ -98,23 +117,28 @@ fn generate_children_block(
                     let __w = { let __opt: Option<iced::Element<'_, _>> = #ts; if let Some(__child) = __opt { __w.push(__child) } else { __w } };
                 });
             }
+            Generated::Multi(ts) => {
+                stmts.push(quote! {
+                    let __w = __w.extend(#ts);
+                });
+            }
         }
     }
     quote! { { #(#stmts)* __w } }
 }
 
-fn has_optional(children: &[Generated]) -> bool {
-    children.iter().any(|c| matches!(c, Generated::Optional(_)))
+fn needs_block(children: &[Generated]) -> bool {
+    children.iter().any(|c| matches!(c, Generated::Optional(_) | Generated::Multi(_)))
 }
 
-pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
+pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Generated {
     match node {
         Node::Text {
             content,
             style,
             attrs,
         } => {
-            let text_arg = generate_text_arg(content);
+            let text_arg = generate_text_arg(content, ctx);
             let mut expr = quote! { iced::widget::text(#text_arg) };
             if let Some(size) = attrs.size {
                 expr = quote! { #expr.size(#size) };
@@ -163,7 +187,7 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
                 "<container> must have exactly 1 child element, found {}",
                 children.len()
             );
-            let child = generate(&children[0], styles).into_widget();
+            let child = generate(&children[0], styles, ctx).into_widget();
             let mut expr = quote! { iced::widget::container(#child) };
 
             if let Some(padding_expr) = generate_padding(padding) {
@@ -192,8 +216,8 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
             clip,
             children,
         } => {
-            let generated_children: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
-            let mut expr = if has_optional(&generated_children) {
+            let generated_children: Vec<_> = children.iter().map(|c| generate(c, styles, ctx)).collect();
+            let mut expr = if needs_block(&generated_children) {
                 generate_children_block(quote! { iced::widget::Row::new() }, &generated_children)
             } else {
                 let child_tokens: Vec<_> = generated_children.into_iter().map(|c| match c {
@@ -235,8 +259,8 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
             clip,
             children,
         } => {
-            let generated_children: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
-            let mut expr = if has_optional(&generated_children) {
+            let generated_children: Vec<_> = children.iter().map(|c| generate(c, styles, ctx)).collect();
+            let mut expr = if needs_block(&generated_children) {
                 generate_children_block(quote! { iced::widget::Column::new() }, &generated_children)
             } else {
                 let child_tokens: Vec<_> = generated_children.into_iter().map(|c| match c {
@@ -290,7 +314,7 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
             let child = if children.is_empty() {
                 quote! { iced::widget::text("") }
             } else {
-                generate(&children[0], styles).into_widget()
+                generate(&children[0], styles, ctx).into_widget()
             };
             let mut expr = quote! { iced::widget::button(#child) };
 
@@ -348,8 +372,8 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
             clip,
             children,
         } => {
-            let generated_children: Vec<_> = children.iter().map(|c| generate(c, styles)).collect();
-            let mut expr = if has_optional(&generated_children) {
+            let generated_children: Vec<_> = children.iter().map(|c| generate(c, styles, ctx)).collect();
+            let mut expr = if needs_block(&generated_children) {
                 generate_children_block(quote! { iced::widget::Stack::new() }, &generated_children)
             } else {
                 let child_tokens: Vec<_> = generated_children.into_iter().map(|c| match c {
@@ -399,9 +423,8 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
             align_x,
             style,
         } => {
-            let value_field: syn::Expr = syn::parse_str(&format!("&self.{}", value))
-                .unwrap_or_else(|e| panic!("invalid value field path \"{}\": {}", value, e));
-            let mut expr = quote! { iced::widget::text_input(#placeholder, #value_field) };
+            let value_expr = resolve_field_path(value, ctx);
+            let mut expr = quote! { iced::widget::text_input(#placeholder, &#value_expr) };
             if let Some(id_val) = id {
                 expr = quote! { #expr.id(#id_val) };
             }
@@ -487,13 +510,10 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
             text_wrapping,
             style,
         } => {
-            let is_checked_field: syn::Expr = syn::parse_str(&format!("self.{}", is_checked))
-                .unwrap_or_else(|e| {
-                    panic!("invalid is-checked field path \"{}\": {}", is_checked, e)
-                });
+            let is_checked_field = resolve_field_path(is_checked, ctx);
             let mut expr = quote! { iced::widget::checkbox(#is_checked_field) };
             if !label.is_empty() {
-                let label_arg = generate_text_arg(label);
+                let label_arg = generate_text_arg(label, ctx);
                 expr = quote! { #expr.label(#label_arg) };
             }
             if let Some(val) = on_toggle {
@@ -555,12 +575,12 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
             true_branch,
             false_branch,
         } => {
-            let cond = generate_condition(condition);
-            let true_expr = generate(true_branch, styles).into_widget();
+            let cond = generate_condition(condition, ctx);
+            let true_expr = generate(true_branch, styles, ctx).into_widget();
 
             match false_branch {
                 Some(false_node) => {
-                    let false_expr = generate(false_node, styles).into_widget();
+                    let false_expr = generate(false_node, styles, ctx).into_widget();
                     Generated::Widget(quote! {
                         {
                             let __if_result: iced::Element<'_, _> = if #cond {
@@ -578,6 +598,15 @@ pub fn generate(node: &Node, styles: &StyleMaps) -> Generated {
                     })
                 }
             }
+        }
+        Node::ForEach { iterable, body } => {
+            let iter_field = resolve_field_path(iterable, ctx);
+            let mut inner_ctx = ctx.clone();
+            inner_ctx.local_vars.push("item".to_string());
+            let body_tokens = generate(body, styles, &inner_ctx).into_widget();
+            Generated::Multi(quote! {
+                #iter_field.iter().map(|item| { (#body_tokens).into() })
+            })
         }
     }
 }

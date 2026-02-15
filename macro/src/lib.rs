@@ -90,7 +90,8 @@ pub fn layout(input: TokenStream) -> TokenStream {
         style_bindings.push(quote! { let #var = #closure; });
     }
 
-    let tokens = generate::generate(&layout.root, &style_maps).into_widget();
+    let ctx = generate::GenerateContext::default();
+    let tokens = generate::generate(&layout.root, &style_maps, &ctx).into_widget();
 
     let expanded = if style_bindings.is_empty() {
         quote! { #tokens.into() }

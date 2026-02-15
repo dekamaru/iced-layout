@@ -169,6 +169,18 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     text_shaping, text_wrapping, style,
                 }
             }
+            b"foreach" => {
+                let iterable = parse_string_attr(&e, b"iterable")
+                    .expect("<foreach> requires an 'iterable' attribute");
+                assert!(has_closing_tag, "<foreach> must have a closing tag");
+                let child = parse_node(reader);
+                assert!(
+                    !matches!(child, Node::Text { ref content, .. } if content.is_empty()),
+                    "<foreach> must contain exactly 1 child element"
+                );
+                consume_closing_tag(reader, b"foreach");
+                Node::ForEach { iterable, body: Box::new(child) }
+            }
             b"if" => {
                 let condition = parse_string_attr(&e, b"condition")
                     .expect("<if> requires a 'condition' attribute");

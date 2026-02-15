@@ -253,4 +253,8 @@ pub enum Node {
         true_branch: Box<Node>,
         false_branch: Option<Box<Node>>,
     },
+    ForEach {
+        iterable: String,
+        body: Box<Node>,
+    },
 }

@@ -6,7 +6,7 @@
 - [x] State access
 - [x] Callbacks (buttons)
 - [x] If conditions
-- [ ] Loops
+- [x] Loops
 - [ ] Components
 - [x] Styling
     - [ ] Background gradient

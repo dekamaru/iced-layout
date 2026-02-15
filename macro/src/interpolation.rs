@@ -1,5 +1,7 @@
 use quote::quote;
 
+use crate::generate::{GenerateContext, resolve_field_path};
+
 pub enum Segment {
     Literal(String),
     Variable(String),
@@ -27,7 +29,7 @@ pub fn parse_interpolation(text: &str) -> Vec<Segment> {
     segments
 }
 
-pub fn generate_text_arg(content: &str) -> proc_macro2::TokenStream {
+pub fn generate_text_arg(content: &str, ctx: &GenerateContext) -> proc_macro2::TokenStream {
     let segments = parse_interpolation(content);
 
     // No interpolation — plain string literal
@@ -38,9 +40,8 @@ pub fn generate_text_arg(content: &str) -> proc_macro2::TokenStream {
     // Single variable, no surrounding text
     if segments.len() == 1 {
         if let Segment::Variable(ref path) = segments[0] {
-            let field: syn::Expr = syn::parse_str(&format!("&self.{}", path))
-                .expect("invalid variable path in ${...}");
-            return quote! { #field };
+            let field = resolve_field_path(path, ctx);
+            return quote! { &#field };
         }
     }
 
@@ -55,8 +56,7 @@ pub fn generate_text_arg(content: &str) -> proc_macro2::TokenStream {
             }
             Segment::Variable(path) => {
                 fmt_str.push_str("{}");
-                let field: syn::Expr = syn::parse_str(&format!("self.{}", path))
-                    .expect("invalid variable path in ${...}");
+                let field = resolve_field_path(path, ctx);
                 args.push(quote! { #field });
             }
         }
