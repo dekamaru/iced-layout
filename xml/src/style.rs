@@ -1,5 +1,5 @@
 use iced_layout_core::{
-    ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, TextInputStyle,
+    ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FontDef, TextInputStyle,
     TextInputStyleFields, TextStyle,
 };
 use quick_xml::events::{BytesStart, Event};
@@ -13,6 +13,7 @@ pub struct ParsedStyles {
     pub button: Vec<(String, ButtonStyle)>,
     pub checkbox: Vec<(String, CheckboxStyle)>,
     pub text_input: Vec<(String, TextInputStyle)>,
+    pub font: Vec<(String, FontDef)>,
 }
 
 impl Default for ParsedStyles {
@@ -23,6 +24,7 @@ impl Default for ParsedStyles {
             button: Vec::new(),
             checkbox: Vec::new(),
             text_input: Vec::new(),
+            font: Vec::new(),
         }
     }
 }
@@ -191,6 +193,17 @@ fn parse_text_input_style(
     (id, style)
 }
 
+fn parse_font_def(e: &BytesStart) -> (String, FontDef) {
+    let id = parse_string_attr(e, b"id").expect("<font> requires an 'id' attribute");
+    let def = FontDef {
+        family: parse_string_attr(e, b"family"),
+        weight: parse_font_weight_attr(e, b"weight"),
+        stretch: parse_font_stretch_attr(e, b"stretch"),
+        style: parse_font_style_attr(e, b"style"),
+    };
+    (id, def)
+}
+
 fn parse_text_input_style_empty(e: &BytesStart) -> (String, TextInputStyle) {
     let id =
         parse_string_attr(e, b"id").expect("<text-input-style> requires an 'id' attribute");
@@ -224,6 +237,10 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                     b"text-input-style" => {
                         styles.text_input.push(parse_text_input_style(&e, reader));
                     }
+                    b"font" => {
+                        styles.font.push(parse_font_def(&e));
+                        consume_closing_tag(reader, &tag);
+                    }
                     other => panic!(
                         "unexpected element in <styles>: {}",
                         String::from_utf8_lossy(other)
@@ -236,6 +253,7 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                 b"button-style" => styles.button.push(parse_button_style_empty(&e)),
                 b"checkbox-style" => styles.checkbox.push(parse_checkbox_style(&e)),
                 b"text-input-style" => styles.text_input.push(parse_text_input_style_empty(&e)),
+                b"font" => styles.font.push(parse_font_def(&e)),
                 other => panic!(
                     "unexpected element in <styles>: {}",
                     String::from_utf8_lossy(other)

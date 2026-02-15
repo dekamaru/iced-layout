@@ -91,6 +91,42 @@
         <xs:union memberTypes="WrappingKeyword"/>
     </xs:simpleType>
 
+    <xs:simpleType name="FontWeight">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="thin"/>
+            <xs:enumeration value="extra-light"/>
+            <xs:enumeration value="light"/>
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="medium"/>
+            <xs:enumeration value="semibold"/>
+            <xs:enumeration value="bold"/>
+            <xs:enumeration value="extra-bold"/>
+            <xs:enumeration value="black"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FontStretch">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ultra-condensed"/>
+            <xs:enumeration value="extra-condensed"/>
+            <xs:enumeration value="condensed"/>
+            <xs:enumeration value="semi-condensed"/>
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="semi-expanded"/>
+            <xs:enumeration value="expanded"/>
+            <xs:enumeration value="extra-expanded"/>
+            <xs:enumeration value="ultra-expanded"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FontStyle">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="italic"/>
+            <xs:enumeration value="oblique"/>
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:element name="container">
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="1">
@@ -133,6 +169,7 @@
         <xs:complexType mixed="true">
             <xs:attribute name="size" type="xs:float" use="optional"/>
             <xs:attribute name="line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
             <xs:attribute name="align-x" type="Alignment" use="optional"/>
@@ -257,6 +294,7 @@
             <xs:attribute name="text-line-height" type="LineHeight" use="optional"/>
             <xs:attribute name="text-shaping" type="Shaping" use="optional"/>
             <xs:attribute name="text-wrapping" type="Wrapping" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
             <xs:attribute name="style" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
@@ -276,6 +314,7 @@
             <xs:attribute name="on-submit" type="xs:string" use="optional"/>
             <xs:attribute name="on-submit-maybe" type="xs:string" use="optional"/>
             <xs:attribute name="on-paste" type="xs:string" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
             <xs:attribute name="padding-top" type="xs:float" use="optional"/>
@@ -345,6 +384,15 @@
                 <xs:element ref="foreach"/>
             </xs:choice>
             <xs:attribute name="iterable" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="font">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="family" type="xs:string" use="optional"/>
+            <xs:attribute name="weight" type="FontWeight" use="optional"/>
+            <xs:attribute name="stretch" type="FontStretch" use="optional"/>
+            <xs:attribute name="style" type="FontStyle" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="container-style">
@@ -583,6 +631,7 @@
                 <xs:element ref="button-style"/>
                 <xs:element ref="checkbox-style"/>
                 <xs:element ref="text-input-style"/>
+                <xs:element ref="font"/>
             </xs:choice>
         </xs:complexType>
     </xs:element>

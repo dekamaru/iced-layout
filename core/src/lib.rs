@@ -66,6 +66,47 @@ pub enum Wrapping {
     WordOrGlyph,
 }
 
+#[derive(Clone, Copy)]
+pub enum FontWeight {
+    Thin,
+    ExtraLight,
+    Light,
+    Normal,
+    Medium,
+    Semibold,
+    Bold,
+    ExtraBold,
+    Black,
+}
+
+#[derive(Clone, Copy)]
+pub enum FontStretch {
+    UltraCondensed,
+    ExtraCondensed,
+    Condensed,
+    SemiCondensed,
+    Normal,
+    SemiExpanded,
+    Expanded,
+    ExtraExpanded,
+    UltraExpanded,
+}
+
+#[derive(Clone, Copy)]
+pub enum FontStyle {
+    Normal,
+    Italic,
+    Oblique,
+}
+
+#[derive(Default)]
+pub struct FontDef {
+    pub family: Option<String>,
+    pub weight: Option<FontWeight>,
+    pub stretch: Option<FontStretch>,
+    pub style: Option<FontStyle>,
+}
+
 #[derive(Default)]
 pub struct TextAttrs {
     pub size: Option<f32>,
@@ -75,6 +116,7 @@ pub struct TextAttrs {
     pub align_x: Option<TextAlignment>,
     pub align_y: Option<Vertical>,
     pub color: Option<Color>,
+    pub font: Option<String>,
 }
 
 #[derive(Default)]
@@ -163,6 +205,7 @@ pub struct Layout {
     pub button_styles: Vec<(String, ButtonStyle)>,
     pub checkbox_styles: Vec<(String, CheckboxStyle)>,
     pub text_input_styles: Vec<(String, TextInputStyle)>,
+    pub font_defs: Vec<(String, FontDef)>,
     pub root: Node,
 }
 
@@ -233,6 +276,7 @@ pub enum Node {
         line_height: Option<LineHeight>,
         align_x: Option<Horizontal>,
         style: Option<String>,
+        font: Option<String>,
     },
     Checkbox {
         label: String,
@@ -247,6 +291,7 @@ pub enum Node {
         text_shaping: Option<Shaping>,
         text_wrapping: Option<Wrapping>,
         style: Option<String>,
+        font: Option<String>,
     },
     If {
         condition: String,

@@ -126,13 +126,14 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 let line_height = parse_line_height_attr(&e, b"line-height");
                 let align_x = parse_horizontal_attr(&e, b"align-x");
                 let style = parse_string_attr(&e, b"style");
+                let font = parse_string_attr(&e, b"font");
                 if has_closing_tag {
                     consume_closing_tag(reader, b"text-input");
                 }
                 Node::TextInput {
                     placeholder, value, id, secure, on_input,
                     on_submit, on_submit_maybe, on_paste,
-                    width, padding, size, line_height, align_x, style,
+                    width, padding, size, line_height, align_x, style, font,
                 }
             }
             b"checkbox" => {
@@ -148,6 +149,7 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 let text_shaping = parse_shaping_attr(&e, b"text-shaping");
                 let text_wrapping = parse_wrapping_attr(&e, b"text-wrapping");
                 let style = parse_string_attr(&e, b"style");
+                let font = parse_string_attr(&e, b"font");
 
                 let mut label = String::new();
                 if has_closing_tag {
@@ -166,7 +168,7 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 Node::Checkbox {
                     label, is_checked, on_toggle, on_toggle_maybe,
                     size, width, spacing, text_size, text_line_height,
-                    text_shaping, text_wrapping, style,
+                    text_shaping, text_wrapping, style, font,
                 }
             }
             b"foreach" => {

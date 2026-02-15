@@ -1,6 +1,6 @@
 use iced_layout_core::{
-    BorderRadius, Color, Horizontal, Length, LineHeight, Padding, Shaping, TextAlignment, TextAttrs,
-    Vertical, Wrapping,
+    BorderRadius, Color, FontStretch, FontStyle, FontWeight, Horizontal, Length, LineHeight,
+    Padding, Shaping, TextAlignment, TextAttrs, Vertical, Wrapping,
 };
 use quick_xml::events::BytesStart;
 use quick_xml::events::Event;
@@ -213,6 +213,45 @@ pub fn parse_wrapping_attr(e: &BytesStart, name: &[u8]) -> Option<Wrapping> {
     })
 }
 
+pub fn parse_font_weight_attr(e: &BytesStart, name: &[u8]) -> Option<FontWeight> {
+    parse_string_attr(e, name).map(|s| match s.as_str() {
+        "thin" => FontWeight::Thin,
+        "extra-light" => FontWeight::ExtraLight,
+        "light" => FontWeight::Light,
+        "normal" => FontWeight::Normal,
+        "medium" => FontWeight::Medium,
+        "semibold" => FontWeight::Semibold,
+        "bold" => FontWeight::Bold,
+        "extra-bold" => FontWeight::ExtraBold,
+        "black" => FontWeight::Black,
+        _ => panic!("invalid font weight: {}", s),
+    })
+}
+
+pub fn parse_font_stretch_attr(e: &BytesStart, name: &[u8]) -> Option<FontStretch> {
+    parse_string_attr(e, name).map(|s| match s.as_str() {
+        "ultra-condensed" => FontStretch::UltraCondensed,
+        "extra-condensed" => FontStretch::ExtraCondensed,
+        "condensed" => FontStretch::Condensed,
+        "semi-condensed" => FontStretch::SemiCondensed,
+        "normal" => FontStretch::Normal,
+        "semi-expanded" => FontStretch::SemiExpanded,
+        "expanded" => FontStretch::Expanded,
+        "extra-expanded" => FontStretch::ExtraExpanded,
+        "ultra-expanded" => FontStretch::UltraExpanded,
+        _ => panic!("invalid font stretch: {}", s),
+    })
+}
+
+pub fn parse_font_style_attr(e: &BytesStart, name: &[u8]) -> Option<FontStyle> {
+    parse_string_attr(e, name).map(|s| match s.as_str() {
+        "normal" => FontStyle::Normal,
+        "italic" => FontStyle::Italic,
+        "oblique" => FontStyle::Oblique,
+        _ => panic!("invalid font style: {}", s),
+    })
+}
+
 pub fn parse_text_attrs(e: &BytesStart) -> TextAttrs {
     TextAttrs {
         size: parse_f32_attr(e, b"size"),
@@ -222,6 +261,7 @@ pub fn parse_text_attrs(e: &BytesStart) -> TextAttrs {
         align_x: parse_text_alignment_attr(e, b"align-x"),
         align_y: parse_vertical_attr(e, b"align-y"),
         color: parse_color_attr(e, b"color"),
+        font: parse_string_attr(e, b"font"),
     }
 }
 

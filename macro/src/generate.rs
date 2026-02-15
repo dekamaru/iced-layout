@@ -173,6 +173,15 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
                 let c = crate::types::generate_color(c);
                 expr = quote! { #expr.color(#c) };
             }
+            if let Some(font_name) = &attrs.font {
+                assert!(
+                    styles.font.contains_key(font_name.as_str()),
+                    "unknown font: \"{}\"",
+                    font_name
+                );
+                let var = style_var_name("font", font_name);
+                expr = quote! { #expr.font(#var) };
+            }
             Generated::Widget(expr)
         }
         Node::Container {
@@ -422,6 +431,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             line_height,
             align_x,
             style,
+            font,
         } => {
             let value_expr = resolve_field_path(value, ctx);
             let mut expr = quote! { iced::widget::text_input(#placeholder, &#value_expr) };
@@ -485,6 +495,15 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
                 let h = generate_horizontal(h);
                 expr = quote! { #expr.align_x(#h) };
             }
+            if let Some(font_name) = font {
+                assert!(
+                    styles.font.contains_key(font_name.as_str()),
+                    "unknown font: \"{}\"",
+                    font_name
+                );
+                let var = style_var_name("font", font_name);
+                expr = quote! { #expr.font(#var) };
+            }
             if let Some(style_name) = style {
                 assert!(
                     styles.text_input.contains_key(style_name.as_str()),
@@ -509,6 +528,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             text_shaping,
             text_wrapping,
             style,
+            font,
         } => {
             let is_checked_field = resolve_field_path(is_checked, ctx);
             let mut expr = quote! { iced::widget::checkbox(#is_checked_field) };
@@ -558,6 +578,15 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             if let Some(wr) = text_wrapping {
                 let wr = generate_wrapping(wr);
                 expr = quote! { #expr.text_wrapping(#wr) };
+            }
+            if let Some(font_name) = font {
+                assert!(
+                    styles.font.contains_key(font_name.as_str()),
+                    "unknown font: \"{}\"",
+                    font_name
+                );
+                let var = style_var_name("font", font_name);
+                expr = quote! { #expr.font(#var) };
             }
             if let Some(style_name) = style {
                 assert!(

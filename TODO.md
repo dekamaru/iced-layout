@@ -1,7 +1,7 @@
 # TODO
 - [ ] Checkbox "checked" in styles
 - [x] Macro optimize styles compilation (reuse compiled styles with .clone())
-- [ ] Support fonts
+- [x] Support fonts
 - [ ] Support "icon" attributes
 - [x] State access
 - [x] Callbacks (buttons)

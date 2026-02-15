@@ -1,6 +1,6 @@
 use iced_layout_core::{
-    BorderRadius, Color, Horizontal, Length, LineHeight, Padding, Shaping, TextAlignment, Vertical,
-    Wrapping,
+    BorderRadius, Color, FontDef, FontStretch, FontStyle, FontWeight, Horizontal, Length,
+    LineHeight, Padding, Shaping, TextAlignment, Vertical, Wrapping,
 };
 use quote::quote;
 
@@ -151,6 +151,69 @@ pub fn generate_shadow(
             color: #shadow_color,
             offset: iced::Vector::new(#shadow_ox, #shadow_oy),
             blur_radius: #shadow_blur,
+        }
+    }
+}
+
+pub fn generate_font_weight(w: &FontWeight) -> proc_macro2::TokenStream {
+    match w {
+        FontWeight::Thin => quote! { iced::font::Weight::Thin },
+        FontWeight::ExtraLight => quote! { iced::font::Weight::ExtraLight },
+        FontWeight::Light => quote! { iced::font::Weight::Light },
+        FontWeight::Normal => quote! { iced::font::Weight::Normal },
+        FontWeight::Medium => quote! { iced::font::Weight::Medium },
+        FontWeight::Semibold => quote! { iced::font::Weight::Semibold },
+        FontWeight::Bold => quote! { iced::font::Weight::Bold },
+        FontWeight::ExtraBold => quote! { iced::font::Weight::ExtraBold },
+        FontWeight::Black => quote! { iced::font::Weight::Black },
+    }
+}
+
+pub fn generate_font_stretch(s: &FontStretch) -> proc_macro2::TokenStream {
+    match s {
+        FontStretch::UltraCondensed => quote! { iced::font::Stretch::UltraCondensed },
+        FontStretch::ExtraCondensed => quote! { iced::font::Stretch::ExtraCondensed },
+        FontStretch::Condensed => quote! { iced::font::Stretch::Condensed },
+        FontStretch::SemiCondensed => quote! { iced::font::Stretch::SemiCondensed },
+        FontStretch::Normal => quote! { iced::font::Stretch::Normal },
+        FontStretch::SemiExpanded => quote! { iced::font::Stretch::SemiExpanded },
+        FontStretch::Expanded => quote! { iced::font::Stretch::Expanded },
+        FontStretch::ExtraExpanded => quote! { iced::font::Stretch::ExtraExpanded },
+        FontStretch::UltraExpanded => quote! { iced::font::Stretch::UltraExpanded },
+    }
+}
+
+pub fn generate_font_style(s: &FontStyle) -> proc_macro2::TokenStream {
+    match s {
+        FontStyle::Normal => quote! { iced::font::Style::Normal },
+        FontStyle::Italic => quote! { iced::font::Style::Italic },
+        FontStyle::Oblique => quote! { iced::font::Style::Oblique },
+    }
+}
+
+pub fn generate_font_def(def: &FontDef) -> proc_macro2::TokenStream {
+    let family = match &def.family {
+        Some(name) => quote! { iced::font::Family::Name(#name) },
+        None => quote! { iced::font::Family::SansSerif },
+    };
+    let weight = match &def.weight {
+        Some(w) => generate_font_weight(w),
+        None => quote! { iced::font::Weight::Normal },
+    };
+    let stretch = match &def.stretch {
+        Some(s) => generate_font_stretch(s),
+        None => quote! { iced::font::Stretch::Normal },
+    };
+    let style = match &def.style {
+        Some(s) => generate_font_style(s),
+        None => quote! { iced::font::Style::Normal },
+    };
+    quote! {
+        iced::font::Font {
+            family: #family,
+            weight: #weight,
+            stretch: #stretch,
+            style: #style,
         }
     }
 }
