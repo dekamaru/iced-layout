@@ -235,6 +235,31 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     false_branch: false_branch.map(Box::new),
                 }
             }
+            b"widget" => {
+                let method = parse_string_attr(&e, b"method")
+                    .expect("<widget> requires a 'method' attribute");
+                let mut indexed_args: Vec<(u8, String)> = Vec::new();
+                for i in 0..10u8 {
+                    let attr_name = format!("arg-{}", i);
+                    if let Some(val) = parse_string_attr(&e, attr_name.as_bytes()) {
+                        indexed_args.push((i, val));
+                    }
+                }
+                indexed_args.sort_by_key(|(i, _)| *i);
+                let args: Vec<String> = indexed_args.into_iter().map(|(_, v)| v).collect();
+                let child = if has_closing_tag {
+                    let c = parse_node(reader);
+                    if matches!(c, Node::Text { ref content, .. } if content.is_empty()) {
+                        None
+                    } else {
+                        consume_closing_tag(reader, b"widget");
+                        Some(Box::new(c))
+                    }
+                } else {
+                    None
+                };
+                Node::Widget { method, args, child }
+            }
             other => panic!(
                 "unsupported tag: {}",
                 String::from_utf8_lossy(other)

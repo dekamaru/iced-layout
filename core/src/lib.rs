@@ -302,4 +302,9 @@ pub enum Node {
         iterable: String,
         body: Box<Node>,
     },
+    Widget {
+        method: String,
+        args: Vec<String>,
+        child: Option<Box<Node>>,
+    },
 }

@@ -628,6 +628,21 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
                 }
             }
         }
+        Node::Widget { method, args, child } => {
+            let method_ident: syn::Ident = syn::parse_str(method)
+                .unwrap_or_else(|e| panic!("invalid widget method name \"{}\": {}", method, e));
+            let mut call_args: Vec<proc_macro2::TokenStream> = Vec::new();
+            if let Some(child_node) = child {
+                let child_tokens = generate(child_node, styles, ctx).into_widget();
+                call_args.push(quote! { (#child_tokens).into() });
+            }
+            for arg in args {
+                let expr = resolve_field_path(arg, ctx);
+                call_args.push(quote! { #expr });
+            }
+            let expr = quote! { self.#method_ident(#(#call_args),*) };
+            Generated::Widget(expr)
+        }
         Node::ForEach { iterable, body } => {
             let iter_field = resolve_field_path(iterable, ctx);
             let mut inner_ctx = ctx.clone();

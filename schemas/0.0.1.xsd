@@ -141,6 +141,7 @@
                 <xs:element ref="text-input"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
             </xs:choice>
             <xs:attribute name="id" type="xs:string" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -192,6 +193,7 @@
                 <xs:element ref="text-input"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
             </xs:choice>
             <xs:attribute name="spacing" type="xs:float" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -219,6 +221,7 @@
                 <xs:element ref="text-input"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
             </xs:choice>
             <xs:attribute name="spacing" type="xs:float" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
@@ -247,6 +250,7 @@
                 <xs:element ref="text-input"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
             </xs:choice>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
@@ -276,6 +280,7 @@
                 <xs:element ref="text-input"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
             </xs:choice>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
@@ -344,6 +349,7 @@
                             <xs:element ref="text-input"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
+                            <xs:element ref="widget"/>
                         </xs:choice>
                     </xs:complexType>
                 </xs:element>
@@ -361,6 +367,7 @@
                             <xs:element ref="text-input"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
+                            <xs:element ref="widget"/>
                         </xs:choice>
                     </xs:complexType>
                 </xs:element>
@@ -382,6 +389,7 @@
                 <xs:element ref="text-input"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
             </xs:choice>
             <xs:attribute name="iterable" type="xs:string" use="required"/>
         </xs:complexType>
@@ -393,6 +401,35 @@
             <xs:attribute name="weight" type="FontWeight" use="optional"/>
             <xs:attribute name="stretch" type="FontStretch" use="optional"/>
             <xs:attribute name="style" type="FontStyle" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="widget">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="1">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="method" type="xs:string" use="required"/>
+            <xs:attribute name="arg-0" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-1" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-2" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-3" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-4" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-5" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-6" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-7" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-8" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-9" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="container-style">
@@ -620,6 +657,7 @@
                 <xs:element ref="text-input"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
             </xs:choice>
         </xs:complexType>
     </xs:element>

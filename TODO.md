@@ -10,7 +10,7 @@
 - [ ] Components
 - [x] Styling
     - [ ] Background gradient
-- [ ] Custom defined widgets
+- [x] Custom defined widgets
 - [x] Button (widget/src/button.rs)
 - [x] Checkbox (widget/src/checkbox.rs)
 - [x] Column (widget/src/column.rs)
