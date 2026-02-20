@@ -307,4 +307,16 @@ pub enum Node {
         args: Vec<String>,
         child: Option<Box<Node>>,
     },
+    VerticalSlider {
+        range_start: f32,
+        range_end: f32,
+        value: String,
+        on_change: String,
+        default: Option<f32>,
+        on_release: Option<String>,
+        width: Option<f32>,
+        height: Option<Length>,
+        step: Option<String>,
+        shift_step: Option<f32>,
+    },
 }

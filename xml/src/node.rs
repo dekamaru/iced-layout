@@ -235,6 +235,26 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     false_branch: false_branch.map(Box::new),
                 }
             }
+            b"vertical-slider" => {
+                let range_start = parse_f32_attr(&e, b"range-start")
+                    .expect("<vertical-slider> requires a 'range-start' attribute");
+                let range_end = parse_f32_attr(&e, b"range-end")
+                    .expect("<vertical-slider> requires a 'range-end' attribute");
+                let value = parse_string_attr(&e, b"value")
+                    .expect("<vertical-slider> requires a 'value' attribute");
+                let on_change = parse_string_attr(&e, b"on-change")
+                    .expect("<vertical-slider> requires an 'on-change' attribute");
+                let default = parse_f32_attr(&e, b"default");
+                let on_release = parse_string_attr(&e, b"on-release");
+                let width = parse_f32_attr(&e, b"width");
+                let height = parse_length_attr(&e, b"height");
+                let step = parse_string_attr(&e, b"step");
+                let shift_step = parse_f32_attr(&e, b"shift-step");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"vertical-slider");
+                }
+                Node::VerticalSlider { range_start, range_end, value, on_change, default, on_release, width, height, step, shift_step }
+            }
             b"widget" => {
                 let method = parse_string_attr(&e, b"method")
                     .expect("<widget> requires a 'method' attribute");
