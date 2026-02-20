@@ -1,6 +1,6 @@
 use iced_layout_core::{
     BorderRadius, Color, FontStretch, FontStyle, FontWeight, Horizontal, Length, LineHeight,
-    Padding, Shaping, TextAlignment, TextAttrs, Vertical, Wrapping,
+    Padding, Shaping, TextAlignment, TextAttrs, TooltipPosition, Vertical, Wrapping,
 };
 use quick_xml::events::BytesStart;
 use quick_xml::events::Event;
@@ -263,6 +263,32 @@ pub fn parse_text_attrs(e: &BytesStart) -> TextAttrs {
         color: parse_color_attr(e, b"color"),
         font: parse_string_attr(e, b"font"),
     }
+}
+
+pub fn parse_delay_attr(e: &BytesStart, name: &[u8]) -> Option<u64> {
+    parse_string_attr(e, name).map(|s| {
+        if let Some(n) = s.strip_suffix("ms") {
+            n.parse::<u64>()
+                .unwrap_or_else(|_| panic!("invalid delay milliseconds value: \"{}\"", s))
+        } else if let Some(n) = s.strip_suffix('s') {
+            n.parse::<u64>()
+                .unwrap_or_else(|_| panic!("invalid delay seconds value: \"{}\"", s))
+                * 1000
+        } else {
+            panic!("invalid delay \"{}\", expected format: <number>ms or <number>s", s)
+        }
+    })
+}
+
+pub fn parse_tooltip_position_attr(e: &BytesStart, name: &[u8]) -> Option<TooltipPosition> {
+    parse_string_attr(e, name).map(|s| match s.as_str() {
+        "top" => TooltipPosition::Top,
+        "bottom" => TooltipPosition::Bottom,
+        "left" => TooltipPosition::Left,
+        "right" => TooltipPosition::Right,
+        "follow-cursor" => TooltipPosition::FollowCursor,
+        _ => panic!("invalid tooltip position: {}", s),
+    })
 }
 
 pub fn parse_border_radius(e: &BytesStart) -> BorderRadius {

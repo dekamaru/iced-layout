@@ -209,6 +209,15 @@ pub struct Layout {
     pub root: Node,
 }
 
+#[derive(Clone, Copy)]
+pub enum TooltipPosition {
+    Top,
+    Bottom,
+    Left,
+    Right,
+    FollowCursor,
+}
+
 pub enum Node {
     Container {
         id: Option<String>,
@@ -318,5 +327,14 @@ pub enum Node {
         height: Option<Length>,
         step: Option<String>,
         shift_step: Option<f32>,
+    },
+    Tooltip {
+        position: TooltipPosition,
+        gap: Option<f32>,
+        padding: Option<f32>,
+        delay: Option<u64>,
+        snap_within_viewport: Option<bool>,
+        style: Option<String>,
+        children: Vec<Node>,
     },
 }

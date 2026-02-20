@@ -255,6 +255,18 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 }
                 Node::VerticalSlider { range_start, range_end, value, on_change, default, on_release, width, height, step, shift_step }
             }
+            b"tooltip" => {
+                let position = parse_tooltip_position_attr(&e, b"position")
+                    .expect("<tooltip> requires a 'position' attribute");
+                let gap = parse_f32_attr(&e, b"gap");
+                let padding = parse_f32_attr(&e, b"padding");
+                let delay = parse_delay_attr(&e, b"delay");
+                let snap_within_viewport = parse_bool_attr(&e, b"snap-within-viewport");
+                let style = parse_string_attr(&e, b"style");
+                let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
+                assert_eq!(children.len(), 2, "<tooltip> must have exactly 2 children (content, tooltip)");
+                Node::Tooltip { position, gap, padding, delay, snap_within_viewport, style, children }
+            }
             b"widget" => {
                 let method = parse_string_attr(&e, b"method")
                     .expect("<widget> requires a 'method' attribute");

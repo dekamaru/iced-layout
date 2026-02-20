@@ -1,6 +1,6 @@
 use iced_layout_core::{
     BorderRadius, Color, FontDef, FontStretch, FontStyle, FontWeight, Horizontal, Length,
-    LineHeight, Padding, Shaping, TextAlignment, Vertical, Wrapping,
+    LineHeight, Padding, Shaping, TextAlignment, TooltipPosition, Vertical, Wrapping,
 };
 use quote::quote;
 
@@ -108,6 +108,16 @@ pub fn generate_wrapping(w: &Wrapping) -> proc_macro2::TokenStream {
         Wrapping::Word => quote! { iced::widget::text::Wrapping::Word },
         Wrapping::Glyph => quote! { iced::widget::text::Wrapping::Glyph },
         Wrapping::WordOrGlyph => quote! { iced::widget::text::Wrapping::WordOrGlyph },
+    }
+}
+
+pub fn generate_tooltip_position(p: &TooltipPosition) -> proc_macro2::TokenStream {
+    match p {
+        TooltipPosition::Top => quote! { iced::widget::tooltip::Position::Top },
+        TooltipPosition::Bottom => quote! { iced::widget::tooltip::Position::Bottom },
+        TooltipPosition::Left => quote! { iced::widget::tooltip::Position::Left },
+        TooltipPosition::Right => quote! { iced::widget::tooltip::Position::Right },
+        TooltipPosition::FollowCursor => quote! { iced::widget::tooltip::Position::FollowCursor },
     }
 }
 

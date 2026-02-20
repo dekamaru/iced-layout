@@ -36,7 +36,7 @@
 - [-] TextEditor (widget/src/text_editor.rs)
 - [x] TextInput (widget/src/text_input.rs)
 - [-] Toggler (widget/src/toggler.rs)
-- [-] Tooltip (widget/src/tooltip.rs)
+- [x] Tooltip (widget/src/tooltip.rs)
 - [x] VerticalSlider (widget/src/vertical_slider.rs)
 
 ## Feature-gated:

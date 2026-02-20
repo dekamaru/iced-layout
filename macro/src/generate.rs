@@ -6,7 +6,8 @@ use crate::interpolation::generate_text_arg;
 use crate::style_var_name;
 use crate::types::{
     generate_horizontal, generate_length, generate_line_height, generate_padding,
-    generate_shaping, generate_text_alignment, generate_vertical, generate_wrapping,
+    generate_shaping, generate_text_alignment, generate_tooltip_position, generate_vertical,
+    generate_wrapping,
 };
 
 #[derive(Clone, Default)]
@@ -687,6 +688,48 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             if let Some(val) = on_release {
                 let handler = generate_event_handler(val, "on-release", "on_release", HandlerStyle::SelfCall);
                 expr = quote! { #expr #handler };
+            }
+            Generated::Widget(expr)
+        }
+        Node::Tooltip {
+            position,
+            gap,
+            padding,
+            delay,
+            snap_within_viewport,
+            style,
+            children,
+        } => {
+            assert_eq!(
+                children.len(),
+                2,
+                "<tooltip> must have exactly 2 children (content, tooltip), found {}",
+                children.len()
+            );
+            let content = generate(&children[0], styles, ctx).into_widget();
+            let tooltip_widget = generate(&children[1], styles, ctx).into_widget();
+            let pos = generate_tooltip_position(position);
+            let mut expr = quote! { iced::widget::tooltip(#content, #tooltip_widget, #pos) };
+            if let Some(g) = gap {
+                expr = quote! { #expr.gap(#g) };
+            }
+            if let Some(p) = padding {
+                expr = quote! { #expr.padding(#p) };
+            }
+            if let Some(d) = delay {
+                expr = quote! { #expr.delay(::std::time::Duration::from_millis(#d)) };
+            }
+            if let Some(snap) = snap_within_viewport {
+                expr = quote! { #expr.snap_within_viewport(#snap) };
+            }
+            if let Some(style_name) = style {
+                assert!(
+                    styles.container.contains_key(style_name.as_str()),
+                    "unknown container style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("container", style_name);
+                expr = quote! { #expr.style(#var) };
             }
             Generated::Widget(expr)
         }
