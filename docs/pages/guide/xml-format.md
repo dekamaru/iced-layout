@@ -7,7 +7,7 @@ All layouts are defined in XML files. The root element must be `<layout>`, which
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/dekamaru/iced-layout/main/schemas/0.0.1.xsd">
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/dekamaru/iced-layout/refs/heads/main/schemas/0.0.1.xsd">
     <root>
         <!-- your widget tree here -->
     </root>
@@ -29,7 +29,7 @@ Style elements (`<container-style>`, `<button-style>`, etc.) defined inside `<st
 
 ```xml
 <layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/dekamaru/iced-layout/main/schemas/0.0.1.xsd">
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/dekamaru/iced-layout/refs/heads/main/schemas/0.0.1.xsd">
     <root>
         <container style="my-box">
             <text>Styled</text>

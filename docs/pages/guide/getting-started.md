@@ -26,7 +26,7 @@ Define your layout in an XML file (e.g. `src/my_layout.xml`):
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/dekamaru/iced-layout/main/schemas/0.0.1.xsd">
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/dekamaru/iced-layout/refs/heads/main/schemas/0.0.1.xsd">
     <root>
         <column>
             <text size="24">Hello, iced-layout!</text>
