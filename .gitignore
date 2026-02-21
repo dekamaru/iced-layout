@@ -1,4 +1,7 @@
 /target
+.idea/
+.claude/
+CLAUDE.md
 docs/.vitepress/cache
 docs/.vitepress/dist
 docs/.vitepress/generated-sidebar.json
