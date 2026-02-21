@@ -367,4 +367,12 @@ pub enum Node {
         font: Option<String>,
         style: Option<String>,
     },
+    Sensor {
+        on_show: Option<String>,
+        on_resize: Option<String>,
+        on_hide: Option<String>,
+        anticipate: Option<f32>,
+        delay: Option<u64>,
+        children: Vec<Node>,
+    },
 }

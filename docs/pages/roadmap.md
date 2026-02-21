@@ -34,9 +34,9 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 | TextInput | ✅ Done |
 | Tooltip | ✅ Done |
 | VerticalSlider | ✅ Done |
-| Sensor | 🔧 Partial |
+| Sensor | ✅ Done |
 | TextEditor | 🔧 Partial |
-| Toggler | 🔧 Partial |
+| Toggler | ✅ Done |
 | ComboBox | 🔲 Planned |
 | Float | 🔲 Planned |
 | Grid | 🔲 Planned |

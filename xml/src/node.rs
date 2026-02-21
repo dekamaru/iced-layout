@@ -293,6 +293,15 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     spacing, font, style,
                 }
             }
+            b"sensor" => {
+                let on_show = parse_string_attr(&e, b"on-show");
+                let on_resize = parse_string_attr(&e, b"on-resize");
+                let on_hide = parse_string_attr(&e, b"on-hide");
+                let anticipate = parse_f32_attr(&e, b"anticipate");
+                let delay = parse_delay_attr(&e, b"delay");
+                let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
+                Node::Sensor { on_show, on_resize, on_hide, anticipate, delay, children }
+            }
             b"widget" => {
                 let method = parse_string_attr(&e, b"method")
                     .expect("<widget> requires a 'method' attribute");

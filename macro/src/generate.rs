@@ -823,6 +823,51 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             }
             Generated::Widget(expr)
         }
+        Node::Sensor {
+            on_show,
+            on_resize,
+            on_hide,
+            anticipate,
+            delay,
+            children,
+        } => {
+            let child = if children.is_empty() {
+                quote! { iced::widget::Space::new() }
+            } else {
+                generate(&children[0], styles, ctx).into_widget()
+            };
+            let mut expr = quote! { iced::widget::sensor(#child) };
+            if let Some(val) = on_show {
+                let handler = generate_event_handler(
+                    val,
+                    "on-show",
+                    "on_show",
+                    HandlerStyle::Closure("size"),
+                );
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_resize {
+                let handler = generate_event_handler(
+                    val,
+                    "on-resize",
+                    "on_resize",
+                    HandlerStyle::Closure("size"),
+                );
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_hide {
+                let handler =
+                    generate_event_handler(val, "on-hide", "on_hide", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(a) = anticipate {
+                expr = quote! { #expr.anticipate(#a) };
+            }
+            if let Some(d) = delay {
+                expr = quote! { #expr.delay(::std::time::Duration::from_millis(#d)) };
+            }
+            Generated::Widget(expr)
+        }
         Node::ForEach { iterable, body } => {
             let iter_field = resolve_field_path(iterable, ctx);
             let mut inner_ctx = ctx.clone();
