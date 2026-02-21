@@ -132,7 +132,7 @@
             <xs:documentation>Containers let you align a widget inside their boundaries.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:choice minOccurs="0" maxOccurs="1">
+            <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element ref="container"/>
                 <xs:element ref="text"/>
                 <xs:element ref="row"/>
@@ -272,7 +272,7 @@
             <xs:documentation>Buttons allow your users to perform actions by pressing them.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:choice minOccurs="0" maxOccurs="1">
+            <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element ref="container"/>
                 <xs:element ref="text"/>
                 <xs:element ref="row"/>
@@ -493,7 +493,7 @@
             <xs:documentation>Generate messages when content pops in and out of view.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:choice minOccurs="0" maxOccurs="1">
+            <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element ref="container"/>
                 <xs:element ref="text"/>
                 <xs:element ref="row"/>

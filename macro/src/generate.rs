@@ -317,16 +317,13 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             on_press_maybe,
             children,
         } => {
-            assert!(
-                children.len() <= 1,
-                "<button> must have at most 1 child element, found {}",
+            assert_eq!(
+                children.len(),
+                1,
+                "<button> must have exactly 1 child element, found {}",
                 children.len()
             );
-            let child = if children.is_empty() {
-                quote! { iced::widget::text("") }
-            } else {
-                generate(&children[0], styles, ctx).into_widget()
-            };
+            let child = generate(&children[0], styles, ctx).into_widget();
             let mut expr = quote! { iced::widget::button(#child) };
 
             if let Some(padding_expr) = generate_padding(padding) {
@@ -831,11 +828,13 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             delay,
             children,
         } => {
-            let child = if children.is_empty() {
-                quote! { iced::widget::Space::new() }
-            } else {
-                generate(&children[0], styles, ctx).into_widget()
-            };
+            assert_eq!(
+                children.len(),
+                1,
+                "<sensor> must have exactly 1 child element, found {}",
+                children.len()
+            );
+            let child = generate(&children[0], styles, ctx).into_widget();
             let mut expr = quote! { iced::widget::sensor(#child) };
             if let Some(val) = on_show {
                 let handler = generate_event_handler(
