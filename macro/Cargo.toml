@@ -3,13 +3,15 @@ name = "iced-layout-macro"
 version = "0.0.1"
 edition = "2024"
 license = "MIT"
+description = "Proc macro for iced-layout"
+repository = "https://github.com/dekamaru/iced-layout"
 
 [lib]
 proc-macro = true
 
 [dependencies]
-iced-layout-core = { path = "../core" }
-iced-layout-xml = { path = "../xml" }
+iced-layout-core = { path = "../core", version = "0.0.1" }
+iced-layout-xml = { path = "../xml", version = "0.0.1" }
 proc-macro2 = "1"
 quote = "1"
 syn = { version = "2", features = ["full"] }

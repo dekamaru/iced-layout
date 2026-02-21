@@ -6,8 +6,11 @@ name = "iced-layout"
 version = "0.0.1"
 edition = "2024"
 license = "MIT"
+description = "Define iced UI layouts in XML with compile-time macro expansion"
+repository = "https://github.com/dekamaru/iced-layout"
+readme = "README.md"
 
 [dependencies]
-iced-layout-core = { path = "core" }
-iced-layout-xml = { path = "xml" }
-iced-layout-macro = { path = "macro" }
+iced-layout-core = { path = "core", version = "0.0.1" }
+iced-layout-xml = { path = "xml", version = "0.0.1" }
+iced-layout-macro = { path = "macro", version = "0.0.1" }

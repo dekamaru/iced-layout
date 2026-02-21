@@ -3,7 +3,9 @@ name = "iced-layout-xml"
 version = "0.0.1"
 edition = "2024"
 license = "MIT"
+description = "XML parser for iced-layout"
+repository = "https://github.com/dekamaru/iced-layout"
 
 [dependencies]
-iced-layout-core = { path = "../core" }
+iced-layout-core = { path = "../core", version = "0.0.1" }
 quick-xml = "0.37"
