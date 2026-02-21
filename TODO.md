@@ -3,6 +3,7 @@
 - [x] Macro optimize styles compilation (reuse compiled styles with .clone())
 - [x] Support fonts
 - [ ] Support "icon" attributes
+- [ ] docs for conditions, state usage, loops
 - [x] State access
 - [x] Callbacks (buttons)
 - [x] If conditions
