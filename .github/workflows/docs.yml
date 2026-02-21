@@ -11,7 +11,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version-file: docs/.nvmrc
           cache: 'npm'
           cache-dependency-path: docs/package-lock.json
       - run: npm ci
