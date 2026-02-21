@@ -24,6 +24,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'Schema', link: '/schema/container' },
+      { text: 'Roadmap', link: '/roadmap' },
     ],
     sidebar: [
       {
@@ -31,6 +32,10 @@ export default defineConfig({
         items: [
           { text: 'Getting Started', link: '/guide/getting-started' },
           { text: 'XML Format', link: '/guide/xml-format' },
+          { text: 'State Access', link: '/guide/state-access' },
+          { text: 'Loops and Conditions', link: '/guide/loops-and-conditions' },
+          { text: 'Custom Widgets', link: '/guide/custom-widgets' },
+          { text: 'Roadmap', link: '/roadmap' },
         ],
       },
       {
