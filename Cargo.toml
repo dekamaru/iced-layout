@@ -5,6 +5,7 @@ members = [".", "core", "xml", "macro", "docs/docs-gen"]
 name = "iced-layout"
 version = "0.0.1"
 edition = "2024"
+license = "MIT"
 
 [dependencies]
 iced-layout-core = { path = "core" }

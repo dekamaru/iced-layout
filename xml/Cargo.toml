@@ -2,6 +2,7 @@
 name = "iced-layout-xml"
 version = "0.0.1"
 edition = "2024"
+license = "MIT"
 
 [dependencies]
 iced-layout-core = { path = "../core" }
