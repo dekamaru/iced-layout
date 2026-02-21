@@ -128,6 +128,9 @@
     </xs:simpleType>
 
     <xs:element name="container">
+        <xs:annotation>
+            <xs:documentation>Containers let you align a widget inside their boundaries.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="1">
                 <xs:element ref="container"/>
@@ -172,6 +175,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="text">
+        <xs:annotation>
+            <xs:documentation>Text widgets display information through writing.</xs:documentation>
+        </xs:annotation>
         <xs:complexType mixed="true">
             <xs:attribute name="size" type="xs:float" use="optional"/>
             <xs:attribute name="line-height" type="LineHeight" use="optional"/>
@@ -189,6 +195,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="row">
+        <xs:annotation>
+            <xs:documentation>Distribute content horizontally.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:element ref="container"/>
@@ -222,6 +231,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="column">
+        <xs:annotation>
+            <xs:documentation>Distribute content vertically.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:element ref="container"/>
@@ -256,6 +268,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="button">
+        <xs:annotation>
+            <xs:documentation>Buttons allow your users to perform actions by pressing them.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="1">
                 <xs:element ref="container"/>
@@ -291,6 +306,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="stack">
+        <xs:annotation>
+            <xs:documentation>Display content on top of other content.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:element ref="container"/>
@@ -317,6 +335,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="checkbox">
+        <xs:annotation>
+            <xs:documentation>Checkboxes can be used to let users make binary choices.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:attribute name="is-checked" type="xs:string" use="required"/>
             <xs:attribute name="label" type="xs:string" use="optional"/>
@@ -334,12 +355,18 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="space">
+        <xs:annotation>
+            <xs:documentation>Add some explicit spacing between elements.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="height" type="Length" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="text-input">
+        <xs:annotation>
+            <xs:documentation>Text inputs display fields that can be filled with text.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:attribute name="placeholder" type="xs:string" use="required"/>
             <xs:attribute name="value" type="xs:string" use="required"/>
@@ -365,6 +392,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="vertical-slider">
+        <xs:annotation>
+            <xs:documentation>Sliders let users set a value by moving an indicator.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:attribute name="range-start" type="xs:float" use="required"/>
             <xs:attribute name="range-end" type="xs:float" use="required"/>
@@ -380,6 +410,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="tooltip">
+        <xs:annotation>
+            <xs:documentation>Tooltips display a hint of information over some element when hovered.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:choice minOccurs="2" maxOccurs="2">
                 <xs:element ref="container"/>
@@ -409,6 +442,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="toggler">
+        <xs:annotation>
+            <xs:documentation>Togglers let users make binary choices by toggling a switch.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:attribute name="is-toggled" type="xs:string" use="required"/>
             <xs:attribute name="label" type="xs:string" use="optional"/>
@@ -427,6 +463,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="text-editor">
+        <xs:annotation>
+            <xs:documentation>Text editors display a multi-line text input for text editing.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:attribute name="content" type="xs:string" use="required"/>
             <xs:attribute name="id" type="xs:string" use="optional"/>
@@ -450,6 +489,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="sensor">
+        <xs:annotation>
+            <xs:documentation>Generate messages when content pops in and out of view.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="1">
                 <xs:element ref="container"/>

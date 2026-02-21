@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "vitepress": "^2.0.0-alpha.16"
+  },
+  "scripts": {
+    "docs:dev": "cargo run -p docs-gen && vitepress dev",
+    "docs:build": "cargo run -p docs-gen --release && vitepress build",
+    "docs:preview": "vitepress preview"
+  }
+}

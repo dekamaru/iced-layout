@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "core", "xml", "macro"]
+members = [".", "core", "xml", "macro", "docs/docs-gen"]
 
 [package]
 name = "iced-layout"

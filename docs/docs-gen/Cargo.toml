@@ -1,0 +1,12 @@
+[package]
+name = "docs-gen"
+version = "0.0.1"
+edition = "2024"
+
+[[bin]]
+name = "docs-gen"
+path = "src/main.rs"
+
+[dependencies]
+quick-xml = "0.37"
+serde_json = "1"

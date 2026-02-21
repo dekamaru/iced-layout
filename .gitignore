@@ -1,1 +1,8 @@
 /target
+docs/.vitepress/cache
+docs/.vitepress/dist
+docs/.vitepress/generated-sidebar.json
+docs/node_modules
+docs/pages/schema/
+docs/pages/styles/
+docs/pages/types.md
