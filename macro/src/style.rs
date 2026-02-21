@@ -1,6 +1,6 @@
 use iced_layout_core::{
     BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, TextInputStyle,
-    TextInputStyleFields,
+    TextInputStyleFields, TogglerStyle,
 };
 use quote::quote;
 
@@ -222,6 +222,67 @@ pub fn merge_text_input_fields(
         placeholder_color: overlay.placeholder_color.or(base.placeholder_color),
         value_color: overlay.value_color.or(base.value_color),
         selection_color: overlay.selection_color.or(base.selection_color),
+    }
+}
+
+pub fn generate_toggler_style_closure(s: &TogglerStyle) -> proc_macro2::TokenStream {
+    let background = match &s.background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
+    };
+    let background_border_width = s.background_border_width.unwrap_or(0.0);
+    let background_border_color =
+        generate_color_or(&s.background_border_color, quote! { iced::Color::TRANSPARENT });
+
+    let foreground = match &s.foreground_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
+    };
+    let foreground_border_width = s.foreground_border_width.unwrap_or(0.0);
+    let foreground_border_color =
+        generate_color_or(&s.foreground_border_color, quote! { iced::Color::TRANSPARENT });
+
+    let text_color = generate_option_color(&s.text_color);
+
+    let border_radius = {
+        let br = &s.border_radius;
+        if br.top_left.is_none()
+            && br.top_right.is_none()
+            && br.bottom_right.is_none()
+            && br.bottom_left.is_none()
+        {
+            quote! { None }
+        } else {
+            let tl = br.top_left.unwrap_or(0.0);
+            let tr = br.top_right.unwrap_or(0.0);
+            let brr = br.bottom_right.unwrap_or(0.0);
+            let bl = br.bottom_left.unwrap_or(0.0);
+            quote! {
+                Some(iced::border::Radius { top_left: #tl, top_right: #tr, bottom_right: #brr, bottom_left: #bl })
+            }
+        }
+    };
+
+    let padding_ratio = s.padding_ratio.unwrap_or(0.05);
+
+    quote! {
+        |_theme, _status| iced::widget::toggler::Style {
+            background: #background,
+            background_border_width: #background_border_width,
+            background_border_color: #background_border_color,
+            foreground: #foreground,
+            foreground_border_width: #foreground_border_width,
+            foreground_border_color: #foreground_border_color,
+            text_color: #text_color,
+            border_radius: #border_radius,
+            padding_ratio: #padding_ratio,
+        }
     }
 }
 

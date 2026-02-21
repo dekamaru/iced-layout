@@ -199,12 +199,26 @@ pub struct TextInputStyle {
     pub disabled: Option<TextInputStyleFields>,
 }
 
+#[derive(Default)]
+pub struct TogglerStyle {
+    pub background_color: Option<Color>,
+    pub background_border_width: Option<f32>,
+    pub background_border_color: Option<Color>,
+    pub foreground_color: Option<Color>,
+    pub foreground_border_width: Option<f32>,
+    pub foreground_border_color: Option<Color>,
+    pub text_color: Option<Color>,
+    pub border_radius: BorderRadius,
+    pub padding_ratio: Option<f32>,
+}
+
 pub struct Layout {
     pub container_styles: Vec<(String, ContainerStyle)>,
     pub text_styles: Vec<(String, TextStyle)>,
     pub button_styles: Vec<(String, ButtonStyle)>,
     pub checkbox_styles: Vec<(String, CheckboxStyle)>,
     pub text_input_styles: Vec<(String, TextInputStyle)>,
+    pub toggler_styles: Vec<(String, TogglerStyle)>,
     pub font_defs: Vec<(String, FontDef)>,
     pub root: Node,
 }
@@ -336,5 +350,21 @@ pub enum Node {
         snap_within_viewport: Option<bool>,
         style: Option<String>,
         children: Vec<Node>,
+    },
+    Toggler {
+        is_toggled: String,
+        label: Option<String>,
+        on_toggle: Option<String>,
+        on_toggle_maybe: Option<String>,
+        size: Option<f32>,
+        width: Option<Length>,
+        text_size: Option<f32>,
+        text_line_height: Option<LineHeight>,
+        text_alignment: Option<TextAlignment>,
+        text_shaping: Option<Shaping>,
+        text_wrapping: Option<Wrapping>,
+        spacing: Option<f32>,
+        font: Option<String>,
+        style: Option<String>,
     },
 }

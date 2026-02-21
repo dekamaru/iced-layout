@@ -6,35 +6,61 @@ use quick_xml::events::BytesStart;
 use quick_xml::events::Event;
 use quick_xml::Reader;
 
-const WIDGET_NAMES: &[&str] = &[
-    "container",
-    "text",
-    "row",
-    "column",
-    "button",
-    "stack",
-    "checkbox",
-    "space",
-    "text-input",
-    "vertical-slider",
-    "tooltip",
-    "toggler",
-    "text-editor",
-    "sensor",
-    "if",
-    "foreach",
-    "widget",
-];
+/// Discovers widget and style element names from the XSD by reading the allowed
+/// children of `<root>` and `<styles>`, preserving their declaration order.
+fn discover_element_lists(content: &str) -> (Vec<String>, Vec<String>) {
+    let mut reader = Reader::from_str(content);
+    let mut depth: i32 = 0;
+    let mut current_element: Option<String> = None;
+    let mut in_root_choice = false;
+    let mut in_styles_choice = false;
+    let mut widgets: Vec<String> = Vec::new();
+    let mut styles: Vec<String> = Vec::new();
 
-const STYLE_NAMES: &[&str] = &[
-    "container-style",
-    "text-style",
-    "button-style",
-    "checkbox-style",
-    "text-input-style",
-    "toggler-style",
-    "text-editor-style",
-];
+    loop {
+        match reader.read_event().expect("XSD parse error") {
+            Event::Start(e) => {
+                depth += 1;
+                let local = String::from_utf8_lossy(e.local_name().as_ref()).into_owned();
+                if local == "element" && depth == 2 {
+                    current_element = get_attr(&e, b"name");
+                } else if local == "choice" && depth == 4 {
+                    match current_element.as_deref() {
+                        Some("root") => in_root_choice = true,
+                        Some("styles") => in_styles_choice = true,
+                        _ => {}
+                    }
+                }
+            }
+            Event::Empty(e) => {
+                let local = String::from_utf8_lossy(e.local_name().as_ref()).into_owned();
+                if local == "element" && depth == 4 {
+                    if let Some(ref_name) = get_attr(&e, b"ref") {
+                        if in_root_choice && !widgets.contains(&ref_name) {
+                            widgets.push(ref_name);
+                        } else if in_styles_choice && !styles.contains(&ref_name) {
+                            styles.push(ref_name);
+                        }
+                    }
+                }
+            }
+            Event::End(e) => {
+                let local = String::from_utf8_lossy(e.local_name().as_ref()).into_owned();
+                if local == "choice" && depth == 4 {
+                    in_root_choice = false;
+                    in_styles_choice = false;
+                } else if local == "element" && depth == 2 {
+                    current_element = None;
+                }
+                depth -= 1;
+            }
+            Event::Eof => break,
+            _ => {}
+        }
+    }
+
+    (widgets, styles)
+}
 
 fn fallback_description(name: &str) -> &'static str {
     match name {
@@ -275,6 +301,7 @@ fn get_attr(e: &BytesStart, name: &[u8]) -> Option<String> {
 fn parse_xsd(path: &PathBuf) -> (Vec<Widget>, Vec<Style>, HashMap<String, Vec<String>>) {
     let content = fs::read_to_string(path).expect("Failed to read XSD file");
     let type_map = parse_type_map(&content);
+    let (widget_names, style_names) = discover_element_lists(&content);
 
     let mut reader = Reader::from_str(&content);
     let mut widgets: HashMap<String, Widget> = HashMap::new();
@@ -290,7 +317,7 @@ fn parse_xsd(path: &PathBuf) -> (Vec<Widget>, Vec<Style>, HashMap<String, Vec<St
 
                 if local == "element" && depth == 2 {
                     if let Some(name) = get_attr(&e, b"name") {
-                        if WIDGET_NAMES.contains(&name.as_str()) {
+                        if widget_names.contains(&name) {
                             widgets.entry(name.clone()).or_insert_with(|| Widget {
                                 name: name.clone(),
                                 description: None,
@@ -368,9 +395,9 @@ fn parse_xsd(path: &PathBuf) -> (Vec<Widget>, Vec<Style>, HashMap<String, Vec<St
         }
     }
 
-    let widgets = WIDGET_NAMES
+    let widgets = widget_names
         .iter()
-        .filter_map(|&name| widgets.remove(name))
+        .filter_map(|name| widgets.remove(name.as_str()))
         .collect();
 
     // --- Parse styles ---
@@ -391,7 +418,7 @@ fn parse_xsd(path: &PathBuf) -> (Vec<Widget>, Vec<Style>, HashMap<String, Vec<St
 
                 if local == "element" && depth == 2 {
                     if let Some(name) = get_attr(&e, b"name") {
-                        if STYLE_NAMES.contains(&name.as_str()) {
+                        if style_names.contains(&name) {
                             styles.entry(name.clone()).or_insert_with(|| Style {
                                 name: name.clone(),
                                 attrs: Vec::new(),
@@ -456,9 +483,9 @@ fn parse_xsd(path: &PathBuf) -> (Vec<Widget>, Vec<Style>, HashMap<String, Vec<St
         }
     }
 
-    let styles = STYLE_NAMES
+    let styles = style_names
         .iter()
-        .filter_map(|&name| styles.remove(name))
+        .filter_map(|name| styles.remove(name.as_str()))
         .collect();
 
     (widgets, styles, type_map)

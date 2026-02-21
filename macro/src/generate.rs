@@ -10,6 +10,7 @@ use crate::types::{
     generate_wrapping,
 };
 
+
 #[derive(Clone, Default)]
 pub struct GenerateContext {
     pub local_vars: Vec<String>,
@@ -729,6 +730,95 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
                     style_name
                 );
                 let var = style_var_name("container", style_name);
+                expr = quote! { #expr.style(#var) };
+            }
+            Generated::Widget(expr)
+        }
+        Node::Toggler {
+            is_toggled,
+            label,
+            on_toggle,
+            on_toggle_maybe,
+            size,
+            width,
+            text_size,
+            text_line_height,
+            text_alignment,
+            text_shaping,
+            text_wrapping,
+            spacing,
+            font,
+            style,
+        } => {
+            let is_toggled_field = resolve_field_path(is_toggled, ctx);
+            let mut expr = quote! { iced::widget::toggler(#is_toggled_field) };
+            if let Some(lbl) = label {
+                let lbl_arg = generate_text_arg(lbl, ctx);
+                expr = quote! { #expr.label(#lbl_arg) };
+            }
+            if let Some(val) = on_toggle {
+                let handler = generate_event_handler(
+                    val,
+                    "on-toggle",
+                    "on_toggle",
+                    HandlerStyle::Closure("toggled"),
+                );
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_toggle_maybe {
+                let handler = generate_event_handler(
+                    val,
+                    "on-toggle-maybe",
+                    "on_toggle_maybe",
+                    HandlerStyle::SelfCall,
+                );
+                expr = quote! { #expr #handler };
+            }
+            if let Some(s) = size {
+                expr = quote! { #expr.size(#s) };
+            }
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(ts) = text_size {
+                expr = quote! { #expr.text_size(#ts) };
+            }
+            if let Some(lh) = text_line_height {
+                let lh = generate_line_height(lh);
+                expr = quote! { #expr.text_line_height(#lh) };
+            }
+            if let Some(ta) = text_alignment {
+                let ta = generate_text_alignment(ta);
+                expr = quote! { #expr.text_alignment(#ta) };
+            }
+            if let Some(sh) = text_shaping {
+                let sh = generate_shaping(sh);
+                expr = quote! { #expr.text_shaping(#sh) };
+            }
+            if let Some(wr) = text_wrapping {
+                let wr = generate_wrapping(wr);
+                expr = quote! { #expr.text_wrapping(#wr) };
+            }
+            if let Some(s) = spacing {
+                expr = quote! { #expr.spacing(#s) };
+            }
+            if let Some(font_name) = font {
+                assert!(
+                    styles.font.contains_key(font_name.as_str()),
+                    "unknown font: \"{}\"",
+                    font_name
+                );
+                let var = style_var_name("font", font_name);
+                expr = quote! { #expr.font(#var) };
+            }
+            if let Some(style_name) = style {
+                assert!(
+                    styles.toggler.contains_key(style_name.as_str()),
+                    "unknown toggler style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("toggler", style_name);
                 expr = quote! { #expr.style(#var) };
             }
             Generated::Widget(expr)

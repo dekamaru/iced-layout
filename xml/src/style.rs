@@ -1,6 +1,6 @@
 use iced_layout_core::{
     ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FontDef, TextInputStyle,
-    TextInputStyleFields, TextStyle,
+    TextInputStyleFields, TextStyle, TogglerStyle,
 };
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::Reader;
@@ -13,6 +13,7 @@ pub struct ParsedStyles {
     pub button: Vec<(String, ButtonStyle)>,
     pub checkbox: Vec<(String, CheckboxStyle)>,
     pub text_input: Vec<(String, TextInputStyle)>,
+    pub toggler: Vec<(String, TogglerStyle)>,
     pub font: Vec<(String, FontDef)>,
 }
 
@@ -24,6 +25,7 @@ impl Default for ParsedStyles {
             button: Vec::new(),
             checkbox: Vec::new(),
             text_input: Vec::new(),
+            toggler: Vec::new(),
             font: Vec::new(),
         }
     }
@@ -193,6 +195,22 @@ fn parse_text_input_style(
     (id, style)
 }
 
+fn parse_toggler_style(e: &BytesStart) -> (String, TogglerStyle) {
+    let id = parse_string_attr(e, b"id").expect("<toggler-style> requires an 'id' attribute");
+    let style = TogglerStyle {
+        background_color: parse_color_attr(e, b"background-color"),
+        background_border_width: parse_f32_attr(e, b"background-border-width"),
+        background_border_color: parse_color_attr(e, b"background-border-color"),
+        foreground_color: parse_color_attr(e, b"foreground-color"),
+        foreground_border_width: parse_f32_attr(e, b"foreground-border-width"),
+        foreground_border_color: parse_color_attr(e, b"foreground-border-color"),
+        text_color: parse_color_attr(e, b"text-color"),
+        border_radius: parse_border_radius(e),
+        padding_ratio: parse_f32_attr(e, b"padding-ratio"),
+    };
+    (id, style)
+}
+
 fn parse_font_def(e: &BytesStart) -> (String, FontDef) {
     let id = parse_string_attr(e, b"id").expect("<font> requires an 'id' attribute");
     let def = FontDef {
@@ -237,6 +255,10 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                     b"text-input-style" => {
                         styles.text_input.push(parse_text_input_style(&e, reader));
                     }
+                    b"toggler-style" => {
+                        styles.toggler.push(parse_toggler_style(&e));
+                        consume_closing_tag(reader, &tag);
+                    }
                     b"font" => {
                         styles.font.push(parse_font_def(&e));
                         consume_closing_tag(reader, &tag);
@@ -253,6 +275,7 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                 b"button-style" => styles.button.push(parse_button_style_empty(&e)),
                 b"checkbox-style" => styles.checkbox.push(parse_checkbox_style(&e)),
                 b"text-input-style" => styles.text_input.push(parse_text_input_style_empty(&e)),
+                b"toggler-style" => styles.toggler.push(parse_toggler_style(&e)),
                 b"font" => styles.font.push(parse_font_def(&e)),
                 other => panic!(
                     "unexpected element in <styles>: {}",

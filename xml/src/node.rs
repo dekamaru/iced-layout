@@ -267,6 +267,32 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 assert_eq!(children.len(), 2, "<tooltip> must have exactly 2 children (content, tooltip)");
                 Node::Tooltip { position, gap, padding, delay, snap_within_viewport, style, children }
             }
+            b"toggler" => {
+                let is_toggled = parse_string_attr(&e, b"is-toggled")
+                    .expect("<toggler> requires an 'is-toggled' attribute");
+                let label = parse_string_attr(&e, b"label");
+                let on_toggle = parse_string_attr(&e, b"on-toggle");
+                let on_toggle_maybe = parse_string_attr(&e, b"on-toggle-maybe");
+                let size = parse_f32_attr(&e, b"size");
+                let width = parse_length_attr(&e, b"width");
+                let text_size = parse_f32_attr(&e, b"text-size");
+                let text_line_height = parse_line_height_attr(&e, b"text-line-height");
+                let text_alignment = parse_text_alignment_attr(&e, b"text-alignment");
+                let text_shaping = parse_shaping_attr(&e, b"text-shaping");
+                let text_wrapping = parse_wrapping_attr(&e, b"text-wrapping");
+                let spacing = parse_f32_attr(&e, b"spacing");
+                let font = parse_string_attr(&e, b"font");
+                let style = parse_string_attr(&e, b"style");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"toggler");
+                }
+                Node::Toggler {
+                    is_toggled, label, on_toggle, on_toggle_maybe,
+                    size, width, text_size, text_line_height,
+                    text_alignment, text_shaping, text_wrapping,
+                    spacing, font, style,
+                }
+            }
             b"widget" => {
                 let method = parse_string_attr(&e, b"method")
                     .expect("<widget> requires a 'method' attribute");

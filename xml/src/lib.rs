@@ -61,6 +61,7 @@ pub fn parse(xml: &str) -> Layout {
         button_styles: styles.button,
         checkbox_styles: styles.checkbox,
         text_input_styles: styles.text_input,
+        toggler_styles: styles.toggler,
         font_defs: styles.font,
         root: root.expect("<layout> must contain a <root> element"),
     }

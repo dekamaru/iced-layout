@@ -10,14 +10,14 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 use iced_layout_core::{
-    ButtonStyle, CheckboxStyle, ContainerStyle, FontDef, TextInputStyle, TextStyle,
+    ButtonStyle, CheckboxStyle, ContainerStyle, FontDef, TextInputStyle, TextStyle, TogglerStyle,
 };
 use quote::{format_ident, quote};
 use syn::{LitStr, parse_macro_input};
 
 use crate::style::{
     generate_button_style_closure, generate_checkbox_style_closure,
-    generate_container_style, generate_text_input_style_closure,
+    generate_container_style, generate_text_input_style_closure, generate_toggler_style_closure,
 };
 use crate::types::generate_font_def;
 
@@ -27,6 +27,7 @@ pub(crate) struct StyleMaps<'a> {
     pub button: HashMap<&'a str, &'a ButtonStyle>,
     pub checkbox: HashMap<&'a str, &'a CheckboxStyle>,
     pub text_input: HashMap<&'a str, &'a TextInputStyle>,
+    pub toggler: HashMap<&'a str, &'a TogglerStyle>,
     pub font: HashMap<&'a str, &'a FontDef>,
 }
 
@@ -67,6 +68,7 @@ pub fn layout(input: TokenStream) -> TokenStream {
         button: layout.button_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         checkbox: layout.checkbox_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         text_input: layout.text_input_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        toggler: layout.toggler_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         font: layout.font_defs.iter().map(|(k, v)| (k.as_str(), v)).collect(),
     };
 
@@ -90,6 +92,11 @@ pub fn layout(input: TokenStream) -> TokenStream {
     for (name, tis) in &style_maps.text_input {
         let var = style_var_name("text_input", name);
         let closure = generate_text_input_style_closure(tis);
+        style_bindings.push(quote! { let #var = #closure; });
+    }
+    for (name, ts) in &style_maps.toggler {
+        let var = style_var_name("toggler", name);
+        let closure = generate_toggler_style_closure(ts);
         style_bindings.push(quote! { let #var = #closure; });
     }
     for (name, fd) in &style_maps.font {
