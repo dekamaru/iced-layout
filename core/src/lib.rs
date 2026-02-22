@@ -212,6 +212,25 @@ pub struct TogglerStyle {
     pub padding_ratio: Option<f32>,
 }
 
+#[derive(Default)]
+pub struct TextEditorStyleFields {
+    pub background_color: Option<Color>,
+    pub border_color: Option<Color>,
+    pub border_width: Option<f32>,
+    pub border_radius: BorderRadius,
+    pub placeholder_color: Option<Color>,
+    pub value_color: Option<Color>,
+    pub selection_color: Option<Color>,
+}
+
+#[derive(Default)]
+pub struct TextEditorStyle {
+    pub base: TextEditorStyleFields,
+    pub active: Option<TextEditorStyleFields>,
+    pub hovered: Option<TextEditorStyleFields>,
+    pub disabled: Option<TextEditorStyleFields>,
+}
+
 pub struct Layout {
     pub container_styles: Vec<(String, ContainerStyle)>,
     pub text_styles: Vec<(String, TextStyle)>,
@@ -219,6 +238,7 @@ pub struct Layout {
     pub checkbox_styles: Vec<(String, CheckboxStyle)>,
     pub text_input_styles: Vec<(String, TextInputStyle)>,
     pub toggler_styles: Vec<(String, TogglerStyle)>,
+    pub text_editor_styles: Vec<(String, TextEditorStyle)>,
     pub font_defs: Vec<(String, FontDef)>,
     pub root: Node,
 }
@@ -374,5 +394,22 @@ pub enum Node {
         anticipate: Option<f32>,
         delay: Option<u64>,
         children: Vec<Node>,
+    },
+    TextEditor {
+        content: String,
+        id: Option<String>,
+        placeholder: Option<String>,
+        width: Option<f32>,
+        height: Option<Length>,
+        min_height: Option<f32>,
+        max_height: Option<f32>,
+        on_action: Option<String>,
+        font: Option<String>,
+        size: Option<f32>,
+        line_height: Option<LineHeight>,
+        padding: Padding,
+        wrapping: Option<Wrapping>,
+        key_binding: Option<String>,
+        style: Option<String>,
     },
 }

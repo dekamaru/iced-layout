@@ -1,6 +1,6 @@
 use iced_layout_core::{
-    ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FontDef, TextInputStyle,
-    TextInputStyleFields, TextStyle, TogglerStyle,
+    ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FontDef, TextEditorStyle,
+    TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TextStyle, TogglerStyle,
 };
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::Reader;
@@ -14,6 +14,7 @@ pub struct ParsedStyles {
     pub checkbox: Vec<(String, CheckboxStyle)>,
     pub text_input: Vec<(String, TextInputStyle)>,
     pub toggler: Vec<(String, TogglerStyle)>,
+    pub text_editor: Vec<(String, TextEditorStyle)>,
     pub font: Vec<(String, FontDef)>,
 }
 
@@ -26,6 +27,7 @@ impl Default for ParsedStyles {
             checkbox: Vec::new(),
             text_input: Vec::new(),
             toggler: Vec::new(),
+            text_editor: Vec::new(),
             font: Vec::new(),
         }
     }
@@ -211,6 +213,60 @@ fn parse_toggler_style(e: &BytesStart) -> (String, TogglerStyle) {
     (id, style)
 }
 
+fn parse_text_editor_style_fields(e: &BytesStart) -> TextEditorStyleFields {
+    TextEditorStyleFields {
+        background_color: parse_color_attr(e, b"background-color"),
+        border_color: parse_color_attr(e, b"border-color"),
+        border_width: parse_f32_attr(e, b"border-width"),
+        border_radius: parse_border_radius(e),
+        placeholder_color: parse_color_attr(e, b"placeholder"),
+        value_color: parse_color_attr(e, b"value"),
+        selection_color: parse_color_attr(e, b"selection"),
+    }
+}
+
+fn assign_text_editor_status_fields(
+    style: &mut TextEditorStyle,
+    tag: &[u8],
+    fields: TextEditorStyleFields,
+) {
+    match tag {
+        b"active" => style.active = Some(fields),
+        b"hovered" => style.hovered = Some(fields),
+        b"disabled" => style.disabled = Some(fields),
+        other => panic!(
+            "unexpected element in <text-editor-style>: {}",
+            String::from_utf8_lossy(other)
+        ),
+    }
+}
+
+fn parse_text_editor_style(
+    e: &BytesStart,
+    reader: &mut Reader<&[u8]>,
+) -> (String, TextEditorStyle) {
+    let id =
+        parse_string_attr(e, b"id").expect("<text-editor-style> requires an 'id' attribute");
+    let base = parse_text_editor_style_fields(e);
+    let mut style = TextEditorStyle {
+        base,
+        ..Default::default()
+    };
+
+    parse_stateful_children(reader, b"text-editor-style", &mut style, |s, tag, e| {
+        assign_text_editor_status_fields(s, tag, parse_text_editor_style_fields(e))
+    });
+
+    (id, style)
+}
+
+fn parse_text_editor_style_empty(e: &BytesStart) -> (String, TextEditorStyle) {
+    let id =
+        parse_string_attr(e, b"id").expect("<text-editor-style> requires an 'id' attribute");
+    let base = parse_text_editor_style_fields(e);
+    (id, TextEditorStyle { base, ..Default::default() })
+}
+
 fn parse_font_def(e: &BytesStart) -> (String, FontDef) {
     let id = parse_string_attr(e, b"id").expect("<font> requires an 'id' attribute");
     let def = FontDef {
@@ -259,6 +315,9 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                         styles.toggler.push(parse_toggler_style(&e));
                         consume_closing_tag(reader, &tag);
                     }
+                    b"text-editor-style" => {
+                        styles.text_editor.push(parse_text_editor_style(&e, reader));
+                    }
                     b"font" => {
                         styles.font.push(parse_font_def(&e));
                         consume_closing_tag(reader, &tag);
@@ -276,6 +335,7 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                 b"checkbox-style" => styles.checkbox.push(parse_checkbox_style(&e)),
                 b"text-input-style" => styles.text_input.push(parse_text_input_style_empty(&e)),
                 b"toggler-style" => styles.toggler.push(parse_toggler_style(&e)),
+                b"text-editor-style" => styles.text_editor.push(parse_text_editor_style_empty(&e)),
                 b"font" => styles.font.push(parse_font_def(&e)),
                 other => panic!(
                     "unexpected element in <styles>: {}",

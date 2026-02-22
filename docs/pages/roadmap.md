@@ -6,50 +6,51 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 
 ## Core features
 
-| Feature | Status |
-|---------|--------|
-| State access | ✅ Done |
-| Callbacks (buttons, inputs) | ✅ Done |
-| If conditions | ✅ Done |
-| Loops (`<foreach>`) | ✅ Done |
-| Styling | ✅ Done |
+| Feature                             | Status |
+|-------------------------------------|--------|
+| State access                        | ✅ Done |
+| Callbacks (buttons, inputs)         | ✅ Done |
+| If conditions                       | ✅ Done |
+| Loops (`<foreach>`)                 | ✅ Done |
+| Styling                             | ✅ Done |
 | Custom defined widgets (`<widget>`) | ✅ Done |
-| Support icon attributes | 🔲 Planned |
-| Background gradients | 🔲 Planned |
-| Components | 🔲 Planned |
-| Checkbox `checked` in styles | 🔲 Planned |
+| Support icon attributes             | 🔲 Planned |
+| Background gradients                | 🔲 Planned |
+| Components                          | 🔲 Planned |
+| Checkbox `checked` in styles        | 🔲 Planned |
+| Text editor highlight support       | 🔲 Planned |
 
 ## Widget coverage
 
-| Widget | Status |
-|--------|--------|
-| Button | ✅ Done |
-| Checkbox | ✅ Done |
-| Column | ✅ Done |
-| Container | ✅ Done |
-| Row | ✅ Done |
-| Space | ✅ Done |
-| Stack | ✅ Done |
-| Text | ✅ Done |
-| TextInput | ✅ Done |
-| Tooltip | ✅ Done |
+| Widget         | Status |
+|----------------|--------|
+| Button         | ✅ Done |
+| Checkbox       | ✅ Done |
+| Column         | ✅ Done |
+| Container      | ✅ Done |
+| Row            | ✅ Done |
+| Space          | ✅ Done |
+| Stack          | ✅ Done |
+| Text           | ✅ Done |
+| TextInput      | ✅ Done |
+| Tooltip        | ✅ Done |
 | VerticalSlider | ✅ Done |
-| Sensor | ✅ Done |
-| TextEditor | 🔧 Partial |
-| Toggler | ✅ Done |
-| ComboBox | 🔲 Planned |
-| Float | 🔲 Planned |
-| Grid | 🔲 Planned |
-| MouseArea | 🔲 Planned |
-| PaneGrid | 🔲 Planned |
-| PickList | 🔲 Planned |
-| Pin | 🔲 Planned |
-| ProgressBar | 🔲 Planned |
-| Radio | 🔲 Planned |
-| Responsive | 🔲 Planned |
-| Rule | 🔲 Planned |
-| Scrollable | 🔲 Planned |
-| Slider | 🔲 Planned |
+| Sensor         | ✅ Done |
+| TextEditor     | ✅ Done |
+| Toggler        | ✅ Done |
+| ComboBox       | 🔲 Planned |
+| Float          | 🔲 Planned |
+| Grid           | 🔲 Planned |
+| MouseArea      | 🔲 Planned |
+| PaneGrid       | 🔲 Planned |
+| PickList       | 🔲 Planned |
+| Pin            | 🔲 Planned |
+| ProgressBar    | 🔲 Planned |
+| Radio          | 🔲 Planned |
+| Responsive     | 🔲 Planned |
+| Rule           | 🔲 Planned |
+| Scrollable     | 🔲 Planned |
+| Slider         | 🔲 Planned |
 
 ## Feature-gated widgets
 

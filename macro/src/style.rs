@@ -1,6 +1,6 @@
 use iced_layout_core::{
-    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, TextInputStyle,
-    TextInputStyleFields, TogglerStyle,
+    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, TextEditorStyle,
+    TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TogglerStyle,
 };
 use quote::quote;
 
@@ -282,6 +282,106 @@ pub fn generate_toggler_style_closure(s: &TogglerStyle) -> proc_macro2::TokenStr
             text_color: #text_color,
             border_radius: #border_radius,
             padding_ratio: #padding_ratio,
+        }
+    }
+}
+
+pub fn generate_text_editor_fields_tokens(
+    fields: &TextEditorStyleFields,
+) -> proc_macro2::TokenStream {
+    let background = match &fields.background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
+    };
+
+    let border = generate_border(&fields.border_color, fields.border_width, &fields.border_radius);
+    let placeholder_color = generate_color_or(
+        &fields.placeholder_color,
+        quote! { iced::Color { r: 0.4, g: 0.4, b: 0.4, a: 1.0 } },
+    );
+    let value_color = generate_color_or(&fields.value_color, quote! { iced::Color::BLACK });
+    let selection_color = generate_color_or(
+        &fields.selection_color,
+        quote! { iced::Color { r: 0.0, g: 0.0, b: 1.0, a: 0.3 } },
+    );
+
+    quote! {
+        iced::widget::text_editor::Style {
+            background: #background,
+            border: #border,
+            placeholder: #placeholder_color,
+            value: #value_color,
+            selection: #selection_color,
+        }
+    }
+}
+
+pub fn merge_text_editor_fields(
+    base: &TextEditorStyleFields,
+    overlay: &TextEditorStyleFields,
+) -> TextEditorStyleFields {
+    TextEditorStyleFields {
+        background_color: overlay.background_color.or(base.background_color),
+        border_color: overlay.border_color.or(base.border_color),
+        border_width: overlay.border_width.or(base.border_width),
+        border_radius: BorderRadius {
+            top_left: overlay.border_radius.top_left.or(base.border_radius.top_left),
+            top_right: overlay.border_radius.top_right.or(base.border_radius.top_right),
+            bottom_right: overlay
+                .border_radius
+                .bottom_right
+                .or(base.border_radius.bottom_right),
+            bottom_left: overlay
+                .border_radius
+                .bottom_left
+                .or(base.border_radius.bottom_left),
+        },
+        placeholder_color: overlay.placeholder_color.or(base.placeholder_color),
+        value_color: overlay.value_color.or(base.value_color),
+        selection_color: overlay.selection_color.or(base.selection_color),
+    }
+}
+
+pub fn generate_text_editor_style_closure(tes: &TextEditorStyle) -> proc_macro2::TokenStream {
+    let base_style = generate_text_editor_fields_tokens(&tes.base);
+
+    let status_overrides: Vec<_> = [
+        (
+            &tes.active,
+            quote! { iced::widget::text_editor::Status::Active },
+        ),
+        (
+            &tes.hovered,
+            quote! { iced::widget::text_editor::Status::Hovered },
+        ),
+        (
+            &tes.disabled,
+            quote! { iced::widget::text_editor::Status::Disabled },
+        ),
+    ]
+    .into_iter()
+    .filter_map(|(opt, status_token)| {
+        opt.as_ref().map(|fields| {
+            let merged = merge_text_editor_fields(&tes.base, fields);
+            let style = generate_text_editor_fields_tokens(&merged);
+            quote! { #status_token => #style }
+        })
+    })
+    .collect();
+
+    if status_overrides.is_empty() {
+        quote! {
+            |_theme, _status| #base_style
+        }
+    } else {
+        quote! {
+            |_theme, status| match status {
+                #(#status_overrides,)*
+                _ => #base_style
+            }
         }
     }
 }

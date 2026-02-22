@@ -293,6 +293,32 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     spacing, font, style,
                 }
             }
+            b"text-editor" => {
+                let content = parse_string_attr(&e, b"content")
+                    .expect("<text-editor> requires a 'content' attribute");
+                let id = parse_string_attr(&e, b"id");
+                let placeholder = parse_string_attr(&e, b"placeholder");
+                let width = parse_f32_attr(&e, b"width");
+                let height = parse_length_attr(&e, b"height");
+                let min_height = parse_f32_attr(&e, b"min-height");
+                let max_height = parse_f32_attr(&e, b"max-height");
+                let on_action = parse_string_attr(&e, b"on-action");
+                let font = parse_string_attr(&e, b"font");
+                let size = parse_f32_attr(&e, b"size");
+                let line_height = parse_line_height_attr(&e, b"line-height");
+                let padding = parse_padding(&e);
+                let wrapping = parse_wrapping_attr(&e, b"wrapping");
+                let key_binding = parse_string_attr(&e, b"key-binding");
+                let style = parse_string_attr(&e, b"style");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"text-editor");
+                }
+                Node::TextEditor {
+                    content, id, placeholder, width, height,
+                    min_height, max_height, on_action, font, size,
+                    line_height, padding, wrapping, key_binding, style,
+                }
+            }
             b"sensor" => {
                 let on_show = parse_string_attr(&e, b"on-show");
                 let on_resize = parse_string_attr(&e, b"on-resize");

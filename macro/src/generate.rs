@@ -867,6 +867,96 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             }
             Generated::Widget(expr)
         }
+        Node::TextEditor {
+            content,
+            id,
+            placeholder,
+            width,
+            height,
+            min_height,
+            max_height,
+            on_action,
+            font,
+            size,
+            line_height,
+            padding,
+            wrapping,
+            key_binding,
+            style,
+        } => {
+            let content_expr = resolve_field_path(content, ctx);
+            let mut expr = quote! { iced::widget::text_editor(&#content_expr) };
+            if let Some(id_val) = id {
+                expr = quote! { #expr.id(#id_val) };
+            }
+            if let Some(ph) = placeholder {
+                expr = quote! { #expr.placeholder(#ph) };
+            }
+            if let Some(w) = width {
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(h) = height {
+                let h = generate_length(h);
+                expr = quote! { #expr.height(#h) };
+            }
+            if let Some(mh) = min_height {
+                expr = quote! { #expr.min_height(#mh) };
+            }
+            if let Some(mh) = max_height {
+                expr = quote! { #expr.max_height(#mh) };
+            }
+            if let Some(val) = on_action {
+                let handler = generate_event_handler(
+                    val,
+                    "on-action",
+                    "on_action",
+                    HandlerStyle::Closure("action"),
+                );
+                expr = quote! { #expr #handler };
+            }
+            if let Some(font_name) = font {
+                assert!(
+                    styles.font.contains_key(font_name.as_str()),
+                    "unknown font: \"{}\"",
+                    font_name
+                );
+                let var = style_var_name("font", font_name);
+                expr = quote! { #expr.font(#var) };
+            }
+            if let Some(s) = size {
+                expr = quote! { #expr.size(#s) };
+            }
+            if let Some(lh) = line_height {
+                let lh = generate_line_height(lh);
+                expr = quote! { #expr.line_height(#lh) };
+            }
+            if let Some(padding_expr) = generate_padding(padding) {
+                expr = quote! { #expr.padding(#padding_expr) };
+            }
+            if let Some(wr) = wrapping {
+                let wr = generate_wrapping(wr);
+                expr = quote! { #expr.wrapping(#wr) };
+            }
+            if let Some(kb) = key_binding {
+                let kb_handler = generate_event_handler(
+                    kb,
+                    "key-binding",
+                    "key_binding",
+                    HandlerStyle::Closure("key_press"),
+                );
+                expr = quote! { #expr #kb_handler };
+            }
+            if let Some(style_name) = style {
+                assert!(
+                    styles.text_editor.contains_key(style_name.as_str()),
+                    "unknown text-editor style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("text_editor", style_name);
+                expr = quote! { #expr.style(#var) };
+            }
+            Generated::Widget(expr)
+        }
         Node::ForEach { iterable, body } => {
             let iter_field = resolve_field_path(iterable, ctx);
             let mut inner_ctx = ctx.clone();
