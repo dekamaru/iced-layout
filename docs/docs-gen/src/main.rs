@@ -587,7 +587,7 @@ fn main() {
     let schema_path = docs_dir
         .parent()
         .expect("docs/ has no parent directory")
-        .join("schemas/0.0.1.xsd");
+        .join("schemas/0.0.2.xsd");
 
     let widgets_dir = docs_dir.join("pages/schema");
     let styles_dir = docs_dir.join("pages/styles");
