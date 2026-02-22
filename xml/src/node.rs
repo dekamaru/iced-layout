@@ -293,6 +293,38 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     spacing, font, style,
                 }
             }
+            b"combo-box" => {
+                let state = parse_string_attr(&e, b"state")
+                    .expect("<combo-box> requires a 'state' attribute");
+                let placeholder = parse_string_attr(&e, b"placeholder")
+                    .expect("<combo-box> requires a 'placeholder' attribute");
+                let selection = parse_string_attr(&e, b"selection")
+                    .expect("<combo-box> requires a 'selection' attribute");
+                let on_selected = parse_string_attr(&e, b"on-selected")
+                    .expect("<combo-box> requires an 'on-selected' attribute");
+                let on_input = parse_string_attr(&e, b"on-input");
+                let on_option_hovered = parse_string_attr(&e, b"on-option-hovered");
+                let on_open = parse_string_attr(&e, b"on-open");
+                let on_close = parse_string_attr(&e, b"on-close");
+                let padding = parse_padding(&e);
+                let font = parse_string_attr(&e, b"font");
+                let size = parse_f32_attr(&e, b"size");
+                let line_height = parse_line_height_attr(&e, b"line-height");
+                let width = parse_length_attr(&e, b"width");
+                let menu_height = parse_length_attr(&e, b"menu-height");
+                let text_shaping = parse_shaping_attr(&e, b"text-shaping");
+                let input_style = parse_string_attr(&e, b"input-style");
+                let menu_style = parse_string_attr(&e, b"menu-style");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"combo-box");
+                }
+                Node::ComboBox {
+                    state, placeholder, selection, on_selected,
+                    on_input, on_option_hovered, on_open, on_close,
+                    padding, font, size, line_height, width, menu_height,
+                    text_shaping, input_style, menu_style,
+                }
+            }
             b"text-editor" => {
                 let content = parse_string_attr(&e, b"content")
                     .expect("<text-editor> requires a 'content' attribute");

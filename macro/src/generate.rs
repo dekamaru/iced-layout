@@ -867,6 +867,106 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             }
             Generated::Widget(expr)
         }
+        Node::ComboBox {
+            state,
+            placeholder,
+            selection,
+            on_selected,
+            on_input,
+            on_option_hovered,
+            on_open,
+            on_close,
+            padding,
+            font,
+            size,
+            line_height,
+            width,
+            menu_height,
+            text_shaping,
+            input_style,
+            menu_style,
+        } => {
+            let state_expr = resolve_field_path(state, ctx);
+            let selection_expr = resolve_field_path(selection, ctx);
+            let on_selected_ts = if on_selected.contains("::") {
+                let msg: syn::Expr = syn::parse_str(on_selected)
+                    .unwrap_or_else(|e| panic!("invalid on-selected expression '{}': {}", on_selected, e));
+                quote! { #msg }
+            } else {
+                let handler: syn::Ident = syn::parse_str(on_selected)
+                    .unwrap_or_else(|e| panic!("invalid on-selected method name '{}': {}", on_selected, e));
+                quote! { |item| self.#handler(item) }
+            };
+            let mut expr = quote! {
+                iced::widget::combo_box(&#state_expr, #placeholder, #selection_expr.as_ref(), #on_selected_ts)
+            };
+            if let Some(val) = on_input {
+                let handler = generate_event_handler(val, "on-input", "on_input", HandlerStyle::Closure("s"));
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_option_hovered {
+                let handler = generate_event_handler(val, "on-option-hovered", "on_option_hovered", HandlerStyle::Closure("item"));
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_open {
+                let handler = generate_event_handler(val, "on-open", "on_open", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_close {
+                let handler = generate_event_handler(val, "on-close", "on_close", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(padding_expr) = generate_padding(padding) {
+                expr = quote! { #expr.padding(#padding_expr) };
+            }
+            if let Some(font_name) = font {
+                assert!(
+                    styles.font.contains_key(font_name.as_str()),
+                    "unknown font: \"{}\"",
+                    font_name
+                );
+                let var = style_var_name("font", font_name);
+                expr = quote! { #expr.font(#var) };
+            }
+            if let Some(s) = size {
+                expr = quote! { #expr.size(#s) };
+            }
+            if let Some(lh) = line_height {
+                let lh = generate_line_height(lh);
+                expr = quote! { #expr.line_height(#lh) };
+            }
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(mh) = menu_height {
+                let mh = generate_length(mh);
+                expr = quote! { #expr.menu_height(#mh) };
+            }
+            if let Some(sh) = text_shaping {
+                let sh = generate_shaping(sh);
+                expr = quote! { #expr.text_shaping(#sh) };
+            }
+            if let Some(style_name) = input_style {
+                assert!(
+                    styles.text_input.contains_key(style_name.as_str()),
+                    "unknown text-input style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("text_input", style_name);
+                expr = quote! { #expr.input_style(#var) };
+            }
+            if let Some(style_name) = menu_style {
+                assert!(
+                    styles.overlay_menu.contains_key(style_name.as_str()),
+                    "unknown overlay-menu style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("overlay_menu", style_name);
+                expr = quote! { #expr.menu_style(#var) };
+            }
+            Generated::Widget(expr)
+        }
         Node::TextEditor {
             content,
             id,

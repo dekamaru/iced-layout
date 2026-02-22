@@ -1,6 +1,7 @@
 use iced_layout_core::{
-    ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FontDef, TextEditorStyle,
-    TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TextStyle, TogglerStyle,
+    ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FontDef, OverlayMenuStyle,
+    TextEditorStyle, TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TextStyle,
+    TogglerStyle,
 };
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::Reader;
@@ -15,6 +16,7 @@ pub struct ParsedStyles {
     pub text_input: Vec<(String, TextInputStyle)>,
     pub toggler: Vec<(String, TogglerStyle)>,
     pub text_editor: Vec<(String, TextEditorStyle)>,
+    pub overlay_menu: Vec<(String, OverlayMenuStyle)>,
     pub font: Vec<(String, FontDef)>,
 }
 
@@ -28,6 +30,7 @@ impl Default for ParsedStyles {
             text_input: Vec::new(),
             toggler: Vec::new(),
             text_editor: Vec::new(),
+            overlay_menu: Vec::new(),
             font: Vec::new(),
         }
     }
@@ -267,6 +270,25 @@ fn parse_text_editor_style_empty(e: &BytesStart) -> (String, TextEditorStyle) {
     (id, TextEditorStyle { base, ..Default::default() })
 }
 
+fn parse_overlay_menu_style(e: &BytesStart) -> (String, OverlayMenuStyle) {
+    let id =
+        parse_string_attr(e, b"id").expect("<overlay-menu-style> requires an 'id' attribute");
+    let style = OverlayMenuStyle {
+        background_color: parse_color_attr(e, b"background-color"),
+        border_color: parse_color_attr(e, b"border-color"),
+        border_width: parse_f32_attr(e, b"border-width"),
+        border_radius: parse_border_radius(e),
+        text_color: parse_color_attr(e, b"text-color"),
+        selected_text_color: parse_color_attr(e, b"selected-text-color"),
+        selected_background_color: parse_color_attr(e, b"selected-background-color"),
+        shadow_color: parse_color_attr(e, b"shadow-color"),
+        shadow_offset_x: parse_f32_attr(e, b"shadow-offset-x"),
+        shadow_offset_y: parse_f32_attr(e, b"shadow-offset-y"),
+        shadow_blur_radius: parse_f32_attr(e, b"shadow-blur-radius"),
+    };
+    (id, style)
+}
+
 fn parse_font_def(e: &BytesStart) -> (String, FontDef) {
     let id = parse_string_attr(e, b"id").expect("<font> requires an 'id' attribute");
     let def = FontDef {
@@ -318,6 +340,10 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                     b"text-editor-style" => {
                         styles.text_editor.push(parse_text_editor_style(&e, reader));
                     }
+                    b"overlay-menu-style" => {
+                        styles.overlay_menu.push(parse_overlay_menu_style(&e));
+                        consume_closing_tag(reader, &tag);
+                    }
                     b"font" => {
                         styles.font.push(parse_font_def(&e));
                         consume_closing_tag(reader, &tag);
@@ -336,6 +362,7 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                 b"text-input-style" => styles.text_input.push(parse_text_input_style_empty(&e)),
                 b"toggler-style" => styles.toggler.push(parse_toggler_style(&e)),
                 b"text-editor-style" => styles.text_editor.push(parse_text_editor_style_empty(&e)),
+                b"overlay-menu-style" => styles.overlay_menu.push(parse_overlay_menu_style(&e)),
                 b"font" => styles.font.push(parse_font_def(&e)),
                 other => panic!(
                     "unexpected element in <styles>: {}",

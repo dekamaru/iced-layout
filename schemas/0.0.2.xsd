@@ -1,0 +1,1048 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="LengthKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="fill"/>
+            <xs:enumeration value="shrink"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="LengthFunction">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="fill-portion\(.+\)"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Length">
+        <xs:union memberTypes="xs:float LengthKeyword LengthFunction"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="HorizontalKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Horizontal">
+        <xs:union memberTypes="HorizontalKeyword"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="VerticalKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="top"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="bottom"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Vertical">
+        <xs:union memberTypes="VerticalKeyword"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="LineHeightFunction">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="relative\(.+\)"/>
+            <xs:pattern value="absolute\(.+\)"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="LineHeight">
+        <xs:union memberTypes="LineHeightFunction"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="AlignmentKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="default"/>
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+            <xs:enumeration value="justified"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Alignment">
+        <xs:union memberTypes="AlignmentKeyword"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="ShapingKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto"/>
+            <xs:enumeration value="basic"/>
+            <xs:enumeration value="advanced"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Shaping">
+        <xs:union memberTypes="ShapingKeyword"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="WrappingKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="none"/>
+            <xs:enumeration value="word"/>
+            <xs:enumeration value="glyph"/>
+            <xs:enumeration value="word-or-glyph"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Wrapping">
+        <xs:union memberTypes="WrappingKeyword"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="FontWeight">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="thin"/>
+            <xs:enumeration value="extra-light"/>
+            <xs:enumeration value="light"/>
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="medium"/>
+            <xs:enumeration value="semibold"/>
+            <xs:enumeration value="bold"/>
+            <xs:enumeration value="extra-bold"/>
+            <xs:enumeration value="black"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FontStretch">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ultra-condensed"/>
+            <xs:enumeration value="extra-condensed"/>
+            <xs:enumeration value="condensed"/>
+            <xs:enumeration value="semi-condensed"/>
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="semi-expanded"/>
+            <xs:enumeration value="expanded"/>
+            <xs:enumeration value="extra-expanded"/>
+            <xs:enumeration value="ultra-expanded"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FontStyle">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="italic"/>
+            <xs:enumeration value="oblique"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="container">
+        <xs:annotation>
+            <xs:documentation>Containers let you align a widget inside their boundaries.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="padding" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-top" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-right" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-left" type="xs:float" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="max-width" type="xs:float" use="optional"/>
+            <xs:attribute name="max-height" type="xs:float" use="optional"/>
+            <xs:attribute name="center-x" type="Length" use="optional"/>
+            <xs:attribute name="center-y" type="Length" use="optional"/>
+            <xs:attribute name="center" type="Length" use="optional"/>
+            <xs:attribute name="align-left" type="Length" use="optional"/>
+            <xs:attribute name="align-right" type="Length" use="optional"/>
+            <xs:attribute name="align-top" type="Length" use="optional"/>
+            <xs:attribute name="align-bottom" type="Length" use="optional"/>
+            <xs:attribute name="align-x" type="Horizontal" use="optional"/>
+            <xs:attribute name="align-y" type="Vertical" use="optional"/>
+            <xs:attribute name="clip" type="xs:boolean" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="text">
+        <xs:annotation>
+            <xs:documentation>Text widgets display information through writing.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
+            <xs:attribute name="font-maybe" type="xs:string" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="align-x" type="Alignment" use="optional"/>
+            <xs:attribute name="align-y" type="Vertical" use="optional"/>
+            <xs:attribute name="shaping" type="Shaping" use="optional"/>
+            <xs:attribute name="wrapping" type="Wrapping" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+            <xs:attribute name="color" type="xs:string" use="optional"/>
+            <xs:attribute name="color-maybe" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="row">
+        <xs:annotation>
+            <xs:documentation>Distribute content horizontally.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="spacing" type="xs:float" use="optional"/>
+            <xs:attribute name="padding" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-top" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-right" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-left" type="xs:float" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="align-y" type="Vertical" use="optional"/>
+            <xs:attribute name="clip" type="xs:boolean" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="column">
+        <xs:annotation>
+            <xs:documentation>Distribute content vertically.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="spacing" type="xs:float" use="optional"/>
+            <xs:attribute name="padding" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-top" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-right" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-left" type="xs:float" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="max-width" type="xs:float" use="optional"/>
+            <xs:attribute name="align-x" type="Horizontal" use="optional"/>
+            <xs:attribute name="clip" type="xs:boolean" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="button">
+        <xs:annotation>
+            <xs:documentation>Buttons allow your users to perform actions by pressing them.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="padding" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-top" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-right" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-left" type="xs:float" use="optional"/>
+            <xs:attribute name="on-press" type="xs:string" use="optional"/>
+            <xs:attribute name="on-press-with" type="xs:string" use="optional"/>
+            <xs:attribute name="on-press-maybe" type="xs:string" use="optional"/>
+            <xs:attribute name="clip" type="xs:boolean" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="stack">
+        <xs:annotation>
+            <xs:documentation>Display content on top of other content.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="clip" type="xs:boolean" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="checkbox">
+        <xs:annotation>
+            <xs:documentation>Checkboxes can be used to let users make binary choices.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="is-checked" type="xs:string" use="required"/>
+            <xs:attribute name="label" type="xs:string" use="optional"/>
+            <xs:attribute name="on-toggle" type="xs:string" use="optional"/>
+            <xs:attribute name="on-toggle-maybe" type="xs:string" use="optional"/>
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="spacing" type="xs:float" use="optional"/>
+            <xs:attribute name="text-size" type="xs:float" use="optional"/>
+            <xs:attribute name="text-line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="text-shaping" type="Shaping" use="optional"/>
+            <xs:attribute name="text-wrapping" type="Wrapping" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="space">
+        <xs:annotation>
+            <xs:documentation>Add some explicit spacing between elements.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="text-input">
+        <xs:annotation>
+            <xs:documentation>Text inputs display fields that can be filled with text.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="placeholder" type="xs:string" use="required"/>
+            <xs:attribute name="value" type="xs:string" use="required"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="secure" type="xs:boolean" use="optional"/>
+            <xs:attribute name="on-input" type="xs:string" use="optional"/>
+            <xs:attribute name="on-input-maybe" type="xs:string" use="optional"/>
+            <xs:attribute name="on-submit" type="xs:string" use="optional"/>
+            <xs:attribute name="on-submit-maybe" type="xs:string" use="optional"/>
+            <xs:attribute name="on-paste" type="xs:string" use="optional"/>
+            <xs:attribute name="on-paste-maybe" type="xs:string" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="padding" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-top" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-right" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-left" type="xs:float" use="optional"/>
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="align-x" type="Horizontal" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vertical-slider">
+        <xs:annotation>
+            <xs:documentation>Sliders let users set a value by moving an indicator.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="range-start" type="xs:float" use="required"/>
+            <xs:attribute name="range-end" type="xs:float" use="required"/>
+            <xs:attribute name="value" type="xs:string" use="required"/>
+            <xs:attribute name="on-change" type="xs:string" use="required"/>
+            <xs:attribute name="default" type="xs:float" use="optional"/>
+            <xs:attribute name="on-release" type="xs:string" use="optional"/>
+            <xs:attribute name="width" type="xs:float" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="step" type="xs:string" use="optional"/>
+            <xs:attribute name="shift-step" type="xs:float" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="tooltip">
+        <xs:annotation>
+            <xs:documentation>Tooltips display a hint of information over some element when hovered.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="2" maxOccurs="2">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="position" type="xs:string" use="required"/>
+            <xs:attribute name="gap" type="xs:float" use="optional"/>
+            <xs:attribute name="padding" type="xs:float" use="optional"/>
+            <xs:attribute name="delay" type="xs:string" use="optional"/>
+            <xs:attribute name="snap-within-viewport" type="xs:boolean" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="toggler">
+        <xs:annotation>
+            <xs:documentation>Togglers let users make binary choices by toggling a switch.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="is-toggled" type="xs:string" use="required"/>
+            <xs:attribute name="label" type="xs:string" use="optional"/>
+            <xs:attribute name="on-toggle" type="xs:string" use="optional"/>
+            <xs:attribute name="on-toggle-maybe" type="xs:string" use="optional"/>
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="text-size" type="xs:float" use="optional"/>
+            <xs:attribute name="text-line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="text-alignment" type="Alignment" use="optional"/>
+            <xs:attribute name="text-shaping" type="Shaping" use="optional"/>
+            <xs:attribute name="text-wrapping" type="Wrapping" use="optional"/>
+            <xs:attribute name="spacing" type="xs:float" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="text-editor">
+        <xs:annotation>
+            <xs:documentation>Text editors display a multi-line text input for text editing.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="content" type="xs:string" use="required"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="placeholder" type="xs:string" use="optional"/>
+            <xs:attribute name="width" type="xs:float" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="min-height" type="xs:float" use="optional"/>
+            <xs:attribute name="max-height" type="xs:float" use="optional"/>
+            <xs:attribute name="on-action" type="xs:string" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="padding" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-top" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-right" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-left" type="xs:float" use="optional"/>
+            <xs:attribute name="wrapping" type="Wrapping" use="optional"/>
+            <xs:attribute name="key-binding" type="xs:string" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sensor">
+        <xs:annotation>
+            <xs:documentation>Generate messages when content pops in and out of view.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="on-show" type="xs:string" use="optional"/>
+            <xs:attribute name="on-resize" type="xs:string" use="optional"/>
+            <xs:attribute name="on-hide" type="xs:string" use="optional"/>
+            <xs:attribute name="anticipate" type="xs:float" use="optional"/>
+            <xs:attribute name="delay" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="combo-box">
+        <xs:annotation>
+            <xs:documentation>Combo boxes display a dropdown list of searchable and selectable options.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="state" type="xs:string" use="required"/>
+            <xs:attribute name="placeholder" type="xs:string" use="required"/>
+            <xs:attribute name="selection" type="xs:string" use="required"/>
+            <xs:attribute name="on-selected" type="xs:string" use="required"/>
+            <xs:attribute name="on-input" type="xs:string" use="optional"/>
+            <xs:attribute name="on-option-hovered" type="xs:string" use="optional"/>
+            <xs:attribute name="on-open" type="xs:string" use="optional"/>
+            <xs:attribute name="on-close" type="xs:string" use="optional"/>
+            <xs:attribute name="padding" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-top" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-right" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-left" type="xs:float" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="menu-height" type="Length" use="optional"/>
+            <xs:attribute name="text-shaping" type="Shaping" use="optional"/>
+            <xs:attribute name="input-style" type="xs:string" use="optional"/>
+            <xs:attribute name="menu-style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="if">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="true" minOccurs="1">
+                    <xs:complexType>
+                        <xs:choice>
+                            <xs:element ref="container"/>
+                            <xs:element ref="text"/>
+                            <xs:element ref="row"/>
+                            <xs:element ref="column"/>
+                            <xs:element ref="button"/>
+                            <xs:element ref="stack"/>
+                            <xs:element ref="checkbox"/>
+                            <xs:element ref="space"/>
+                            <xs:element ref="text-input"/>
+                            <xs:element ref="vertical-slider"/>
+                            <xs:element ref="tooltip"/>
+                            <xs:element ref="toggler"/>
+                            <xs:element ref="text-editor"/>
+                            <xs:element ref="sensor"/>
+                            <xs:element ref="combo-box"/>
+                            <xs:element ref="if"/>
+                            <xs:element ref="foreach"/>
+                            <xs:element ref="widget"/>
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="false" minOccurs="0">
+                    <xs:complexType>
+                        <xs:choice>
+                            <xs:element ref="container"/>
+                            <xs:element ref="text"/>
+                            <xs:element ref="row"/>
+                            <xs:element ref="column"/>
+                            <xs:element ref="button"/>
+                            <xs:element ref="stack"/>
+                            <xs:element ref="checkbox"/>
+                            <xs:element ref="space"/>
+                            <xs:element ref="text-input"/>
+                            <xs:element ref="vertical-slider"/>
+                            <xs:element ref="tooltip"/>
+                            <xs:element ref="toggler"/>
+                            <xs:element ref="text-editor"/>
+                            <xs:element ref="sensor"/>
+                            <xs:element ref="combo-box"/>
+                            <xs:element ref="if"/>
+                            <xs:element ref="foreach"/>
+                            <xs:element ref="widget"/>
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+            </xs:all>
+            <xs:attribute name="condition" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="foreach">
+        <xs:complexType>
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="iterable" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="font">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="family" type="xs:string" use="optional"/>
+            <xs:attribute name="weight" type="FontWeight" use="optional"/>
+            <xs:attribute name="stretch" type="FontStretch" use="optional"/>
+            <xs:attribute name="style" type="FontStyle" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="widget">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="1">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="method" type="xs:string" use="required"/>
+            <xs:attribute name="arg-0" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-1" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-2" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-3" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-4" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-5" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-6" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-7" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-8" type="xs:string" use="optional"/>
+            <xs:attribute name="arg-9" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="container-style">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="text-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-color" type="xs:string" use="optional"/>
+            <xs:attribute name="shadow-offset-x" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-offset-y" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-blur-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="snap" type="xs:boolean" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="text-style">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="color" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="button-style">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="active">
+                    <xs:complexType>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="text-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="shadow-offset-x" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-offset-y" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-blur-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="snap" type="xs:boolean" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="hovered">
+                    <xs:complexType>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="text-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="shadow-offset-x" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-offset-y" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-blur-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="snap" type="xs:boolean" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="pressed">
+                    <xs:complexType>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="text-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="shadow-offset-x" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-offset-y" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-blur-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="snap" type="xs:boolean" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="disabled">
+                    <xs:complexType>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="text-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="shadow-offset-x" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-offset-y" type="xs:float" use="optional"/>
+                        <xs:attribute name="shadow-blur-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="snap" type="xs:boolean" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="text-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-color" type="xs:string" use="optional"/>
+            <xs:attribute name="shadow-offset-x" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-offset-y" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-blur-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="snap" type="xs:boolean" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="checkbox-style">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="icon-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="text-color" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="text-input-style">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="active">
+                    <xs:complexType>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="icon" type="xs:string" use="optional"/>
+                        <xs:attribute name="placeholder" type="xs:string" use="optional"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:attribute name="selection" type="xs:string" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="hovered">
+                    <xs:complexType>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="icon" type="xs:string" use="optional"/>
+                        <xs:attribute name="placeholder" type="xs:string" use="optional"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:attribute name="selection" type="xs:string" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="disabled">
+                    <xs:complexType>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="icon" type="xs:string" use="optional"/>
+                        <xs:attribute name="placeholder" type="xs:string" use="optional"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:attribute name="selection" type="xs:string" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="icon" type="xs:string" use="optional"/>
+            <xs:attribute name="placeholder" type="xs:string" use="optional"/>
+            <xs:attribute name="value" type="xs:string" use="optional"/>
+            <xs:attribute name="selection" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="toggler-style">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="background-border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="background-border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="foreground-color" type="xs:string" use="optional"/>
+            <xs:attribute name="foreground-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="foreground-border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="foreground-border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="text-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-ratio" type="xs:float" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="text-editor-style">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="active">
+                    <xs:complexType>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="placeholder" type="xs:string" use="optional"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:attribute name="selection" type="xs:string" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="hovered">
+                    <xs:complexType>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="placeholder" type="xs:string" use="optional"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:attribute name="selection" type="xs:string" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="disabled">
+                    <xs:complexType>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="placeholder" type="xs:string" use="optional"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:attribute name="selection" type="xs:string" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="placeholder" type="xs:string" use="optional"/>
+            <xs:attribute name="value" type="xs:string" use="optional"/>
+            <xs:attribute name="selection" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="overlay-menu-style">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="text-color" type="xs:string" use="optional"/>
+            <xs:attribute name="selected-text-color" type="xs:string" use="optional"/>
+            <xs:attribute name="selected-background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="selected-background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="shadow-color" type="xs:string" use="optional"/>
+            <xs:attribute name="shadow-offset-x" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-offset-y" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-blur-radius" type="xs:float" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="root">
+        <xs:complexType>
+            <xs:choice>
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="styles">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="container-style"/>
+                <xs:element ref="text-style"/>
+                <xs:element ref="button-style"/>
+                <xs:element ref="checkbox-style"/>
+                <xs:element ref="text-input-style"/>
+                <xs:element ref="toggler-style"/>
+                <xs:element ref="text-editor-style"/>
+                <xs:element ref="overlay-menu-style"/>
+                <xs:element ref="font"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="layout">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="root"/>
+                <xs:element ref="styles" minOccurs="0"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

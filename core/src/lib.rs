@@ -231,6 +231,21 @@ pub struct TextEditorStyle {
     pub disabled: Option<TextEditorStyleFields>,
 }
 
+#[derive(Default)]
+pub struct OverlayMenuStyle {
+    pub background_color: Option<Color>,
+    pub border_color: Option<Color>,
+    pub border_width: Option<f32>,
+    pub border_radius: BorderRadius,
+    pub text_color: Option<Color>,
+    pub selected_text_color: Option<Color>,
+    pub selected_background_color: Option<Color>,
+    pub shadow_color: Option<Color>,
+    pub shadow_offset_x: Option<f32>,
+    pub shadow_offset_y: Option<f32>,
+    pub shadow_blur_radius: Option<f32>,
+}
+
 pub struct Layout {
     pub container_styles: Vec<(String, ContainerStyle)>,
     pub text_styles: Vec<(String, TextStyle)>,
@@ -239,6 +254,7 @@ pub struct Layout {
     pub text_input_styles: Vec<(String, TextInputStyle)>,
     pub toggler_styles: Vec<(String, TogglerStyle)>,
     pub text_editor_styles: Vec<(String, TextEditorStyle)>,
+    pub overlay_menu_styles: Vec<(String, OverlayMenuStyle)>,
     pub font_defs: Vec<(String, FontDef)>,
     pub root: Node,
 }
@@ -394,6 +410,25 @@ pub enum Node {
         anticipate: Option<f32>,
         delay: Option<u64>,
         children: Vec<Node>,
+    },
+    ComboBox {
+        state: String,
+        placeholder: String,
+        selection: String,
+        on_selected: String,
+        on_input: Option<String>,
+        on_option_hovered: Option<String>,
+        on_open: Option<String>,
+        on_close: Option<String>,
+        padding: Padding,
+        font: Option<String>,
+        size: Option<f32>,
+        line_height: Option<LineHeight>,
+        width: Option<Length>,
+        menu_height: Option<Length>,
+        text_shaping: Option<Shaping>,
+        input_style: Option<String>,
+        menu_style: Option<String>,
     },
     TextEditor {
         content: String,

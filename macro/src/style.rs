@@ -1,6 +1,6 @@
 use iced_layout_core::{
-    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, TextEditorStyle,
-    TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TogglerStyle,
+    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, OverlayMenuStyle,
+    TextEditorStyle, TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TogglerStyle,
 };
 use quote::quote;
 
@@ -282,6 +282,45 @@ pub fn generate_toggler_style_closure(s: &TogglerStyle) -> proc_macro2::TokenStr
             text_color: #text_color,
             border_radius: #border_radius,
             padding_ratio: #padding_ratio,
+        }
+    }
+}
+
+pub fn generate_overlay_menu_style_closure(s: &OverlayMenuStyle) -> proc_macro2::TokenStream {
+    let background = match &s.background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
+    };
+
+    let border = generate_border(&s.border_color, s.border_width, &s.border_radius);
+    let text_color = generate_color_or(&s.text_color, quote! { iced::Color::BLACK });
+    let selected_text_color =
+        generate_color_or(&s.selected_text_color, quote! { iced::Color::WHITE });
+    let selected_background = match &s.selected_background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
+    };
+    let shadow = generate_shadow(
+        &s.shadow_color,
+        s.shadow_offset_x,
+        s.shadow_offset_y,
+        s.shadow_blur_radius,
+    );
+
+    quote! {
+        |_theme| iced::overlay::menu::Style {
+            background: #background,
+            border: #border,
+            text_color: #text_color,
+            selected_text_color: #selected_text_color,
+            selected_background: #selected_background,
+            shadow: #shadow,
         }
     }
 }

@@ -10,16 +10,16 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 use iced_layout_core::{
-    ButtonStyle, CheckboxStyle, ContainerStyle, FontDef, TextEditorStyle, TextInputStyle,
-    TextStyle, TogglerStyle,
+    ButtonStyle, CheckboxStyle, ContainerStyle, FontDef, OverlayMenuStyle, TextEditorStyle,
+    TextInputStyle, TextStyle, TogglerStyle,
 };
 use quote::{format_ident, quote};
 use syn::{LitStr, parse_macro_input};
 
 use crate::style::{
     generate_button_style_closure, generate_checkbox_style_closure, generate_container_style,
-    generate_text_editor_style_closure, generate_text_input_style_closure,
-    generate_toggler_style_closure,
+    generate_overlay_menu_style_closure, generate_text_editor_style_closure,
+    generate_text_input_style_closure, generate_toggler_style_closure,
 };
 use crate::types::generate_font_def;
 
@@ -31,6 +31,7 @@ pub(crate) struct StyleMaps<'a> {
     pub text_input: HashMap<&'a str, &'a TextInputStyle>,
     pub toggler: HashMap<&'a str, &'a TogglerStyle>,
     pub text_editor: HashMap<&'a str, &'a TextEditorStyle>,
+    pub overlay_menu: HashMap<&'a str, &'a OverlayMenuStyle>,
     pub font: HashMap<&'a str, &'a FontDef>,
 }
 
@@ -73,6 +74,7 @@ pub fn layout(input: TokenStream) -> TokenStream {
         text_input: layout.text_input_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         toggler: layout.toggler_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         text_editor: layout.text_editor_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        overlay_menu: layout.overlay_menu_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         font: layout.font_defs.iter().map(|(k, v)| (k.as_str(), v)).collect(),
     };
 
@@ -106,6 +108,11 @@ pub fn layout(input: TokenStream) -> TokenStream {
     for (name, tes) in &style_maps.text_editor {
         let var = style_var_name("text_editor", name);
         let closure = generate_text_editor_style_closure(tes);
+        style_bindings.push(quote! { let #var = #closure; });
+    }
+    for (name, oms) in &style_maps.overlay_menu {
+        let var = style_var_name("overlay_menu", name);
+        let closure = generate_overlay_menu_style_closure(oms);
         style_bindings.push(quote! { let #var = #closure; });
     }
     for (name, fd) in &style_maps.font {
