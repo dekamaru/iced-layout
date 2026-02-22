@@ -22,23 +22,23 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 
 ## Widget coverage
 
-| Widget         | Status |
-|----------------|--------|
-| Button         | ✅ Done |
-| Checkbox       | ✅ Done |
-| Column         | ✅ Done |
-| Container      | ✅ Done |
-| Row            | ✅ Done |
-| Space          | ✅ Done |
-| Stack          | ✅ Done |
-| Text           | ✅ Done |
-| TextInput      | ✅ Done |
-| Tooltip        | ✅ Done |
-| VerticalSlider | ✅ Done |
-| Sensor         | ✅ Done |
-| TextEditor     | ✅ Done |
-| Toggler        | ✅ Done |
-| ComboBox       | 🔲 Planned |
+| Widget         | Status     |
+|----------------|------------|
+| Button         | ✅ Done     |
+| Checkbox       | ✅ Done     |
+| Column         | ✅ Done     |
+| Container      | ✅ Done     |
+| Row            | ✅ Done     |
+| Space          | ✅ Done     |
+| Stack          | ✅ Done     |
+| Text           | ✅ Done     |
+| TextInput      | ✅ Done     |
+| Tooltip        | ✅ Done     |
+| VerticalSlider | ✅ Done     |
+| Sensor         | ✅ Done     |
+| TextEditor     | ✅ Done     |
+| Toggler        | ✅ Done     |
+| ComboBox       | ✅ Done     |
 | Float          | 🔲 Planned |
 | Grid           | 🔲 Planned |
 | MouseArea      | 🔲 Planned |
