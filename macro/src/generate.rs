@@ -1066,5 +1066,33 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
                 #iter_field.iter().map(|item| { (#body_tokens).into() })
             })
         }
+        Node::Float { scale, translate, style, children } => {
+            assert_eq!(
+                children.len(),
+                1,
+                "<float> must have exactly 1 child element, found {}",
+                children.len()
+            );
+            let child = generate(&children[0], styles, ctx).into_widget();
+            let mut expr = quote! { iced::widget::Float::new(#child) };
+            if let Some(s) = scale {
+                expr = quote! { #expr.scale(#s) };
+            }
+            if let Some(t) = translate {
+                let handler: syn::Ident = syn::parse_str(t)
+                    .unwrap_or_else(|e| panic!("invalid translate method name \"{}\": {}", t, e));
+                expr = quote! { #expr.translate(|bounds, viewport| self.#handler(bounds, viewport)) };
+            }
+            if let Some(style_name) = style {
+                assert!(
+                    styles.float.contains_key(style_name.as_str()),
+                    "unknown float style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("float", style_name);
+                expr = quote! { #expr.style(#var) };
+            }
+            Generated::Widget(expr)
+        }
     }
 }

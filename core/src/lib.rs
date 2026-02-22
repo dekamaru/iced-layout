@@ -246,6 +246,15 @@ pub struct OverlayMenuStyle {
     pub shadow_blur_radius: Option<f32>,
 }
 
+#[derive(Default)]
+pub struct FloatStyle {
+    pub shadow_color: Option<Color>,
+    pub shadow_offset_x: Option<f32>,
+    pub shadow_offset_y: Option<f32>,
+    pub shadow_blur_radius: Option<f32>,
+    pub shadow_border_radius: BorderRadius,
+}
+
 pub struct Layout {
     pub container_styles: Vec<(String, ContainerStyle)>,
     pub text_styles: Vec<(String, TextStyle)>,
@@ -255,6 +264,7 @@ pub struct Layout {
     pub toggler_styles: Vec<(String, TogglerStyle)>,
     pub text_editor_styles: Vec<(String, TextEditorStyle)>,
     pub overlay_menu_styles: Vec<(String, OverlayMenuStyle)>,
+    pub float_styles: Vec<(String, FloatStyle)>,
     pub font_defs: Vec<(String, FontDef)>,
     pub root: Node,
 }
@@ -446,5 +456,11 @@ pub enum Node {
         wrapping: Option<Wrapping>,
         key_binding: Option<String>,
         style: Option<String>,
+    },
+    Float {
+        scale: Option<f32>,
+        translate: Option<String>,
+        style: Option<String>,
+        children: Vec<Node>,
     },
 }

@@ -1,6 +1,7 @@
 use iced_layout_core::{
-    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, OverlayMenuStyle,
-    TextEditorStyle, TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TogglerStyle,
+    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FloatStyle,
+    OverlayMenuStyle, TextEditorStyle, TextEditorStyleFields, TextInputStyle, TextInputStyleFields,
+    TogglerStyle,
 };
 use quote::quote;
 
@@ -381,6 +382,26 @@ pub fn merge_text_editor_fields(
         placeholder_color: overlay.placeholder_color.or(base.placeholder_color),
         value_color: overlay.value_color.or(base.value_color),
         selection_color: overlay.selection_color.or(base.selection_color),
+    }
+}
+
+pub fn generate_float_style_closure(s: &FloatStyle) -> proc_macro2::TokenStream {
+    let shadow = generate_shadow(
+        &s.shadow_color,
+        s.shadow_offset_x,
+        s.shadow_offset_y,
+        s.shadow_blur_radius,
+    );
+    let br = &s.shadow_border_radius;
+    let tl = br.top_left.unwrap_or(0.0);
+    let tr = br.top_right.unwrap_or(0.0);
+    let brr = br.bottom_right.unwrap_or(0.0);
+    let bl = br.bottom_left.unwrap_or(0.0);
+    quote! {
+        |_theme| iced::widget::float::Style {
+            shadow: #shadow,
+            shadow_border_radius: iced::border::Radius { top_left: #tl, top_right: #tr, bottom_right: #brr, bottom_left: #bl },
+        }
     }
 }
 

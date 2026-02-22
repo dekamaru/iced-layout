@@ -148,6 +148,7 @@
                 <xs:element ref="text-editor"/>
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -216,6 +217,7 @@
                 <xs:element ref="text-editor"/>
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -253,6 +255,7 @@
                 <xs:element ref="text-editor"/>
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -291,6 +294,7 @@
                 <xs:element ref="text-editor"/>
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -330,6 +334,7 @@
                 <xs:element ref="text-editor"/>
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -435,6 +440,7 @@
                 <xs:element ref="text-editor"/>
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -515,6 +521,7 @@
                 <xs:element ref="text-editor"/>
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -554,6 +561,37 @@
             <xs:attribute name="menu-style" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="float">
+        <xs:annotation>
+            <xs:documentation>Make elements float!.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="scale" type="xs:float" use="optional"/>
+            <xs:attribute name="translate" type="xs:string" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="if">
         <xs:complexType>
             <xs:all>
@@ -575,6 +613,7 @@
                             <xs:element ref="text-editor"/>
                             <xs:element ref="sensor"/>
                             <xs:element ref="combo-box"/>
+                            <xs:element ref="float"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -599,6 +638,7 @@
                             <xs:element ref="text-editor"/>
                             <xs:element ref="sensor"/>
                             <xs:element ref="combo-box"/>
+                            <xs:element ref="float"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -627,6 +667,7 @@
                 <xs:element ref="text-editor"/>
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -661,6 +702,7 @@
                 <xs:element ref="text-editor"/>
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -976,6 +1018,20 @@
             <xs:attribute name="selection" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="float-style">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="shadow-color" type="xs:string" use="optional"/>
+            <xs:attribute name="shadow-offset-x" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-offset-y" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-blur-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="shadow-border-radius-bottom-left" type="xs:float" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="overlay-menu-style">
         <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
@@ -1016,6 +1072,7 @@
                 <xs:element ref="text-editor"/>
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1033,6 +1090,7 @@
                 <xs:element ref="toggler-style"/>
                 <xs:element ref="text-editor-style"/>
                 <xs:element ref="overlay-menu-style"/>
+                <xs:element ref="float-style"/>
                 <xs:element ref="font"/>
             </xs:choice>
         </xs:complexType>

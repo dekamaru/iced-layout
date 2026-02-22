@@ -308,6 +308,23 @@ pub fn parse_border_radius(e: &BytesStart) -> BorderRadius {
     }
 }
 
+pub fn parse_shadow_border_radius(e: &BytesStart) -> BorderRadius {
+    if let Some(all) = parse_f32_attr(e, b"shadow-border-radius") {
+        return BorderRadius {
+            top_left: Some(all),
+            top_right: Some(all),
+            bottom_right: Some(all),
+            bottom_left: Some(all),
+        };
+    }
+    BorderRadius {
+        top_left: parse_f32_attr(e, b"shadow-border-radius-top-left"),
+        top_right: parse_f32_attr(e, b"shadow-border-radius-top-right"),
+        bottom_right: parse_f32_attr(e, b"shadow-border-radius-bottom-right"),
+        bottom_left: parse_f32_attr(e, b"shadow-border-radius-bottom-left"),
+    }
+}
+
 pub fn consume_closing_tag(reader: &mut Reader<&[u8]>, tag: &[u8]) {
     loop {
         match reader.read_event().expect("failed to read XML") {

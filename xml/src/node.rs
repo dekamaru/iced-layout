@@ -360,6 +360,13 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
                 Node::Sensor { on_show, on_resize, on_hide, anticipate, delay, children }
             }
+            b"float" => {
+                let scale = parse_f32_attr(&e, b"scale");
+                let translate = parse_string_attr(&e, b"translate");
+                let style = parse_string_attr(&e, b"style");
+                let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
+                Node::Float { scale, translate, style, children }
+            }
             b"widget" => {
                 let method = parse_string_attr(&e, b"method")
                     .expect("<widget> requires a 'method' attribute");

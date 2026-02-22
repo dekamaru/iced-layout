@@ -10,16 +10,17 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 use iced_layout_core::{
-    ButtonStyle, CheckboxStyle, ContainerStyle, FontDef, OverlayMenuStyle, TextEditorStyle,
-    TextInputStyle, TextStyle, TogglerStyle,
+    ButtonStyle, CheckboxStyle, ContainerStyle, FloatStyle, FontDef, OverlayMenuStyle,
+    TextEditorStyle, TextInputStyle, TextStyle, TogglerStyle,
 };
 use quote::{format_ident, quote};
 use syn::{LitStr, parse_macro_input};
 
 use crate::style::{
     generate_button_style_closure, generate_checkbox_style_closure, generate_container_style,
-    generate_overlay_menu_style_closure, generate_text_editor_style_closure,
-    generate_text_input_style_closure, generate_toggler_style_closure,
+    generate_float_style_closure, generate_overlay_menu_style_closure,
+    generate_text_editor_style_closure, generate_text_input_style_closure,
+    generate_toggler_style_closure,
 };
 use crate::types::generate_font_def;
 
@@ -32,6 +33,7 @@ pub(crate) struct StyleMaps<'a> {
     pub toggler: HashMap<&'a str, &'a TogglerStyle>,
     pub text_editor: HashMap<&'a str, &'a TextEditorStyle>,
     pub overlay_menu: HashMap<&'a str, &'a OverlayMenuStyle>,
+    pub float: HashMap<&'a str, &'a FloatStyle>,
     pub font: HashMap<&'a str, &'a FontDef>,
 }
 
@@ -75,6 +77,7 @@ pub fn layout(input: TokenStream) -> TokenStream {
         toggler: layout.toggler_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         text_editor: layout.text_editor_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         overlay_menu: layout.overlay_menu_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        float: layout.float_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         font: layout.font_defs.iter().map(|(k, v)| (k.as_str(), v)).collect(),
     };
 
@@ -114,6 +117,13 @@ pub fn layout(input: TokenStream) -> TokenStream {
         let var = style_var_name("overlay_menu", name);
         let closure = generate_overlay_menu_style_closure(oms);
         style_bindings.push(quote! { let #var = #closure; });
+    }
+    for (name, fs) in &style_maps.float {
+        let var = style_var_name("float", name);
+        let closure = generate_float_style_closure(fs);
+        style_bindings.push(quote! {
+            let #var: fn(&iced::Theme) -> iced::widget::float::Style = #closure;
+        });
     }
     for (name, fd) in &style_maps.font {
         let var = style_var_name("font", name);
