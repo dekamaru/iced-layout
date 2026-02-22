@@ -65,7 +65,11 @@ pub fn parse(xml: &str) -> Layout {
         text_editor_styles: styles.text_editor,
         overlay_menu_styles: styles.overlay_menu,
         float_styles: styles.float,
+        pick_list_styles: styles.pick_list,
         font_defs: styles.font,
+        checkbox_icons: styles.checkbox_icons,
+        text_input_icons: styles.text_input_icons,
+        pick_list_icons: styles.pick_list_icons,
         root: root.expect("<layout> must contain a <root> element"),
     }
 }

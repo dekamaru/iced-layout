@@ -1,7 +1,7 @@
 use iced_layout_core::{
     BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FloatStyle,
-    OverlayMenuStyle, TextEditorStyle, TextEditorStyleFields, TextInputStyle, TextInputStyleFields,
-    TogglerStyle,
+    OverlayMenuStyle, PickListStyle, PickListStyleFields, TextEditorStyle, TextEditorStyleFields,
+    TextInputStyle, TextInputStyleFields, TogglerStyle,
 };
 use quote::quote;
 
@@ -382,6 +382,89 @@ pub fn merge_text_editor_fields(
         placeholder_color: overlay.placeholder_color.or(base.placeholder_color),
         value_color: overlay.value_color.or(base.value_color),
         selection_color: overlay.selection_color.or(base.selection_color),
+    }
+}
+
+pub fn generate_pick_list_style_fields_tokens(
+    fields: &PickListStyleFields,
+) -> proc_macro2::TokenStream {
+    let text_color = generate_color_or(&fields.text_color, quote! { iced::Color::BLACK });
+    let placeholder_color =
+        generate_color_or(&fields.placeholder_color, quote! { iced::Color { r: 0.4, g: 0.4, b: 0.4, a: 1.0 } });
+    let handle_color = generate_color_or(&fields.handle_color, quote! { iced::Color::BLACK });
+    let background = match &fields.background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::WHITE) },
+    };
+    let border = generate_border(&fields.border_color, fields.border_width, &fields.border_radius);
+    quote! {
+        iced::widget::pick_list::Style {
+            text_color: #text_color,
+            placeholder_color: #placeholder_color,
+            handle_color: #handle_color,
+            background: #background,
+            border: #border,
+        }
+    }
+}
+
+pub fn merge_pick_list_fields(
+    base: &PickListStyleFields,
+    overlay: &PickListStyleFields,
+) -> PickListStyleFields {
+    PickListStyleFields {
+        text_color: overlay.text_color.or(base.text_color),
+        placeholder_color: overlay.placeholder_color.or(base.placeholder_color),
+        handle_color: overlay.handle_color.or(base.handle_color),
+        background_color: overlay.background_color.or(base.background_color),
+        border_color: overlay.border_color.or(base.border_color),
+        border_width: overlay.border_width.or(base.border_width),
+        border_radius: BorderRadius {
+            top_left: overlay.border_radius.top_left.or(base.border_radius.top_left),
+            top_right: overlay.border_radius.top_right.or(base.border_radius.top_right),
+            bottom_right: overlay
+                .border_radius
+                .bottom_right
+                .or(base.border_radius.bottom_right),
+            bottom_left: overlay
+                .border_radius
+                .bottom_left
+                .or(base.border_radius.bottom_left),
+        },
+    }
+}
+
+pub fn generate_pick_list_style_closure(s: &PickListStyle) -> proc_macro2::TokenStream {
+    let base_style = generate_pick_list_style_fields_tokens(&s.base);
+
+    let status_overrides: Vec<_> = [
+        (&s.active, quote! { iced::widget::pick_list::Status::Active }),
+        (&s.hovered, quote! { iced::widget::pick_list::Status::Hovered }),
+    ]
+    .into_iter()
+    .filter_map(|(opt, status_token)| {
+        opt.as_ref().map(|fields| {
+            let merged = merge_pick_list_fields(&s.base, fields);
+            let style = generate_pick_list_style_fields_tokens(&merged);
+            quote! { #status_token => #style }
+        })
+    })
+    .collect();
+
+    if status_overrides.is_empty() {
+        quote! {
+            |_theme, _status| #base_style
+        }
+    } else {
+        quote! {
+            |_theme, status| match status {
+                #(#status_overrides,)*
+                _ => #base_style
+            }
+        }
     }
 }
 

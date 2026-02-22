@@ -1,6 +1,7 @@
 use iced_layout_core::{
-    BorderRadius, Color, FontStretch, FontStyle, FontWeight, Horizontal, Length, LineHeight,
-    Padding, Shaping, TextAlignment, TextAttrs, TooltipPosition, Vertical, Wrapping,
+    BorderRadius, Color, FontStretch, FontStyle, FontWeight, Horizontal, Interaction, Length,
+    LineHeight, Padding, Shaping, TextAlignment, TextAttrs, TextInputSide, TooltipPosition,
+    Vertical, Wrapping,
 };
 use quick_xml::events::BytesStart;
 use quick_xml::events::Event;
@@ -288,6 +289,62 @@ pub fn parse_tooltip_position_attr(e: &BytesStart, name: &[u8]) -> Option<Toolti
         "right" => TooltipPosition::Right,
         "follow-cursor" => TooltipPosition::FollowCursor,
         _ => panic!("invalid tooltip position: {}", s),
+    })
+}
+
+pub fn parse_interaction_attr(e: &BytesStart, name: &[u8]) -> Option<Interaction> {
+    parse_string_attr(e, name).map(|s| match s.as_str() {
+        "none" => Interaction::None,
+        "hidden" => Interaction::Hidden,
+        "idle" => Interaction::Idle,
+        "context-menu" => Interaction::ContextMenu,
+        "help" => Interaction::Help,
+        "pointer" => Interaction::Pointer,
+        "progress" => Interaction::Progress,
+        "wait" => Interaction::Wait,
+        "cell" => Interaction::Cell,
+        "crosshair" => Interaction::Crosshair,
+        "text" => Interaction::Text,
+        "alias" => Interaction::Alias,
+        "copy" => Interaction::Copy,
+        "move" => Interaction::Move,
+        "no-drop" => Interaction::NoDrop,
+        "not-allowed" => Interaction::NotAllowed,
+        "grab" => Interaction::Grab,
+        "grabbing" => Interaction::Grabbing,
+        "resizing-horizontally" => Interaction::ResizingHorizontally,
+        "resizing-vertically" => Interaction::ResizingVertically,
+        "resizing-diagonally-up" => Interaction::ResizingDiagonallyUp,
+        "resizing-diagonally-down" => Interaction::ResizingDiagonallyDown,
+        "resizing-column" => Interaction::ResizingColumn,
+        "resizing-row" => Interaction::ResizingRow,
+        "all-scroll" => Interaction::AllScroll,
+        "zoom-in" => Interaction::ZoomIn,
+        "zoom-out" => Interaction::ZoomOut,
+        _ => panic!("invalid interaction: {}", s),
+    })
+}
+
+pub fn parse_code_point_attr(e: &BytesStart, name: &[u8]) -> Option<char> {
+    parse_string_attr(e, name).map(|s| {
+        if let Some(hex) = s.strip_prefix("U+").or_else(|| s.strip_prefix("0x")) {
+            let n = u32::from_str_radix(hex, 16)
+                .unwrap_or_else(|_| panic!("invalid code point hex \"{s}\""));
+            char::from_u32(n).unwrap_or_else(|| panic!("invalid Unicode code point U+{n:04X}"))
+        } else {
+            let mut chars = s.chars();
+            let c = chars.next().unwrap_or_else(|| panic!("empty code-point attribute"));
+            assert!(chars.next().is_none(), "code-point must be a single character or U+XXXX hex, got \"{s}\"");
+            c
+        }
+    })
+}
+
+pub fn parse_text_input_side_attr(e: &BytesStart, name: &[u8]) -> Option<TextInputSide> {
+    parse_string_attr(e, name).map(|s| match s.as_str() {
+        "left" => TextInputSide::Left,
+        "right" => TextInputSide::Right,
+        _ => panic!("invalid text-input side: {}", s),
     })
 }
 

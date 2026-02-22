@@ -1,7 +1,8 @@
 use iced_layout_core::{
-    ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FloatStyle, FontDef,
-    OverlayMenuStyle, TextEditorStyle, TextEditorStyleFields, TextInputStyle, TextInputStyleFields,
-    TextStyle, TogglerStyle,
+    ButtonStyle, ButtonStyleFields, CheckboxIcon, CheckboxStyle, ContainerStyle, FloatStyle,
+    FontDef, OverlayMenuStyle, PickListIcon, PickListStyle, PickListStyleFields, TextEditorStyle,
+    TextEditorStyleFields, TextInputIcon, TextInputStyle, TextInputStyleFields, TextStyle,
+    TogglerStyle,
 };
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::Reader;
@@ -18,7 +19,11 @@ pub struct ParsedStyles {
     pub text_editor: Vec<(String, TextEditorStyle)>,
     pub overlay_menu: Vec<(String, OverlayMenuStyle)>,
     pub float: Vec<(String, FloatStyle)>,
+    pub pick_list: Vec<(String, PickListStyle)>,
     pub font: Vec<(String, FontDef)>,
+    pub checkbox_icons: Vec<(String, CheckboxIcon)>,
+    pub text_input_icons: Vec<(String, TextInputIcon)>,
+    pub pick_list_icons: Vec<(String, PickListIcon)>,
 }
 
 impl Default for ParsedStyles {
@@ -33,7 +38,11 @@ impl Default for ParsedStyles {
             text_editor: Vec::new(),
             overlay_menu: Vec::new(),
             float: Vec::new(),
+            pick_list: Vec::new(),
             font: Vec::new(),
+            checkbox_icons: Vec::new(),
+            text_input_icons: Vec::new(),
+            pick_list_icons: Vec::new(),
         }
     }
 }
@@ -321,6 +330,103 @@ fn parse_text_input_style_empty(e: &BytesStart) -> (String, TextInputStyle) {
     (id, TextInputStyle { base, ..Default::default() })
 }
 
+fn parse_checkbox_icon(e: &BytesStart) -> (String, CheckboxIcon) {
+    let id = parse_string_attr(e, b"id").expect("<checkbox-icon> requires an 'id' attribute");
+    let font = parse_string_attr(e, b"font").expect("<checkbox-icon> requires a 'font' attribute");
+    let code_point = parse_code_point_attr(e, b"code-point")
+        .expect("<checkbox-icon> requires a 'code-point' attribute");
+    let icon = CheckboxIcon {
+        font,
+        code_point,
+        size: parse_f32_attr(e, b"size"),
+        line_height: parse_line_height_attr(e, b"line-height"),
+        shaping: parse_shaping_attr(e, b"shaping"),
+    };
+    (id, icon)
+}
+
+fn parse_text_input_icon(e: &BytesStart) -> (String, TextInputIcon) {
+    let id =
+        parse_string_attr(e, b"id").expect("<text-input-icon> requires an 'id' attribute");
+    let font =
+        parse_string_attr(e, b"font").expect("<text-input-icon> requires a 'font' attribute");
+    let code_point = parse_code_point_attr(e, b"code-point")
+        .expect("<text-input-icon> requires a 'code-point' attribute");
+    let icon = TextInputIcon {
+        font,
+        code_point,
+        size: parse_f32_attr(e, b"size"),
+        spacing: parse_f32_attr(e, b"spacing"),
+        side: parse_text_input_side_attr(e, b"side"),
+    };
+    (id, icon)
+}
+
+fn parse_pick_list_icon(e: &BytesStart) -> (String, PickListIcon) {
+    let id =
+        parse_string_attr(e, b"id").expect("<pick-list-icon> requires an 'id' attribute");
+    let font =
+        parse_string_attr(e, b"font").expect("<pick-list-icon> requires a 'font' attribute");
+    let code_point = parse_code_point_attr(e, b"code-point")
+        .expect("<pick-list-icon> requires a 'code-point' attribute");
+    let icon = PickListIcon {
+        font,
+        code_point,
+        size: parse_f32_attr(e, b"size"),
+        line_height: parse_line_height_attr(e, b"line-height"),
+        shaping: parse_shaping_attr(e, b"shaping"),
+    };
+    (id, icon)
+}
+
+fn parse_pick_list_style_fields(e: &BytesStart) -> PickListStyleFields {
+    PickListStyleFields {
+        text_color: parse_color_attr(e, b"text-color"),
+        placeholder_color: parse_color_attr(e, b"placeholder-color"),
+        handle_color: parse_color_attr(e, b"handle-color"),
+        background_color: parse_color_attr(e, b"background-color"),
+        border_color: parse_color_attr(e, b"border-color"),
+        border_width: parse_f32_attr(e, b"border-width"),
+        border_radius: parse_border_radius(e),
+    }
+}
+
+fn assign_pick_list_status_fields(
+    style: &mut PickListStyle,
+    tag: &[u8],
+    fields: PickListStyleFields,
+) {
+    match tag {
+        b"active" => style.active = Some(fields),
+        b"hovered" => style.hovered = Some(fields),
+        other => panic!(
+            "unexpected element in <pick-list-style>: {}",
+            String::from_utf8_lossy(other)
+        ),
+    }
+}
+
+fn parse_pick_list_style(e: &BytesStart, reader: &mut Reader<&[u8]>) -> (String, PickListStyle) {
+    let id =
+        parse_string_attr(e, b"id").expect("<pick-list-style> requires an 'id' attribute");
+    let base = parse_pick_list_style_fields(e);
+    let mut style = PickListStyle {
+        base,
+        ..Default::default()
+    };
+    parse_stateful_children(reader, b"pick-list-style", &mut style, |s, tag, e| {
+        assign_pick_list_status_fields(s, tag, parse_pick_list_style_fields(e))
+    });
+    (id, style)
+}
+
+fn parse_pick_list_style_empty(e: &BytesStart) -> (String, PickListStyle) {
+    let id =
+        parse_string_attr(e, b"id").expect("<pick-list-style> requires an 'id' attribute");
+    let base = parse_pick_list_style_fields(e);
+    (id, PickListStyle { base, ..Default::default() })
+}
+
 pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
     let mut styles = ParsedStyles::default();
 
@@ -366,6 +472,21 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                         styles.font.push(parse_font_def(&e));
                         consume_closing_tag(reader, &tag);
                     }
+                    b"pick-list-style" => {
+                        styles.pick_list.push(parse_pick_list_style(&e, reader));
+                    }
+                    b"checkbox-icon" => {
+                        styles.checkbox_icons.push(parse_checkbox_icon(&e));
+                        consume_closing_tag(reader, &tag);
+                    }
+                    b"text-input-icon" => {
+                        styles.text_input_icons.push(parse_text_input_icon(&e));
+                        consume_closing_tag(reader, &tag);
+                    }
+                    b"pick-list-icon" => {
+                        styles.pick_list_icons.push(parse_pick_list_icon(&e));
+                        consume_closing_tag(reader, &tag);
+                    }
                     other => panic!(
                         "unexpected element in <styles>: {}",
                         String::from_utf8_lossy(other)
@@ -382,7 +503,11 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                 b"text-editor-style" => styles.text_editor.push(parse_text_editor_style_empty(&e)),
                 b"overlay-menu-style" => styles.overlay_menu.push(parse_overlay_menu_style(&e)),
                 b"float-style" => styles.float.push(parse_float_style(&e)),
+                b"pick-list-style" => styles.pick_list.push(parse_pick_list_style_empty(&e)),
                 b"font" => styles.font.push(parse_font_def(&e)),
+                b"checkbox-icon" => styles.checkbox_icons.push(parse_checkbox_icon(&e)),
+                b"text-input-icon" => styles.text_input_icons.push(parse_text_input_icon(&e)),
+                b"pick-list-icon" => styles.pick_list_icons.push(parse_pick_list_icon(&e)),
                 other => panic!(
                     "unexpected element in <styles>: {}",
                     String::from_utf8_lossy(other)

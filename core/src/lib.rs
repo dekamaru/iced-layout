@@ -255,6 +255,92 @@ pub struct FloatStyle {
     pub shadow_border_radius: BorderRadius,
 }
 
+#[derive(Clone, Copy)]
+pub enum TextInputSide {
+    Left,
+    Right,
+}
+
+pub struct CheckboxIcon {
+    pub font: String,
+    pub code_point: char,
+    pub size: Option<f32>,
+    pub line_height: Option<LineHeight>,
+    pub shaping: Option<Shaping>,
+}
+
+pub struct TextInputIcon {
+    pub font: String,
+    pub code_point: char,
+    pub size: Option<f32>,
+    pub spacing: Option<f32>,
+    pub side: Option<TextInputSide>,
+}
+
+pub struct PickListIcon {
+    pub font: String,
+    pub code_point: char,
+    pub size: Option<f32>,
+    pub line_height: Option<LineHeight>,
+    pub shaping: Option<Shaping>,
+}
+
+pub enum PickListHandle {
+    Arrow { size: Option<f32> },
+    Static { icon: String },
+    Dynamic { closed: String, open: String },
+    None,
+}
+
+#[derive(Default)]
+pub struct PickListStyleFields {
+    pub text_color: Option<Color>,
+    pub placeholder_color: Option<Color>,
+    pub handle_color: Option<Color>,
+    pub background_color: Option<Color>,
+    pub border_color: Option<Color>,
+    pub border_width: Option<f32>,
+    pub border_radius: BorderRadius,
+}
+
+#[derive(Default)]
+pub struct PickListStyle {
+    pub base: PickListStyleFields,
+    pub active: Option<PickListStyleFields>,
+    pub hovered: Option<PickListStyleFields>,
+}
+
+#[derive(Clone, Copy)]
+pub enum Interaction {
+    None,
+    Hidden,
+    Idle,
+    ContextMenu,
+    Help,
+    Pointer,
+    Progress,
+    Wait,
+    Cell,
+    Crosshair,
+    Text,
+    Alias,
+    Copy,
+    Move,
+    NoDrop,
+    NotAllowed,
+    Grab,
+    Grabbing,
+    ResizingHorizontally,
+    ResizingVertically,
+    ResizingDiagonallyUp,
+    ResizingDiagonallyDown,
+    ResizingColumn,
+    ResizingRow,
+    AllScroll,
+    ZoomIn,
+    ZoomOut,
+}
+
 pub struct Layout {
     pub container_styles: Vec<(String, ContainerStyle)>,
     pub text_styles: Vec<(String, TextStyle)>,
@@ -265,7 +351,11 @@ pub struct Layout {
     pub text_editor_styles: Vec<(String, TextEditorStyle)>,
     pub overlay_menu_styles: Vec<(String, OverlayMenuStyle)>,
     pub float_styles: Vec<(String, FloatStyle)>,
+    pub pick_list_styles: Vec<(String, PickListStyle)>,
     pub font_defs: Vec<(String, FontDef)>,
+    pub checkbox_icons: Vec<(String, CheckboxIcon)>,
+    pub text_input_icons: Vec<(String, TextInputIcon)>,
+    pub pick_list_icons: Vec<(String, PickListIcon)>,
     pub root: Node,
 }
 
@@ -346,6 +436,7 @@ pub enum Node {
         align_x: Option<Horizontal>,
         style: Option<String>,
         font: Option<String>,
+        icon: Option<String>,
     },
     Checkbox {
         label: String,
@@ -361,6 +452,7 @@ pub enum Node {
         text_wrapping: Option<Wrapping>,
         style: Option<String>,
         font: Option<String>,
+        icon: Option<String>,
     },
     If {
         condition: String,
@@ -439,6 +531,7 @@ pub enum Node {
         text_shaping: Option<Shaping>,
         input_style: Option<String>,
         menu_style: Option<String>,
+        icon: Option<String>,
     },
     TextEditor {
         content: String,
@@ -462,5 +555,38 @@ pub enum Node {
         translate: Option<String>,
         style: Option<String>,
         children: Vec<Node>,
+    },
+    MouseArea {
+        on_press: Option<String>,
+        on_release: Option<String>,
+        on_double_click: Option<String>,
+        on_right_press: Option<String>,
+        on_right_release: Option<String>,
+        on_middle_press: Option<String>,
+        on_middle_release: Option<String>,
+        on_scroll: Option<String>,
+        on_enter: Option<String>,
+        on_move: Option<String>,
+        on_exit: Option<String>,
+        interaction: Option<Interaction>,
+        children: Vec<Node>,
+    },
+    PickList {
+        options: String,
+        selected: String,
+        on_select: String,
+        placeholder: Option<String>,
+        width: Option<Length>,
+        menu_height: Option<Length>,
+        padding: Padding,
+        text_size: Option<f32>,
+        text_line_height: Option<LineHeight>,
+        text_shaping: Option<Shaping>,
+        font: Option<String>,
+        handle: Option<PickListHandle>,
+        on_open: Option<String>,
+        on_close: Option<String>,
+        style: Option<String>,
+        menu_style: Option<String>,
     },
 }

@@ -10,8 +10,9 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 use iced_layout_core::{
-    ButtonStyle, CheckboxStyle, ContainerStyle, FloatStyle, FontDef, OverlayMenuStyle,
-    TextEditorStyle, TextInputStyle, TextStyle, TogglerStyle,
+    ButtonStyle, CheckboxIcon, CheckboxStyle, ContainerStyle, FloatStyle, FontDef,
+    OverlayMenuStyle, PickListIcon, PickListStyle, TextEditorStyle, TextInputIcon, TextInputStyle,
+    TextStyle, TogglerStyle,
 };
 use quote::{format_ident, quote};
 use syn::{LitStr, parse_macro_input};
@@ -19,10 +20,13 @@ use syn::{LitStr, parse_macro_input};
 use crate::style::{
     generate_button_style_closure, generate_checkbox_style_closure, generate_container_style,
     generate_float_style_closure, generate_overlay_menu_style_closure,
-    generate_text_editor_style_closure, generate_text_input_style_closure,
-    generate_toggler_style_closure,
+    generate_pick_list_style_closure, generate_text_editor_style_closure,
+    generate_text_input_style_closure, generate_toggler_style_closure,
 };
-use crate::types::generate_font_def;
+use crate::types::{
+    generate_checkbox_icon_expr, generate_font_def, generate_pick_list_icon_expr,
+    generate_text_input_icon_expr,
+};
 
 pub(crate) struct StyleMaps<'a> {
     pub container: HashMap<&'a str, &'a ContainerStyle>,
@@ -34,7 +38,11 @@ pub(crate) struct StyleMaps<'a> {
     pub text_editor: HashMap<&'a str, &'a TextEditorStyle>,
     pub overlay_menu: HashMap<&'a str, &'a OverlayMenuStyle>,
     pub float: HashMap<&'a str, &'a FloatStyle>,
+    pub pick_list: HashMap<&'a str, &'a PickListStyle>,
     pub font: HashMap<&'a str, &'a FontDef>,
+    pub checkbox_icons: HashMap<&'a str, &'a CheckboxIcon>,
+    pub text_input_icons: HashMap<&'a str, &'a TextInputIcon>,
+    pub pick_list_icons: HashMap<&'a str, &'a PickListIcon>,
 }
 
 pub(crate) fn style_var_name(prefix: &str, name: &str) -> syn::Ident {
@@ -78,7 +86,11 @@ pub fn layout(input: TokenStream) -> TokenStream {
         text_editor: layout.text_editor_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         overlay_menu: layout.overlay_menu_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         float: layout.float_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        pick_list: layout.pick_list_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         font: layout.font_defs.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        checkbox_icons: layout.checkbox_icons.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        text_input_icons: layout.text_input_icons.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        pick_list_icons: layout.pick_list_icons.iter().map(|(k, v)| (k.as_str(), v)).collect(),
     };
 
     let mut style_bindings = Vec::new();
@@ -129,6 +141,31 @@ pub fn layout(input: TokenStream) -> TokenStream {
         let var = style_var_name("font", name);
         let font_expr = generate_font_def(fd);
         style_bindings.push(quote! { let #var = #font_expr; });
+    }
+    for (name, pls) in &style_maps.pick_list {
+        let var = style_var_name("pick_list", name);
+        let closure = generate_pick_list_style_closure(pls);
+        style_bindings.push(quote! {
+            let #var: fn(&iced::Theme, iced::widget::pick_list::Status) -> iced::widget::pick_list::Style = #closure;
+        });
+    }
+    for (name, icon) in &style_maps.checkbox_icons {
+        let var = style_var_name("checkbox_icon", name);
+        let font_var = style_var_name("font", &icon.font);
+        let expr = generate_checkbox_icon_expr(icon, &font_var);
+        style_bindings.push(quote! { let #var = #expr; });
+    }
+    for (name, icon) in &style_maps.text_input_icons {
+        let var = style_var_name("text_input_icon", name);
+        let font_var = style_var_name("font", &icon.font);
+        let expr = generate_text_input_icon_expr(icon, &font_var);
+        style_bindings.push(quote! { let #var = #expr; });
+    }
+    for (name, icon) in &style_maps.pick_list_icons {
+        let var = style_var_name("pick_list_icon", name);
+        let font_var = style_var_name("font", &icon.font);
+        let expr = generate_pick_list_icon_expr(icon, &font_var);
+        style_bindings.push(quote! { let #var = #expr; });
     }
 
     let ctx = generate::GenerateContext::default();

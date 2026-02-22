@@ -91,6 +91,55 @@
         <xs:union memberTypes="WrappingKeyword"/>
     </xs:simpleType>
 
+    <xs:simpleType name="InteractionKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="none"/>
+            <xs:enumeration value="hidden"/>
+            <xs:enumeration value="idle"/>
+            <xs:enumeration value="context-menu"/>
+            <xs:enumeration value="help"/>
+            <xs:enumeration value="pointer"/>
+            <xs:enumeration value="progress"/>
+            <xs:enumeration value="wait"/>
+            <xs:enumeration value="cell"/>
+            <xs:enumeration value="crosshair"/>
+            <xs:enumeration value="text"/>
+            <xs:enumeration value="alias"/>
+            <xs:enumeration value="copy"/>
+            <xs:enumeration value="move"/>
+            <xs:enumeration value="no-drop"/>
+            <xs:enumeration value="not-allowed"/>
+            <xs:enumeration value="grab"/>
+            <xs:enumeration value="grabbing"/>
+            <xs:enumeration value="resizing-horizontally"/>
+            <xs:enumeration value="resizing-vertically"/>
+            <xs:enumeration value="resizing-diagonally-up"/>
+            <xs:enumeration value="resizing-diagonally-down"/>
+            <xs:enumeration value="resizing-column"/>
+            <xs:enumeration value="resizing-row"/>
+            <xs:enumeration value="all-scroll"/>
+            <xs:enumeration value="zoom-in"/>
+            <xs:enumeration value="zoom-out"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Interaction">
+        <xs:union memberTypes="InteractionKeyword"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="HandleKeyword">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="arrow"/>
+            <xs:enumeration value="static"/>
+            <xs:enumeration value="dynamic"/>
+            <xs:enumeration value="none"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Handle">
+        <xs:union memberTypes="HandleKeyword"/>
+    </xs:simpleType>
+
     <xs:simpleType name="FontWeight">
         <xs:restriction base="xs:string">
             <xs:enumeration value="thin"/>
@@ -149,6 +198,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -218,6 +269,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -256,6 +309,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -295,6 +350,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -335,6 +392,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -361,6 +420,7 @@
             <xs:attribute name="text-shaping" type="Shaping" use="optional"/>
             <xs:attribute name="text-wrapping" type="Wrapping" use="optional"/>
             <xs:attribute name="font" type="xs:string" use="optional"/>
+            <xs:attribute name="icon" type="xs:string" use="optional"/>
             <xs:attribute name="style" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
@@ -389,6 +449,7 @@
             <xs:attribute name="on-paste" type="xs:string" use="optional"/>
             <xs:attribute name="on-paste-maybe" type="xs:string" use="optional"/>
             <xs:attribute name="font" type="xs:string" use="optional"/>
+            <xs:attribute name="icon" type="xs:string" use="optional"/>
             <xs:attribute name="width" type="Length" use="optional"/>
             <xs:attribute name="padding" type="xs:float" use="optional"/>
             <xs:attribute name="padding-top" type="xs:float" use="optional"/>
@@ -441,6 +502,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -522,6 +585,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -552,6 +617,7 @@
             <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
             <xs:attribute name="padding-left" type="xs:float" use="optional"/>
             <xs:attribute name="font" type="xs:string" use="optional"/>
+            <xs:attribute name="icon" type="xs:string" use="optional"/>
             <xs:attribute name="size" type="xs:float" use="optional"/>
             <xs:attribute name="line-height" type="LineHeight" use="optional"/>
             <xs:attribute name="width" type="Length" use="optional"/>
@@ -583,6 +649,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -590,6 +658,79 @@
             <xs:attribute name="scale" type="xs:float" use="optional"/>
             <xs:attribute name="translate" type="xs:string" use="optional"/>
             <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="mouse-area">
+        <xs:annotation>
+            <xs:documentation>A container for capturing mouse events.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="on-press" type="xs:string" use="optional"/>
+            <xs:attribute name="on-release" type="xs:string" use="optional"/>
+            <xs:attribute name="on-double-click" type="xs:string" use="optional"/>
+            <xs:attribute name="on-right-press" type="xs:string" use="optional"/>
+            <xs:attribute name="on-right-release" type="xs:string" use="optional"/>
+            <xs:attribute name="on-middle-press" type="xs:string" use="optional"/>
+            <xs:attribute name="on-middle-release" type="xs:string" use="optional"/>
+            <xs:attribute name="on-scroll" type="xs:string" use="optional"/>
+            <xs:attribute name="on-enter" type="xs:string" use="optional"/>
+            <xs:attribute name="on-move" type="xs:string" use="optional"/>
+            <xs:attribute name="on-exit" type="xs:string" use="optional"/>
+            <xs:attribute name="interaction" type="Interaction" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="pick-list">
+        <xs:annotation>
+            <xs:documentation>Pick lists display a dropdown list of selectable options.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="options" type="xs:string" use="required"/>
+            <xs:attribute name="selected" type="xs:string" use="required"/>
+            <xs:attribute name="on-select" type="xs:string" use="required"/>
+            <xs:attribute name="placeholder" type="xs:string" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="menu-height" type="Length" use="optional"/>
+            <xs:attribute name="padding" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-top" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-right" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-bottom" type="xs:float" use="optional"/>
+            <xs:attribute name="padding-left" type="xs:float" use="optional"/>
+            <xs:attribute name="text-size" type="xs:float" use="optional"/>
+            <xs:attribute name="text-line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="text-shaping" type="Shaping" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
+            <xs:attribute name="handle" type="Handle" use="optional"/>
+            <xs:attribute name="handle-arrow-size" type="xs:float" use="optional"/>
+            <xs:attribute name="handle-static" type="xs:string" use="optional"/>
+            <xs:attribute name="handle-dynamic-closed" type="xs:string" use="optional"/>
+            <xs:attribute name="handle-dynamic-open" type="xs:string" use="optional"/>
+            <xs:attribute name="on-open" type="xs:string" use="optional"/>
+            <xs:attribute name="on-close" type="xs:string" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+            <xs:attribute name="menu-style" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="if">
@@ -614,6 +755,8 @@
                             <xs:element ref="sensor"/>
                             <xs:element ref="combo-box"/>
                             <xs:element ref="float"/>
+                            <xs:element ref="mouse-area"/>
+                            <xs:element ref="pick-list"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -639,6 +782,8 @@
                             <xs:element ref="sensor"/>
                             <xs:element ref="combo-box"/>
                             <xs:element ref="float"/>
+                            <xs:element ref="mouse-area"/>
+                            <xs:element ref="pick-list"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -668,6 +813,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -703,6 +850,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -720,6 +869,39 @@
             <xs:attribute name="arg-9" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="checkbox-icon">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="font" type="xs:string" use="required"/>
+            <xs:attribute name="code-point" type="xs:string" use="required"/>
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="shaping" type="Shaping" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="pick-list-icon">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="font" type="xs:string" use="required"/>
+            <xs:attribute name="code-point" type="xs:string" use="required"/>
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="shaping" type="Shaping" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="text-input-icon">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="font" type="xs:string" use="required"/>
+            <xs:attribute name="code-point" type="xs:string" use="required"/>
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="spacing" type="xs:float" use="optional"/>
+            <xs:attribute name="side" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+
     <xs:element name="container-style">
         <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
@@ -1032,6 +1214,57 @@
             <xs:attribute name="shadow-border-radius-bottom-left" type="xs:float" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="pick-list-style">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="active">
+                    <xs:complexType>
+                        <xs:attribute name="text-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="placeholder-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="hovered">
+                    <xs:complexType>
+                        <xs:attribute name="text-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="placeholder-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="text-color" type="xs:string" use="optional"/>
+            <xs:attribute name="placeholder-color" type="xs:string" use="optional"/>
+            <xs:attribute name="handle-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="overlay-menu-style">
         <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
@@ -1073,6 +1306,8 @@
                 <xs:element ref="sensor"/>
                 <xs:element ref="combo-box"/>
                 <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1091,7 +1326,11 @@
                 <xs:element ref="text-editor-style"/>
                 <xs:element ref="overlay-menu-style"/>
                 <xs:element ref="float-style"/>
+                <xs:element ref="pick-list-style"/>
                 <xs:element ref="font"/>
+                <xs:element ref="checkbox-icon"/>
+                <xs:element ref="pick-list-icon"/>
+                <xs:element ref="text-input-icon"/>
             </xs:choice>
         </xs:complexType>
     </xs:element>

@@ -1,4 +1,4 @@
-use iced_layout_core::Node;
+use iced_layout_core::{Node, PickListHandle};
 use quick_xml::events::Event;
 use quick_xml::Reader;
 
@@ -127,13 +127,14 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 let align_x = parse_horizontal_attr(&e, b"align-x");
                 let style = parse_string_attr(&e, b"style");
                 let font = parse_string_attr(&e, b"font");
+                let icon = parse_string_attr(&e, b"icon");
                 if has_closing_tag {
                     consume_closing_tag(reader, b"text-input");
                 }
                 Node::TextInput {
                     placeholder, value, id, secure, on_input,
                     on_submit, on_submit_maybe, on_paste,
-                    width, padding, size, line_height, align_x, style, font,
+                    width, padding, size, line_height, align_x, style, font, icon,
                 }
             }
             b"checkbox" => {
@@ -150,6 +151,7 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 let text_wrapping = parse_wrapping_attr(&e, b"text-wrapping");
                 let style = parse_string_attr(&e, b"style");
                 let font = parse_string_attr(&e, b"font");
+                let icon = parse_string_attr(&e, b"icon");
 
                 let mut label = String::new();
                 if has_closing_tag {
@@ -168,7 +170,7 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 Node::Checkbox {
                     label, is_checked, on_toggle, on_toggle_maybe,
                     size, width, spacing, text_size, text_line_height,
-                    text_shaping, text_wrapping, style, font,
+                    text_shaping, text_wrapping, style, font, icon,
                 }
             }
             b"foreach" => {
@@ -315,6 +317,7 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 let text_shaping = parse_shaping_attr(&e, b"text-shaping");
                 let input_style = parse_string_attr(&e, b"input-style");
                 let menu_style = parse_string_attr(&e, b"menu-style");
+                let icon = parse_string_attr(&e, b"icon");
                 if has_closing_tag {
                     consume_closing_tag(reader, b"combo-box");
                 }
@@ -322,7 +325,7 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     state, placeholder, selection, on_selected,
                     on_input, on_option_hovered, on_open, on_close,
                     padding, font, size, line_height, width, menu_height,
-                    text_shaping, input_style, menu_style,
+                    text_shaping, input_style, menu_style, icon,
                 }
             }
             b"text-editor" => {
@@ -366,6 +369,79 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 let style = parse_string_attr(&e, b"style");
                 let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
                 Node::Float { scale, translate, style, children }
+            }
+            b"mouse-area" => {
+                let on_press = parse_string_attr(&e, b"on-press");
+                let on_release = parse_string_attr(&e, b"on-release");
+                let on_double_click = parse_string_attr(&e, b"on-double-click");
+                let on_right_press = parse_string_attr(&e, b"on-right-press");
+                let on_right_release = parse_string_attr(&e, b"on-right-release");
+                let on_middle_press = parse_string_attr(&e, b"on-middle-press");
+                let on_middle_release = parse_string_attr(&e, b"on-middle-release");
+                let on_scroll = parse_string_attr(&e, b"on-scroll");
+                let on_enter = parse_string_attr(&e, b"on-enter");
+                let on_move = parse_string_attr(&e, b"on-move");
+                let on_exit = parse_string_attr(&e, b"on-exit");
+                let interaction = parse_interaction_attr(&e, b"interaction");
+                let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
+                Node::MouseArea {
+                    on_press, on_release, on_double_click,
+                    on_right_press, on_right_release,
+                    on_middle_press, on_middle_release,
+                    on_scroll, on_enter, on_move, on_exit,
+                    interaction, children,
+                }
+            }
+            b"pick-list" => {
+                let options = parse_string_attr(&e, b"options")
+                    .expect("<pick-list> requires an 'options' attribute");
+                let selected = parse_string_attr(&e, b"selected")
+                    .expect("<pick-list> requires a 'selected' attribute");
+                let on_select = parse_string_attr(&e, b"on-select")
+                    .expect("<pick-list> requires an 'on-select' attribute");
+                let placeholder = parse_string_attr(&e, b"placeholder");
+                let width = parse_length_attr(&e, b"width");
+                let menu_height = parse_length_attr(&e, b"menu-height");
+                let padding = parse_padding(&e);
+                let text_size = parse_f32_attr(&e, b"text-size");
+                let text_line_height = parse_line_height_attr(&e, b"text-line-height");
+                let text_shaping = parse_shaping_attr(&e, b"text-shaping");
+                let font = parse_string_attr(&e, b"font");
+                let on_open = parse_string_attr(&e, b"on-open");
+                let on_close = parse_string_attr(&e, b"on-close");
+                let style = parse_string_attr(&e, b"style");
+                let menu_style = parse_string_attr(&e, b"menu-style");
+
+                let handle_type = parse_string_attr(&e, b"handle");
+                let handle_arrow_size = parse_f32_attr(&e, b"handle-arrow-size");
+                let handle_static = parse_string_attr(&e, b"handle-static");
+                let handle_dynamic_closed = parse_string_attr(&e, b"handle-dynamic-closed");
+                let handle_dynamic_open = parse_string_attr(&e, b"handle-dynamic-open");
+                let handle = match handle_type.as_deref() {
+                    None => None,
+                    Some("arrow") => Some(PickListHandle::Arrow { size: handle_arrow_size }),
+                    Some("none") => Some(PickListHandle::None),
+                    Some("static") => Some(PickListHandle::Static {
+                        icon: handle_static
+                            .expect("<pick-list handle=\"static\"> requires 'handle-static'"),
+                    }),
+                    Some("dynamic") => Some(PickListHandle::Dynamic {
+                        closed: handle_dynamic_closed
+                            .expect("<pick-list handle=\"dynamic\"> requires 'handle-dynamic-closed'"),
+                        open: handle_dynamic_open
+                            .expect("<pick-list handle=\"dynamic\"> requires 'handle-dynamic-open'"),
+                    }),
+                    Some(other) => panic!("invalid pick-list handle type: {}", other),
+                };
+
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"pick-list");
+                }
+                Node::PickList {
+                    options, selected, on_select, placeholder, width, menu_height,
+                    padding, text_size, text_line_height, text_shaping, font,
+                    handle, on_open, on_close, style, menu_style,
+                }
             }
             b"widget" => {
                 let method = parse_string_attr(&e, b"method")

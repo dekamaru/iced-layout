@@ -1,6 +1,7 @@
 use iced_layout_core::{
-    BorderRadius, Color, FontDef, FontStretch, FontStyle, FontWeight, Horizontal, Length,
-    LineHeight, Padding, Shaping, TextAlignment, TooltipPosition, Vertical, Wrapping,
+    BorderRadius, CheckboxIcon, Color, FontDef, FontStretch, FontStyle, FontWeight, Horizontal,
+    Interaction, Length, LineHeight, Padding, PickListIcon, Shaping, TextAlignment,
+    TextInputIcon, TextInputSide, TooltipPosition, Vertical, Wrapping,
 };
 use quote::quote;
 
@@ -198,6 +199,119 @@ pub fn generate_font_style(s: &FontStyle) -> proc_macro2::TokenStream {
         FontStyle::Normal => quote! { iced::font::Style::Normal },
         FontStyle::Italic => quote! { iced::font::Style::Italic },
         FontStyle::Oblique => quote! { iced::font::Style::Oblique },
+    }
+}
+
+pub fn generate_interaction(i: &Interaction) -> proc_macro2::TokenStream {
+    match i {
+        Interaction::None => quote! { iced::mouse::Interaction::None },
+        Interaction::Hidden => quote! { iced::mouse::Interaction::Hidden },
+        Interaction::Idle => quote! { iced::mouse::Interaction::Idle },
+        Interaction::ContextMenu => quote! { iced::mouse::Interaction::ContextMenu },
+        Interaction::Help => quote! { iced::mouse::Interaction::Help },
+        Interaction::Pointer => quote! { iced::mouse::Interaction::Pointer },
+        Interaction::Progress => quote! { iced::mouse::Interaction::Progress },
+        Interaction::Wait => quote! { iced::mouse::Interaction::Wait },
+        Interaction::Cell => quote! { iced::mouse::Interaction::Cell },
+        Interaction::Crosshair => quote! { iced::mouse::Interaction::Crosshair },
+        Interaction::Text => quote! { iced::mouse::Interaction::Text },
+        Interaction::Alias => quote! { iced::mouse::Interaction::Alias },
+        Interaction::Copy => quote! { iced::mouse::Interaction::Copy },
+        Interaction::Move => quote! { iced::mouse::Interaction::Move },
+        Interaction::NoDrop => quote! { iced::mouse::Interaction::NoDrop },
+        Interaction::NotAllowed => quote! { iced::mouse::Interaction::NotAllowed },
+        Interaction::Grab => quote! { iced::mouse::Interaction::Grab },
+        Interaction::Grabbing => quote! { iced::mouse::Interaction::Grabbing },
+        Interaction::ResizingHorizontally => quote! { iced::mouse::Interaction::ResizingHorizontally },
+        Interaction::ResizingVertically => quote! { iced::mouse::Interaction::ResizingVertically },
+        Interaction::ResizingDiagonallyUp => quote! { iced::mouse::Interaction::ResizingDiagonallyUp },
+        Interaction::ResizingDiagonallyDown => quote! { iced::mouse::Interaction::ResizingDiagonallyDown },
+        Interaction::ResizingColumn => quote! { iced::mouse::Interaction::ResizingColumn },
+        Interaction::ResizingRow => quote! { iced::mouse::Interaction::ResizingRow },
+        Interaction::AllScroll => quote! { iced::mouse::Interaction::AllScroll },
+        Interaction::ZoomIn => quote! { iced::mouse::Interaction::ZoomIn },
+        Interaction::ZoomOut => quote! { iced::mouse::Interaction::ZoomOut },
+    }
+}
+
+pub fn generate_checkbox_icon_expr(
+    icon: &CheckboxIcon,
+    font_var: &syn::Ident,
+) -> proc_macro2::TokenStream {
+    let code_point = icon.code_point;
+    let size = match icon.size {
+        Some(s) => quote! { Some(iced::Pixels(#s)) },
+        None => quote! { None },
+    };
+    let line_height = match &icon.line_height {
+        Some(lh) => generate_line_height(lh),
+        None => quote! { iced::widget::text::LineHeight::default() },
+    };
+    let shaping = match &icon.shaping {
+        Some(sh) => generate_shaping(sh),
+        None => quote! { iced::widget::text::Shaping::Basic },
+    };
+    quote! {
+        iced::widget::checkbox::Icon {
+            font: #font_var,
+            code_point: #code_point,
+            size: #size,
+            line_height: #line_height,
+            shaping: #shaping,
+        }
+    }
+}
+
+pub fn generate_text_input_icon_expr(
+    icon: &TextInputIcon,
+    font_var: &syn::Ident,
+) -> proc_macro2::TokenStream {
+    let code_point = icon.code_point;
+    let size = match icon.size {
+        Some(s) => quote! { Some(iced::Pixels(#s)) },
+        None => quote! { None },
+    };
+    let spacing = icon.spacing.unwrap_or(0.0);
+    let side = match icon.side {
+        Some(TextInputSide::Right) => quote! { iced::widget::text_input::Side::Right },
+        _ => quote! { iced::widget::text_input::Side::Left },
+    };
+    quote! {
+        iced::widget::text_input::Icon {
+            font: #font_var,
+            code_point: #code_point,
+            size: #size,
+            spacing: #spacing,
+            side: #side,
+        }
+    }
+}
+
+pub fn generate_pick_list_icon_expr(
+    icon: &PickListIcon,
+    font_var: &syn::Ident,
+) -> proc_macro2::TokenStream {
+    let code_point = icon.code_point;
+    let size = match icon.size {
+        Some(s) => quote! { Some(iced::Pixels(#s)) },
+        None => quote! { None },
+    };
+    let line_height = match &icon.line_height {
+        Some(lh) => generate_line_height(lh),
+        None => quote! { iced::widget::text::LineHeight::default() },
+    };
+    let shaping = match &icon.shaping {
+        Some(sh) => generate_shaping(sh),
+        None => quote! { iced::widget::text::Shaping::Basic },
+    };
+    quote! {
+        iced::widget::pick_list::Icon {
+            font: #font_var,
+            code_point: #code_point,
+            size: #size,
+            line_height: #line_height,
+            shaping: #shaping,
+        }
     }
 }
 

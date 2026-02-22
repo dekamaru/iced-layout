@@ -6,19 +6,19 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 
 ## Core features
 
-| Feature                             | Status     |
-|-------------------------------------|------------|
-| State access                        | ✅ Done     |
-| Callbacks (buttons, inputs)         | ✅ Done     |
-| If conditions                       | ✅ Done     |
-| Loops (`<foreach>`)                 | ✅ Done     |
-| Styling                             | ✅ Done     |
-| Custom defined widgets (`<widget>`) | ✅ Done     |
-| Support icon attributes             | 🔲 Planned |
-| Background gradients                | 🔲 Planned |
-| Components                          | 🔲 Planned |
-| Checkbox `checked` in styles        | 🔲 Planned |
-| Text editor highlight support       | 🔲 Planned |
+| Feature                             | Status         |
+|-------------------------------------|----------------|
+| State access                        | ✅ Done         |
+| Callbacks (buttons, inputs)         | ✅ Done         |
+| If conditions                       | ✅ Done         |
+| Loops (`<foreach>`)                 | ✅ Done         |
+| Styling                             | ✅ Done         |
+| Custom defined widgets (`<widget>`) | ✅ Done         |
+| Support icon attributes             | ✅ Done (0.0.2) |
+| Background gradients                | 🔲 Planned     |
+| Components                          | 🔲 Planned     |
+| Checkbox `checked` in styles        | 🔲 Planned     |
+| Text editor highlight support       | 🔲 Planned     |
 
 ## Widget coverage
 
@@ -41,9 +41,9 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 | ComboBox       | ✅ Done (0.0.2) |
 | Float          | ✅ Done (0.0.2) |
 | Grid           | 🔲 Planned     |
-| MouseArea      | 🔲 Planned     |
+| MouseArea      | ✅ Done (0.0.2) |
 | PaneGrid       | 🔲 Planned     |
-| PickList       | 🔲 Planned     |
+| PickList       | ✅ Done (0.0.2) |
 | Pin            | 🔲 Planned     |
 | ProgressBar    | 🔲 Planned     |
 | Radio          | 🔲 Planned     |

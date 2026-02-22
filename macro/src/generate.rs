@@ -5,10 +5,11 @@ use crate::StyleMaps;
 use crate::interpolation::generate_text_arg;
 use crate::style_var_name;
 use crate::types::{
-    generate_horizontal, generate_length, generate_line_height, generate_padding,
-    generate_shaping, generate_text_alignment, generate_tooltip_position, generate_vertical,
-    generate_wrapping,
+    generate_horizontal, generate_interaction, generate_length, generate_line_height,
+    generate_padding, generate_shaping, generate_text_alignment, generate_tooltip_position,
+    generate_vertical, generate_wrapping,
 };
+use iced_layout_core::PickListHandle;
 
 
 #[derive(Clone, Default)]
@@ -431,6 +432,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             align_x,
             style,
             font,
+            icon,
         } => {
             let value_expr = resolve_field_path(value, ctx);
             let mut expr = quote! { iced::widget::text_input(#placeholder, &#value_expr) };
@@ -503,6 +505,15 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
                 let var = style_var_name("font", font_name);
                 expr = quote! { #expr.font(#var) };
             }
+            if let Some(icon_name) = icon {
+                assert!(
+                    styles.text_input_icons.contains_key(icon_name.as_str()),
+                    "unknown text-input-icon: \"{}\"",
+                    icon_name
+                );
+                let var = style_var_name("text_input_icon", icon_name);
+                expr = quote! { #expr.icon(#var) };
+            }
             if let Some(style_name) = style {
                 assert!(
                     styles.text_input.contains_key(style_name.as_str()),
@@ -528,6 +539,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             text_wrapping,
             style,
             font,
+            icon,
         } => {
             let is_checked_field = resolve_field_path(is_checked, ctx);
             let mut expr = quote! { iced::widget::checkbox(#is_checked_field) };
@@ -586,6 +598,15 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
                 );
                 let var = style_var_name("font", font_name);
                 expr = quote! { #expr.font(#var) };
+            }
+            if let Some(icon_name) = icon {
+                assert!(
+                    styles.checkbox_icons.contains_key(icon_name.as_str()),
+                    "unknown checkbox-icon: \"{}\"",
+                    icon_name
+                );
+                let var = style_var_name("checkbox_icon", icon_name);
+                expr = quote! { #expr.icon(#var) };
             }
             if let Some(style_name) = style {
                 assert!(
@@ -885,6 +906,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             text_shaping,
             input_style,
             menu_style,
+            icon,
         } => {
             let state_expr = resolve_field_path(state, ctx);
             let selection_expr = resolve_field_path(selection, ctx);
@@ -946,6 +968,15 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             if let Some(sh) = text_shaping {
                 let sh = generate_shaping(sh);
                 expr = quote! { #expr.text_shaping(#sh) };
+            }
+            if let Some(icon_name) = icon {
+                assert!(
+                    styles.text_input_icons.contains_key(icon_name.as_str()),
+                    "unknown text-input-icon: \"{}\"",
+                    icon_name
+                );
+                let var = style_var_name("text_input_icon", icon_name);
+                expr = quote! { #expr.icon(#var) };
             }
             if let Some(style_name) = input_style {
                 assert!(
@@ -1091,6 +1122,210 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
                 );
                 let var = style_var_name("float", style_name);
                 expr = quote! { #expr.style(#var) };
+            }
+            Generated::Widget(expr)
+        }
+        Node::MouseArea {
+            on_press,
+            on_release,
+            on_double_click,
+            on_right_press,
+            on_right_release,
+            on_middle_press,
+            on_middle_release,
+            on_scroll,
+            on_enter,
+            on_move,
+            on_exit,
+            interaction,
+            children,
+        } => {
+            assert_eq!(
+                children.len(),
+                1,
+                "<mouse-area> must have exactly 1 child element, found {}",
+                children.len()
+            );
+            let child = generate(&children[0], styles, ctx).into_widget();
+            let mut expr = quote! { iced::widget::mouse_area(#child) };
+            if let Some(val) = on_press {
+                let handler = generate_event_handler(val, "on-press", "on_press", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_release {
+                let handler = generate_event_handler(val, "on-release", "on_release", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_double_click {
+                let handler = generate_event_handler(val, "on-double-click", "on_double_click", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_right_press {
+                let handler = generate_event_handler(val, "on-right-press", "on_right_press", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_right_release {
+                let handler = generate_event_handler(val, "on-right-release", "on_right_release", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_middle_press {
+                let handler = generate_event_handler(val, "on-middle-press", "on_middle_press", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_middle_release {
+                let handler = generate_event_handler(val, "on-middle-release", "on_middle_release", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_scroll {
+                let handler = generate_event_handler(val, "on-scroll", "on_scroll", HandlerStyle::Closure("delta"));
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_enter {
+                let handler = generate_event_handler(val, "on-enter", "on_enter", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_move {
+                let handler = generate_event_handler(val, "on-move", "on_move", HandlerStyle::Closure("point"));
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_exit {
+                let handler = generate_event_handler(val, "on-exit", "on_exit", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(i) = interaction {
+                let i = generate_interaction(i);
+                expr = quote! { #expr.interaction(#i) };
+            }
+            Generated::Widget(expr)
+        }
+        Node::PickList {
+            options,
+            selected,
+            on_select,
+            placeholder,
+            width,
+            menu_height,
+            padding,
+            text_size,
+            text_line_height,
+            text_shaping,
+            font,
+            handle,
+            on_open,
+            on_close,
+            style,
+            menu_style,
+        } => {
+            let options_expr = resolve_field_path(options, ctx);
+            let selected_expr = resolve_field_path(selected, ctx);
+            let on_select_ts = if on_select.contains("::") {
+                let msg: syn::Expr = syn::parse_str(on_select)
+                    .unwrap_or_else(|e| panic!("invalid on-select expression '{}': {}", on_select, e));
+                quote! { #msg }
+            } else {
+                let handler: syn::Ident = syn::parse_str(on_select)
+                    .unwrap_or_else(|e| panic!("invalid on-select method name '{}': {}", on_select, e));
+                quote! { |item| self.#handler(item) }
+            };
+            let mut expr = quote! {
+                iced::widget::pick_list(#options_expr.clone(), #selected_expr.clone(), #on_select_ts)
+            };
+            if let Some(ph) = placeholder {
+                expr = quote! { #expr.placeholder(#ph) };
+            }
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(mh) = menu_height {
+                let mh = generate_length(mh);
+                expr = quote! { #expr.menu_height(#mh) };
+            }
+            if let Some(padding_expr) = generate_padding(padding) {
+                expr = quote! { #expr.padding(#padding_expr) };
+            }
+            if let Some(ts) = text_size {
+                expr = quote! { #expr.text_size(#ts) };
+            }
+            if let Some(lh) = text_line_height {
+                let lh = generate_line_height(lh);
+                expr = quote! { #expr.text_line_height(#lh) };
+            }
+            if let Some(sh) = text_shaping {
+                let sh = generate_shaping(sh);
+                expr = quote! { #expr.text_shaping(#sh) };
+            }
+            if let Some(font_name) = font {
+                assert!(
+                    styles.font.contains_key(font_name.as_str()),
+                    "unknown font: \"{}\"",
+                    font_name
+                );
+                let var = style_var_name("font", font_name);
+                expr = quote! { #expr.font(#var) };
+            }
+            if let Some(h) = handle {
+                let handle_ts = match h {
+                    PickListHandle::Arrow { size } => {
+                        let sz = match size {
+                            Some(s) => quote! { Some(iced::Pixels(#s)) },
+                            None => quote! { None },
+                        };
+                        quote! { iced::widget::pick_list::Handle::Arrow { size: #sz } }
+                    }
+                    PickListHandle::Static { icon } => {
+                        assert!(
+                            styles.pick_list_icons.contains_key(icon.as_str()),
+                            "unknown pick-list-icon: \"{}\"",
+                            icon
+                        );
+                        let var = style_var_name("pick_list_icon", icon);
+                        quote! { iced::widget::pick_list::Handle::Static(#var) }
+                    }
+                    PickListHandle::Dynamic { closed, open } => {
+                        assert!(
+                            styles.pick_list_icons.contains_key(closed.as_str()),
+                            "unknown pick-list-icon: \"{}\"",
+                            closed
+                        );
+                        assert!(
+                            styles.pick_list_icons.contains_key(open.as_str()),
+                            "unknown pick-list-icon: \"{}\"",
+                            open
+                        );
+                        let closed_var = style_var_name("pick_list_icon", closed);
+                        let open_var = style_var_name("pick_list_icon", open);
+                        quote! { iced::widget::pick_list::Handle::Dynamic { open: #open_var, closed: #closed_var } }
+                    }
+                    PickListHandle::None => quote! { iced::widget::pick_list::Handle::None },
+                };
+                expr = quote! { #expr.handle(#handle_ts) };
+            }
+            if let Some(val) = on_open {
+                let handler = generate_event_handler(val, "on-open", "on_open", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(val) = on_close {
+                let handler = generate_event_handler(val, "on-close", "on_close", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(style_name) = style {
+                assert!(
+                    styles.pick_list.contains_key(style_name.as_str()),
+                    "unknown pick-list style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("pick_list", style_name);
+                expr = quote! { #expr.style(#var) };
+            }
+            if let Some(style_name) = menu_style {
+                assert!(
+                    styles.overlay_menu.contains_key(style_name.as_str()),
+                    "unknown overlay-menu style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("overlay_menu", style_name);
+                expr = quote! { #expr.menu_style(#var) };
             }
             Generated::Widget(expr)
         }
