@@ -443,6 +443,21 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     handle, on_open, on_close, style, menu_style,
                 }
             }
+            b"progress-bar" => {
+                let range_start = parse_f32_attr(&e, b"range-start")
+                    .expect("<progress-bar> requires a 'range-start' attribute");
+                let range_end = parse_f32_attr(&e, b"range-end")
+                    .expect("<progress-bar> requires a 'range-end' attribute");
+                let value = parse_string_attr(&e, b"value")
+                    .expect("<progress-bar> requires a 'value' attribute");
+                let length = parse_length_attr(&e, b"length");
+                let girth = parse_length_attr(&e, b"girth");
+                let style = parse_string_attr(&e, b"style");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"progress-bar");
+                }
+                Node::ProgressBar { range_start, range_end, value, length, girth, style }
+            }
             b"pin" => {
                 let width = parse_length_attr(&e, b"width");
                 let height = parse_length_attr(&e, b"height");

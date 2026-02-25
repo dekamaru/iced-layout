@@ -201,6 +201,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -273,6 +274,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -314,6 +316,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -356,6 +359,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -399,6 +403,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -510,6 +515,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -594,6 +600,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -659,6 +666,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -693,6 +701,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -767,6 +776,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -775,6 +785,19 @@
             <xs:attribute name="height" type="Length" use="optional"/>
             <xs:attribute name="x" type="xs:float" use="optional"/>
             <xs:attribute name="y" type="xs:float" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="progress-bar">
+        <xs:annotation>
+            <xs:documentation>Progress bars visualize the progression of an extended computer operation, such as a download, file transfer, or installation.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="range-start" type="xs:float" use="required"/>
+            <xs:attribute name="range-end" type="xs:float" use="required"/>
+            <xs:attribute name="value" type="xs:string" use="required"/>
+            <xs:attribute name="length" type="Length" use="optional"/>
+            <xs:attribute name="girth" type="Length" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="if">
@@ -802,6 +825,7 @@
                             <xs:element ref="mouse-area"/>
                             <xs:element ref="pick-list"/>
                             <xs:element ref="pin"/>
+                            <xs:element ref="progress-bar"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -830,6 +854,7 @@
                             <xs:element ref="mouse-area"/>
                             <xs:element ref="pick-list"/>
                             <xs:element ref="pin"/>
+                            <xs:element ref="progress-bar"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -862,6 +887,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -900,6 +926,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1313,6 +1340,22 @@
             <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="progress-bar-style">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="bar-color" type="xs:string" use="optional"/>
+            <xs:attribute name="bar-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="overlay-menu-style">
         <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
@@ -1357,6 +1400,7 @@
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
+                <xs:element ref="progress-bar"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1376,6 +1420,7 @@
                 <xs:element ref="overlay-menu-style"/>
                 <xs:element ref="float-style"/>
                 <xs:element ref="pick-list-style"/>
+                <xs:element ref="progress-bar-style"/>
                 <xs:element ref="font"/>
                 <xs:element ref="checkbox-icon"/>
                 <xs:element ref="pick-list-icon"/>

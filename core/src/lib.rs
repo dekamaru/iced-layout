@@ -304,6 +304,15 @@ pub struct PickListStyleFields {
 }
 
 #[derive(Default)]
+pub struct ProgressBarStyle {
+    pub background_color: Option<Color>,
+    pub bar_color: Option<Color>,
+    pub border_color: Option<Color>,
+    pub border_width: Option<f32>,
+    pub border_radius: BorderRadius,
+}
+
+#[derive(Default)]
 pub struct PickListStyle {
     pub base: PickListStyleFields,
     pub active: Option<PickListStyleFields>,
@@ -352,6 +361,7 @@ pub struct Layout {
     pub overlay_menu_styles: Vec<(String, OverlayMenuStyle)>,
     pub float_styles: Vec<(String, FloatStyle)>,
     pub pick_list_styles: Vec<(String, PickListStyle)>,
+    pub progress_bar_styles: Vec<(String, ProgressBarStyle)>,
     pub font_defs: Vec<(String, FontDef)>,
     pub checkbox_icons: Vec<(String, CheckboxIcon)>,
     pub text_input_icons: Vec<(String, TextInputIcon)>,
@@ -595,5 +605,13 @@ pub enum Node {
         x: Option<f32>,
         y: Option<f32>,
         children: Vec<Node>,
+    },
+    ProgressBar {
+        range_start: f32,
+        range_end: f32,
+        value: String,
+        length: Option<Length>,
+        girth: Option<Length>,
+        style: Option<String>,
     },
 }

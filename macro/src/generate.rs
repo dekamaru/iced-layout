@@ -1329,6 +1329,36 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             }
             Generated::Widget(expr)
         }
+        Node::ProgressBar {
+            range_start,
+            range_end,
+            value,
+            length,
+            girth,
+            style,
+        } => {
+            let value_expr = resolve_field_path(value, ctx);
+            let mut expr =
+                quote! { iced::widget::progress_bar(#range_start..=#range_end, #value_expr) };
+            if let Some(l) = length {
+                let l = generate_length(l);
+                expr = quote! { #expr.length(#l) };
+            }
+            if let Some(g) = girth {
+                let g = generate_length(g);
+                expr = quote! { #expr.girth(#g) };
+            }
+            if let Some(style_name) = style {
+                assert!(
+                    styles.progress_bar.contains_key(style_name.as_str()),
+                    "unknown progress-bar style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("progress_bar", style_name);
+                expr = quote! { #expr.style(#var) };
+            }
+            Generated::Widget(expr)
+        }
         Node::Pin {
             width,
             height,

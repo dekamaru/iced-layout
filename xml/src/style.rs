@@ -1,8 +1,8 @@
 use iced_layout_core::{
     ButtonStyle, ButtonStyleFields, CheckboxIcon, CheckboxStyle, ContainerStyle, FloatStyle,
-    FontDef, OverlayMenuStyle, PickListIcon, PickListStyle, PickListStyleFields, TextEditorStyle,
-    TextEditorStyleFields, TextInputIcon, TextInputStyle, TextInputStyleFields, TextStyle,
-    TogglerStyle,
+    FontDef, OverlayMenuStyle, PickListIcon, PickListStyle, PickListStyleFields,
+    ProgressBarStyle, TextEditorStyle, TextEditorStyleFields, TextInputIcon, TextInputStyle,
+    TextInputStyleFields, TextStyle, TogglerStyle,
 };
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::Reader;
@@ -20,6 +20,7 @@ pub struct ParsedStyles {
     pub overlay_menu: Vec<(String, OverlayMenuStyle)>,
     pub float: Vec<(String, FloatStyle)>,
     pub pick_list: Vec<(String, PickListStyle)>,
+    pub progress_bar: Vec<(String, ProgressBarStyle)>,
     pub font: Vec<(String, FontDef)>,
     pub checkbox_icons: Vec<(String, CheckboxIcon)>,
     pub text_input_icons: Vec<(String, TextInputIcon)>,
@@ -39,6 +40,7 @@ impl Default for ParsedStyles {
             overlay_menu: Vec::new(),
             float: Vec::new(),
             pick_list: Vec::new(),
+            progress_bar: Vec::new(),
             font: Vec::new(),
             checkbox_icons: Vec::new(),
             text_input_icons: Vec::new(),
@@ -312,6 +314,19 @@ fn parse_float_style(e: &BytesStart) -> (String, FloatStyle) {
     (id, style)
 }
 
+fn parse_progress_bar_style(e: &BytesStart) -> (String, ProgressBarStyle) {
+    let id =
+        parse_string_attr(e, b"id").expect("<progress-bar-style> requires an 'id' attribute");
+    let style = ProgressBarStyle {
+        background_color: parse_color_attr(e, b"background-color"),
+        bar_color: parse_color_attr(e, b"bar-color"),
+        border_color: parse_color_attr(e, b"border-color"),
+        border_width: parse_f32_attr(e, b"border-width"),
+        border_radius: parse_border_radius(e),
+    };
+    (id, style)
+}
+
 fn parse_font_def(e: &BytesStart) -> (String, FontDef) {
     let id = parse_string_attr(e, b"id").expect("<font> requires an 'id' attribute");
     let def = FontDef {
@@ -475,6 +490,10 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                     b"pick-list-style" => {
                         styles.pick_list.push(parse_pick_list_style(&e, reader));
                     }
+                    b"progress-bar-style" => {
+                        styles.progress_bar.push(parse_progress_bar_style(&e));
+                        consume_closing_tag(reader, &tag);
+                    }
                     b"checkbox-icon" => {
                         styles.checkbox_icons.push(parse_checkbox_icon(&e));
                         consume_closing_tag(reader, &tag);
@@ -504,6 +523,7 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                 b"overlay-menu-style" => styles.overlay_menu.push(parse_overlay_menu_style(&e)),
                 b"float-style" => styles.float.push(parse_float_style(&e)),
                 b"pick-list-style" => styles.pick_list.push(parse_pick_list_style_empty(&e)),
+                b"progress-bar-style" => styles.progress_bar.push(parse_progress_bar_style(&e)),
                 b"font" => styles.font.push(parse_font_def(&e)),
                 b"checkbox-icon" => styles.checkbox_icons.push(parse_checkbox_icon(&e)),
                 b"text-input-icon" => styles.text_input_icons.push(parse_text_input_icon(&e)),

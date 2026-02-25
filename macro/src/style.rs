@@ -1,7 +1,7 @@
 use iced_layout_core::{
     BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FloatStyle,
-    OverlayMenuStyle, PickListStyle, PickListStyleFields, TextEditorStyle, TextEditorStyleFields,
-    TextInputStyle, TextInputStyleFields, TogglerStyle,
+    OverlayMenuStyle, PickListStyle, PickListStyleFields, ProgressBarStyle, TextEditorStyle,
+    TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TogglerStyle,
 };
 use quote::quote;
 
@@ -464,6 +464,31 @@ pub fn generate_pick_list_style_closure(s: &PickListStyle) -> proc_macro2::Token
                 #(#status_overrides,)*
                 _ => #base_style
             }
+        }
+    }
+}
+
+pub fn generate_progress_bar_style_closure(s: &ProgressBarStyle) -> proc_macro2::TokenStream {
+    let background = match &s.background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
+    };
+    let bar = match &s.bar_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
+    };
+    let border = generate_border(&s.border_color, s.border_width, &s.border_radius);
+    quote! {
+        |_theme| iced::widget::progress_bar::Style {
+            background: #background,
+            bar: #bar,
+            border: #border,
         }
     }
 }
