@@ -443,6 +443,43 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     handle, on_open, on_close, style, menu_style,
                 }
             }
+            b"radio" => {
+                let value = parse_string_attr(&e, b"value")
+                    .expect("<radio> requires a 'value' attribute");
+                let selected = parse_string_attr(&e, b"selected")
+                    .expect("<radio> requires a 'selected' attribute");
+                let on_select = parse_string_attr(&e, b"on-select")
+                    .expect("<radio> requires an 'on-select' attribute");
+                let size = parse_f32_attr(&e, b"size");
+                let width = parse_length_attr(&e, b"width");
+                let spacing = parse_f32_attr(&e, b"spacing");
+                let text_size = parse_f32_attr(&e, b"text-size");
+                let text_line_height = parse_line_height_attr(&e, b"text-line-height");
+                let text_shaping = parse_shaping_attr(&e, b"text-shaping");
+                let text_wrapping = parse_wrapping_attr(&e, b"text-wrapping");
+                let font = parse_string_attr(&e, b"font");
+                let style = parse_string_attr(&e, b"style");
+
+                let mut label = String::new();
+                if has_closing_tag {
+                    loop {
+                        match reader.read_event().expect("failed to read XML") {
+                            Event::Text(t) => {
+                                label.push_str(
+                                    &t.unescape().expect("failed to unescape text"),
+                                );
+                            }
+                            Event::End(end) if end.name().as_ref() == b"radio" => break,
+                            _ => {}
+                        }
+                    }
+                }
+                Node::Radio {
+                    label, value, selected, on_select,
+                    size, width, spacing, text_size, text_line_height,
+                    text_shaping, text_wrapping, font, style,
+                }
+            }
             b"progress-bar" => {
                 let range_start = parse_f32_attr(&e, b"range-start")
                     .expect("<progress-bar> requires a 'range-start' attribute");

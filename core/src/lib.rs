@@ -313,6 +313,15 @@ pub struct ProgressBarStyle {
 }
 
 #[derive(Default)]
+pub struct RadioStyle {
+    pub background_color: Option<Color>,
+    pub dot_color: Option<Color>,
+    pub border_width: Option<f32>,
+    pub border_color: Option<Color>,
+    pub text_color: Option<Color>,
+}
+
+#[derive(Default)]
 pub struct PickListStyle {
     pub base: PickListStyleFields,
     pub active: Option<PickListStyleFields>,
@@ -362,6 +371,7 @@ pub struct Layout {
     pub float_styles: Vec<(String, FloatStyle)>,
     pub pick_list_styles: Vec<(String, PickListStyle)>,
     pub progress_bar_styles: Vec<(String, ProgressBarStyle)>,
+    pub radio_styles: Vec<(String, RadioStyle)>,
     pub font_defs: Vec<(String, FontDef)>,
     pub checkbox_icons: Vec<(String, CheckboxIcon)>,
     pub text_input_icons: Vec<(String, TextInputIcon)>,
@@ -612,6 +622,21 @@ pub enum Node {
         value: String,
         length: Option<Length>,
         girth: Option<Length>,
+        style: Option<String>,
+    },
+    Radio {
+        label: String,
+        value: String,
+        selected: String,
+        on_select: String,
+        size: Option<f32>,
+        width: Option<Length>,
+        spacing: Option<f32>,
+        text_size: Option<f32>,
+        text_line_height: Option<LineHeight>,
+        text_shaping: Option<Shaping>,
+        text_wrapping: Option<Wrapping>,
+        font: Option<String>,
         style: Option<String>,
     },
 }

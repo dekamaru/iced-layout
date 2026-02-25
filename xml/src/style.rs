@@ -1,8 +1,8 @@
 use iced_layout_core::{
     ButtonStyle, ButtonStyleFields, CheckboxIcon, CheckboxStyle, ContainerStyle, FloatStyle,
     FontDef, OverlayMenuStyle, PickListIcon, PickListStyle, PickListStyleFields,
-    ProgressBarStyle, TextEditorStyle, TextEditorStyleFields, TextInputIcon, TextInputStyle,
-    TextInputStyleFields, TextStyle, TogglerStyle,
+    ProgressBarStyle, RadioStyle, TextEditorStyle, TextEditorStyleFields, TextInputIcon,
+    TextInputStyle, TextInputStyleFields, TextStyle, TogglerStyle,
 };
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::Reader;
@@ -21,6 +21,7 @@ pub struct ParsedStyles {
     pub float: Vec<(String, FloatStyle)>,
     pub pick_list: Vec<(String, PickListStyle)>,
     pub progress_bar: Vec<(String, ProgressBarStyle)>,
+    pub radio: Vec<(String, RadioStyle)>,
     pub font: Vec<(String, FontDef)>,
     pub checkbox_icons: Vec<(String, CheckboxIcon)>,
     pub text_input_icons: Vec<(String, TextInputIcon)>,
@@ -41,6 +42,7 @@ impl Default for ParsedStyles {
             float: Vec::new(),
             pick_list: Vec::new(),
             progress_bar: Vec::new(),
+            radio: Vec::new(),
             font: Vec::new(),
             checkbox_icons: Vec::new(),
             text_input_icons: Vec::new(),
@@ -327,6 +329,18 @@ fn parse_progress_bar_style(e: &BytesStart) -> (String, ProgressBarStyle) {
     (id, style)
 }
 
+fn parse_radio_style(e: &BytesStart) -> (String, RadioStyle) {
+    let id = parse_string_attr(e, b"id").expect("<radio-style> requires an 'id' attribute");
+    let style = RadioStyle {
+        background_color: parse_color_attr(e, b"background-color"),
+        dot_color: parse_color_attr(e, b"dot-color"),
+        border_width: parse_f32_attr(e, b"border-width"),
+        border_color: parse_color_attr(e, b"border-color"),
+        text_color: parse_color_attr(e, b"text-color"),
+    };
+    (id, style)
+}
+
 fn parse_font_def(e: &BytesStart) -> (String, FontDef) {
     let id = parse_string_attr(e, b"id").expect("<font> requires an 'id' attribute");
     let def = FontDef {
@@ -494,6 +508,10 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                         styles.progress_bar.push(parse_progress_bar_style(&e));
                         consume_closing_tag(reader, &tag);
                     }
+                    b"radio-style" => {
+                        styles.radio.push(parse_radio_style(&e));
+                        consume_closing_tag(reader, &tag);
+                    }
                     b"checkbox-icon" => {
                         styles.checkbox_icons.push(parse_checkbox_icon(&e));
                         consume_closing_tag(reader, &tag);
@@ -524,6 +542,7 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                 b"float-style" => styles.float.push(parse_float_style(&e)),
                 b"pick-list-style" => styles.pick_list.push(parse_pick_list_style_empty(&e)),
                 b"progress-bar-style" => styles.progress_bar.push(parse_progress_bar_style(&e)),
+                b"radio-style" => styles.radio.push(parse_radio_style(&e)),
                 b"font" => styles.font.push(parse_font_def(&e)),
                 b"checkbox-icon" => styles.checkbox_icons.push(parse_checkbox_icon(&e)),
                 b"text-input-icon" => styles.text_input_icons.push(parse_text_input_icon(&e)),

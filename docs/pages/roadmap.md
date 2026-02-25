@@ -46,7 +46,7 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 | PickList       | ✅ Done (0.0.2) |
 | Pin            | ✅ Done (0.0.2) |
 | ProgressBar    | ✅ Done (0.0.2) |
-| Radio          | 🔲 Planned     |
+| Radio          | ✅ Done (0.0.2) |
 | Responsive     | 🔲 Planned     |
 | Rule           | 🔲 Planned     |
 | Scrollable     | 🔲 Planned     |

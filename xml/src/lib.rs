@@ -67,6 +67,7 @@ pub fn parse(xml: &str) -> Layout {
         float_styles: styles.float,
         pick_list_styles: styles.pick_list,
         progress_bar_styles: styles.progress_bar,
+        radio_styles: styles.radio,
         font_defs: styles.font,
         checkbox_icons: styles.checkbox_icons,
         text_input_icons: styles.text_input_icons,

@@ -11,8 +11,8 @@ use std::path::PathBuf;
 
 use iced_layout_core::{
     ButtonStyle, CheckboxIcon, CheckboxStyle, ContainerStyle, FloatStyle, FontDef,
-    OverlayMenuStyle, PickListIcon, PickListStyle, ProgressBarStyle, TextEditorStyle,
-    TextInputIcon, TextInputStyle, TextStyle, TogglerStyle,
+    OverlayMenuStyle, PickListIcon, PickListStyle, ProgressBarStyle, RadioStyle,
+    TextEditorStyle, TextInputIcon, TextInputStyle, TextStyle, TogglerStyle,
 };
 use quote::{format_ident, quote};
 use syn::{LitStr, parse_macro_input};
@@ -21,8 +21,8 @@ use crate::style::{
     generate_button_style_closure, generate_checkbox_style_closure, generate_container_style,
     generate_float_style_closure, generate_overlay_menu_style_closure,
     generate_pick_list_style_closure, generate_progress_bar_style_closure,
-    generate_text_editor_style_closure, generate_text_input_style_closure,
-    generate_toggler_style_closure,
+    generate_radio_style_closure, generate_text_editor_style_closure,
+    generate_text_input_style_closure, generate_toggler_style_closure,
 };
 use crate::types::{
     generate_checkbox_icon_expr, generate_font_def, generate_pick_list_icon_expr,
@@ -41,6 +41,7 @@ pub(crate) struct StyleMaps<'a> {
     pub float: HashMap<&'a str, &'a FloatStyle>,
     pub pick_list: HashMap<&'a str, &'a PickListStyle>,
     pub progress_bar: HashMap<&'a str, &'a ProgressBarStyle>,
+    pub radio: HashMap<&'a str, &'a RadioStyle>,
     pub font: HashMap<&'a str, &'a FontDef>,
     pub checkbox_icons: HashMap<&'a str, &'a CheckboxIcon>,
     pub text_input_icons: HashMap<&'a str, &'a TextInputIcon>,
@@ -90,6 +91,7 @@ pub fn layout(input: TokenStream) -> TokenStream {
         float: layout.float_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         pick_list: layout.pick_list_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         progress_bar: layout.progress_bar_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
+        radio: layout.radio_styles.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         font: layout.font_defs.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         checkbox_icons: layout.checkbox_icons.iter().map(|(k, v)| (k.as_str(), v)).collect(),
         text_input_icons: layout.text_input_icons.iter().map(|(k, v)| (k.as_str(), v)).collect(),
@@ -150,6 +152,13 @@ pub fn layout(input: TokenStream) -> TokenStream {
         let closure = generate_progress_bar_style_closure(pbs);
         style_bindings.push(quote! {
             let #var: fn(&iced::Theme) -> iced::widget::progress_bar::Style = #closure;
+        });
+    }
+    for (name, rs) in &style_maps.radio {
+        let var = style_var_name("radio", name);
+        let closure = generate_radio_style_closure(rs);
+        style_bindings.push(quote! {
+            let #var: fn(&iced::Theme, iced::widget::radio::Status) -> iced::widget::radio::Style = #closure;
         });
     }
     for (name, pls) in &style_maps.pick_list {

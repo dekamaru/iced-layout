@@ -1390,5 +1390,81 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             }
             Generated::Widget(expr)
         }
+        Node::Radio {
+            label,
+            value,
+            selected,
+            on_select,
+            size,
+            width,
+            spacing,
+            text_size,
+            text_line_height,
+            text_shaping,
+            text_wrapping,
+            font,
+            style,
+        } => {
+            let value_expr: syn::Expr = syn::parse_str(value)
+                .unwrap_or_else(|e| panic!("invalid radio value expression \"{}\": {}", value, e));
+            let selected_expr = resolve_field_path(selected, ctx);
+            let on_select_ts = if on_select.contains("::") {
+                let msg: syn::Expr = syn::parse_str(on_select)
+                    .unwrap_or_else(|e| panic!("invalid on-select expression '{}': {}", on_select, e));
+                quote! { #msg }
+            } else {
+                let handler: syn::Ident = syn::parse_str(on_select)
+                    .unwrap_or_else(|e| panic!("invalid on-select method name '{}': {}", on_select, e));
+                quote! { |v| self.#handler(v) }
+            };
+            let label_arg = generate_text_arg(label, ctx);
+            let mut expr = quote! {
+                iced::widget::radio(#label_arg, #value_expr, #selected_expr, #on_select_ts)
+            };
+            if let Some(s) = size {
+                expr = quote! { #expr.size(#s) };
+            }
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(s) = spacing {
+                expr = quote! { #expr.spacing(#s) };
+            }
+            if let Some(ts) = text_size {
+                expr = quote! { #expr.text_size(#ts) };
+            }
+            if let Some(lh) = text_line_height {
+                let lh = generate_line_height(lh);
+                expr = quote! { #expr.text_line_height(#lh) };
+            }
+            if let Some(sh) = text_shaping {
+                let sh = generate_shaping(sh);
+                expr = quote! { #expr.text_shaping(#sh) };
+            }
+            if let Some(wr) = text_wrapping {
+                let wr = generate_wrapping(wr);
+                expr = quote! { #expr.text_wrapping(#wr) };
+            }
+            if let Some(font_name) = font {
+                assert!(
+                    styles.font.contains_key(font_name.as_str()),
+                    "unknown font: \"{}\"",
+                    font_name
+                );
+                let var = style_var_name("font", font_name);
+                expr = quote! { #expr.font(#var) };
+            }
+            if let Some(style_name) = style {
+                assert!(
+                    styles.radio.contains_key(style_name.as_str()),
+                    "unknown radio style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("radio", style_name);
+                expr = quote! { #expr.style(#var) };
+            }
+            Generated::Widget(expr)
+        }
     }
 }

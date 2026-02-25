@@ -1,7 +1,7 @@
 use iced_layout_core::{
     BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FloatStyle,
-    OverlayMenuStyle, PickListStyle, PickListStyleFields, ProgressBarStyle, TextEditorStyle,
-    TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TogglerStyle,
+    OverlayMenuStyle, PickListStyle, PickListStyleFields, ProgressBarStyle, RadioStyle,
+    TextEditorStyle, TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TogglerStyle,
 };
 use quote::quote;
 
@@ -489,6 +489,30 @@ pub fn generate_progress_bar_style_closure(s: &ProgressBarStyle) -> proc_macro2:
             background: #background,
             bar: #bar,
             border: #border,
+        }
+    }
+}
+
+pub fn generate_radio_style_closure(s: &RadioStyle) -> proc_macro2::TokenStream {
+    let background = match &s.background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
+    };
+    let dot_color = generate_color_or(&s.dot_color, quote! { iced::Color::BLACK });
+    let border_width = s.border_width.unwrap_or(1.0);
+    let border_color = generate_color_or(&s.border_color, quote! { iced::Color::BLACK });
+    let text_color = generate_option_color(&s.text_color);
+
+    quote! {
+        |_theme, _status| iced::widget::radio::Style {
+            background: #background,
+            dot_color: #dot_color,
+            border_width: #border_width,
+            border_color: #border_color,
+            text_color: #text_color,
         }
     }
 }

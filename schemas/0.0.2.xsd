@@ -202,6 +202,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -275,6 +276,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -317,6 +319,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -360,6 +363,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -404,6 +408,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -516,6 +521,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -601,6 +607,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -667,6 +674,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -702,6 +710,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -777,6 +786,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -797,6 +807,25 @@
             <xs:attribute name="value" type="xs:string" use="required"/>
             <xs:attribute name="length" type="Length" use="optional"/>
             <xs:attribute name="girth" type="Length" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="radio">
+        <xs:annotation>
+            <xs:documentation>Radio buttons let users choose a single option from a bunch of options.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute name="value" type="xs:string" use="required"/>
+            <xs:attribute name="selected" type="xs:string" use="required"/>
+            <xs:attribute name="on-select" type="xs:string" use="required"/>
+            <xs:attribute name="size" type="xs:float" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="spacing" type="xs:float" use="optional"/>
+            <xs:attribute name="text-size" type="xs:float" use="optional"/>
+            <xs:attribute name="text-line-height" type="LineHeight" use="optional"/>
+            <xs:attribute name="text-shaping" type="Shaping" use="optional"/>
+            <xs:attribute name="text-wrapping" type="Wrapping" use="optional"/>
+            <xs:attribute name="font" type="xs:string" use="optional"/>
             <xs:attribute name="style" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
@@ -826,6 +855,7 @@
                             <xs:element ref="pick-list"/>
                             <xs:element ref="pin"/>
                             <xs:element ref="progress-bar"/>
+                            <xs:element ref="radio"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -855,6 +885,7 @@
                             <xs:element ref="pick-list"/>
                             <xs:element ref="pin"/>
                             <xs:element ref="progress-bar"/>
+                            <xs:element ref="radio"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -888,6 +919,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -927,6 +959,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1356,6 +1389,17 @@
             <xs:attribute name="border-radius-bottom-left" type="xs:float" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="radio-style">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="dot-color" type="xs:string" use="optional"/>
+            <xs:attribute name="border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="text-color" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="overlay-menu-style">
         <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
@@ -1401,6 +1445,7 @@
                 <xs:element ref="pick-list"/>
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
+                <xs:element ref="radio"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1421,6 +1466,7 @@
                 <xs:element ref="float-style"/>
                 <xs:element ref="pick-list-style"/>
                 <xs:element ref="progress-bar-style"/>
+                <xs:element ref="radio-style"/>
                 <xs:element ref="font"/>
                 <xs:element ref="checkbox-icon"/>
                 <xs:element ref="pick-list-icon"/>
