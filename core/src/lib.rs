@@ -639,4 +639,9 @@ pub enum Node {
         font: Option<String>,
         style: Option<String>,
     },
+    Responsive {
+        view: String,
+        width: Option<Length>,
+        height: Option<Length>,
+    },
 }

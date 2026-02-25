@@ -1466,5 +1466,19 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             }
             Generated::Widget(expr)
         }
+        Node::Responsive { view, width, height } => {
+            let view_ident: syn::Ident = syn::parse_str(view)
+                .unwrap_or_else(|e| panic!("invalid responsive view method name \"{}\": {}", view, e));
+            let mut expr = quote! { iced::widget::responsive(|size| self.#view_ident(size)) };
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(h) = height {
+                let h = generate_length(h);
+                expr = quote! { #expr.height(#h) };
+            }
+            Generated::Widget(expr)
+        }
     }
 }

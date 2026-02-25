@@ -22,35 +22,35 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 
 ## Widget coverage
 
-| Widget         | Status         |
-|----------------|----------------|
-| Button         | ✅ Done         |
-| Checkbox       | ✅ Done         |
-| Column         | ✅ Done         |
-| Container      | ✅ Done         |
-| Row            | ✅ Done         |
-| Space          | ✅ Done         |
-| Stack          | ✅ Done         |
-| Text           | ✅ Done         |
-| TextInput      | ✅ Done         |
-| Tooltip        | ✅ Done         |
-| VerticalSlider | ✅ Done (0.0.2) |
-| Sensor         | ✅ Done (0.0.2) |
-| TextEditor     | ✅ Done (0.0.2) |
-| Toggler        | ✅ Done (0.0.2) |
-| ComboBox       | ✅ Done (0.0.2) |
-| Float          | ✅ Done (0.0.2) |
-| Grid           | 🔲 Planned     |
-| MouseArea      | ✅ Done (0.0.2) |
-| PaneGrid       | 🔲 Planned     |
-| PickList       | ✅ Done (0.0.2) |
-| Pin            | ✅ Done (0.0.2) |
-| ProgressBar    | ✅ Done (0.0.2) |
-| Radio          | ✅ Done (0.0.2) |
-| Responsive     | 🔲 Planned     |
-| Rule           | 🔲 Planned     |
-| Scrollable     | 🔲 Planned     |
-| Slider         | 🔲 Planned     |
+| Widget         | Status           |
+|----------------|------------------|
+| Button         | ✅ Done           |
+| Checkbox       | ✅ Done           |
+| Column         | ✅ Done           |
+| Container      | ✅ Done           |
+| Row            | ✅ Done           |
+| Space          | ✅ Done           |
+| Stack          | ✅ Done           |
+| Text           | ✅ Done           |
+| TextInput      | ✅ Done           |
+| Tooltip        | ✅ Done           |
+| VerticalSlider | ✅ Done (0.0.2)   |
+| Sensor         | ✅ Done (0.0.2)   |
+| TextEditor     | ✅ Done (0.0.2)   |
+| Toggler        | ✅ Done (0.0.2)   |
+| ComboBox       | ✅ Done (0.0.2)   |
+| Float          | ✅ Done (0.0.2)   |
+| Grid           | 🔲 Planned       |
+| MouseArea      | ✅ Done (0.0.2)   |
+| PaneGrid       | 🔲 Planned       |
+| PickList       | ✅ Done (0.0.2)   |
+| Pin            | ✅ Done (0.0.2)   |
+| ProgressBar    | ✅ Done (0.0.2)   |
+| Radio          | ✅ Done (0.0.2)   |
+| Responsive     | 🔲✅ Done (0.0.2) |
+| Rule           | 🔲 Planned       |
+| Scrollable     | 🔲 Planned       |
+| Slider         | 🔲 Planned       |
 
 ## Feature-gated widgets
 

@@ -480,6 +480,16 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     text_shaping, text_wrapping, font, style,
                 }
             }
+            b"responsive" => {
+                let view = parse_string_attr(&e, b"view")
+                    .expect("<responsive> requires a 'view' attribute");
+                let width = parse_length_attr(&e, b"width");
+                let height = parse_length_attr(&e, b"height");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"responsive");
+                }
+                Node::Responsive { view, width, height }
+            }
             b"progress-bar" => {
                 let range_start = parse_f32_attr(&e, b"range-start")
                     .expect("<progress-bar> requires a 'range-start' attribute");

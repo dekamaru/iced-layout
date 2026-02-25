@@ -203,6 +203,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -277,6 +278,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -320,6 +322,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -364,6 +367,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -409,6 +413,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -522,6 +527,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -608,6 +614,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -675,6 +682,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -711,6 +719,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -787,6 +796,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -829,6 +839,13 @@
             <xs:attribute name="style" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="responsive">
+        <xs:complexType>
+            <xs:attribute name="view" type="xs:string" use="required"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="if">
         <xs:complexType>
             <xs:all>
@@ -856,6 +873,7 @@
                             <xs:element ref="pin"/>
                             <xs:element ref="progress-bar"/>
                             <xs:element ref="radio"/>
+                            <xs:element ref="responsive"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -886,6 +904,7 @@
                             <xs:element ref="pin"/>
                             <xs:element ref="progress-bar"/>
                             <xs:element ref="radio"/>
+                            <xs:element ref="responsive"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -920,6 +939,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -960,6 +980,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1446,6 +1467,7 @@
                 <xs:element ref="pin"/>
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
+                <xs:element ref="responsive"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
