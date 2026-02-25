@@ -200,6 +200,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -271,6 +272,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -311,6 +313,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -352,6 +355,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -394,6 +398,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -504,6 +509,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -587,6 +593,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -651,6 +658,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -684,6 +692,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -733,6 +742,41 @@
             <xs:attribute name="menu-style" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="pin">
+        <xs:annotation>
+            <xs:documentation>A pin widget positions a widget at some fixed coordinates inside its boundaries.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:element ref="container"/>
+                <xs:element ref="text"/>
+                <xs:element ref="row"/>
+                <xs:element ref="column"/>
+                <xs:element ref="button"/>
+                <xs:element ref="stack"/>
+                <xs:element ref="checkbox"/>
+                <xs:element ref="space"/>
+                <xs:element ref="text-input"/>
+                <xs:element ref="vertical-slider"/>
+                <xs:element ref="tooltip"/>
+                <xs:element ref="toggler"/>
+                <xs:element ref="text-editor"/>
+                <xs:element ref="sensor"/>
+                <xs:element ref="combo-box"/>
+                <xs:element ref="float"/>
+                <xs:element ref="mouse-area"/>
+                <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
+                <xs:element ref="if"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="widget"/>
+            </xs:choice>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="Length" use="optional"/>
+            <xs:attribute name="x" type="xs:float" use="optional"/>
+            <xs:attribute name="y" type="xs:float" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="if">
         <xs:complexType>
             <xs:all>
@@ -757,6 +801,7 @@
                             <xs:element ref="float"/>
                             <xs:element ref="mouse-area"/>
                             <xs:element ref="pick-list"/>
+                            <xs:element ref="pin"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -784,6 +829,7 @@
                             <xs:element ref="float"/>
                             <xs:element ref="mouse-area"/>
                             <xs:element ref="pick-list"/>
+                            <xs:element ref="pin"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -815,6 +861,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -852,6 +899,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1308,6 +1356,7 @@
                 <xs:element ref="float"/>
                 <xs:element ref="mouse-area"/>
                 <xs:element ref="pick-list"/>
+                <xs:element ref="pin"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>

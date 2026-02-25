@@ -1329,5 +1329,36 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             }
             Generated::Widget(expr)
         }
+        Node::Pin {
+            width,
+            height,
+            x,
+            y,
+            children,
+        } => {
+            assert_eq!(
+                children.len(),
+                1,
+                "<pin> must have exactly 1 child element, found {}",
+                children.len()
+            );
+            let child = generate(&children[0], styles, ctx).into_widget();
+            let mut expr = quote! { iced::widget::pin(#child) };
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(h) = height {
+                let h = generate_length(h);
+                expr = quote! { #expr.height(#h) };
+            }
+            if let Some(x) = x {
+                expr = quote! { #expr.x(#x) };
+            }
+            if let Some(y) = y {
+                expr = quote! { #expr.y(#y) };
+            }
+            Generated::Widget(expr)
+        }
     }
 }

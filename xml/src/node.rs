@@ -443,6 +443,14 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     handle, on_open, on_close, style, menu_style,
                 }
             }
+            b"pin" => {
+                let width = parse_length_attr(&e, b"width");
+                let height = parse_length_attr(&e, b"height");
+                let x = parse_f32_attr(&e, b"x");
+                let y = parse_f32_attr(&e, b"y");
+                let children = if has_closing_tag { parse_children(reader) } else { Vec::new() };
+                Node::Pin { width, height, x, y, children }
+            }
             b"widget" => {
                 let method = parse_string_attr(&e, b"method")
                     .expect("<widget> requires a 'method' attribute");

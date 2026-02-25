@@ -589,4 +589,11 @@ pub enum Node {
         style: Option<String>,
         menu_style: Option<String>,
     },
+    Pin {
+        width: Option<Length>,
+        height: Option<Length>,
+        x: Option<f32>,
+        y: Option<f32>,
+        children: Vec<Node>,
+    },
 }
