@@ -44,7 +44,7 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 | MouseArea      | ✅ Done (0.0.2) |
 | PaneGrid       | 🔲 Planned     |
 | PickList       | ✅ Done (0.0.2) |
-| Pin            | 🔲 Planned     |
+| Pin            | ✅ Done (0.0.2) |
 | ProgressBar    | 🔲 Planned     |
 | Radio          | 🔲 Planned     |
 | Responsive     | 🔲 Planned     |
