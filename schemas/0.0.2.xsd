@@ -724,7 +724,7 @@
             <xs:attribute name="font" type="xs:string" use="optional"/>
             <xs:attribute name="handle" type="Handle" use="optional"/>
             <xs:attribute name="handle-arrow-size" type="xs:float" use="optional"/>
-            <xs:attribute name="handle-static" type="xs:string" use="optional"/>
+            <xs:attribute name="handle-static-value" type="xs:string" use="optional"/>
             <xs:attribute name="handle-dynamic-closed" type="xs:string" use="optional"/>
             <xs:attribute name="handle-dynamic-open" type="xs:string" use="optional"/>
             <xs:attribute name="on-open" type="xs:string" use="optional"/>

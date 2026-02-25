@@ -414,7 +414,7 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
 
                 let handle_type = parse_string_attr(&e, b"handle");
                 let handle_arrow_size = parse_f32_attr(&e, b"handle-arrow-size");
-                let handle_static = parse_string_attr(&e, b"handle-static");
+                let handle_static = parse_string_attr(&e, b"handle-static-value");
                 let handle_dynamic_closed = parse_string_attr(&e, b"handle-dynamic-closed");
                 let handle_dynamic_open = parse_string_attr(&e, b"handle-dynamic-open");
                 let handle = match handle_type.as_deref() {
@@ -423,7 +423,7 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                     Some("none") => Some(PickListHandle::None),
                     Some("static") => Some(PickListHandle::Static {
                         icon: handle_static
-                            .expect("<pick-list handle=\"static\"> requires 'handle-static'"),
+                            .expect("<pick-list handle=\"static\"> requires 'handle-static-value'"),
                     }),
                     Some("dynamic") => Some(PickListHandle::Dynamic {
                         closed: handle_dynamic_closed
