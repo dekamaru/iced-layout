@@ -23,7 +23,7 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 
 ## Widget coverage
 
-| Widget         | Status         |
+| Widget         | Iced 0.14.0    |
 |----------------|----------------|
 | Button         | ✅ Done         |
 | Checkbox       | ✅ Done         |
