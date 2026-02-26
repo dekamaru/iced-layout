@@ -127,6 +127,17 @@ pub struct BorderRadius {
     pub bottom_left: Option<f32>,
 }
 
+impl BorderRadius {
+    pub fn merge(&self, overlay: &BorderRadius) -> BorderRadius {
+        BorderRadius {
+            top_left: overlay.top_left.or(self.top_left),
+            top_right: overlay.top_right.or(self.top_right),
+            bottom_right: overlay.bottom_right.or(self.bottom_right),
+            bottom_left: overlay.bottom_left.or(self.bottom_left),
+        }
+    }
+}
+
 #[derive(Default)]
 pub struct ContainerStyle {
     pub text_color: Option<Color>,

@@ -1,5 +1,5 @@
 use iced_layout_core::{
-    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FloatStyle,
+    ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FloatStyle,
     HandleShapeType, OverlayMenuStyle, PickListStyle, PickListStyleFields, ProgressBarStyle,
     RadioStyle, RuleFillMode, RuleStyle, SliderStyle, SliderStyleFields, TextEditorStyle,
     TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TogglerStyle,
@@ -7,20 +7,13 @@ use iced_layout_core::{
 use quote::quote;
 
 use crate::types::{
-    generate_border, generate_color, generate_color_or, generate_option_color, generate_shadow,
+    generate_background, generate_border, generate_border_radius, generate_color_or,
+    generate_option_background, generate_option_color, generate_shadow,
 };
 
 pub fn generate_container_style(s: &ContainerStyle) -> proc_macro2::TokenStream {
     let text_color = generate_option_color(&s.text_color);
-
-    let background = match &s.background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { Some(iced::Background::Color(#c)) }
-        }
-        None => quote! { None },
-    };
-
+    let background = generate_option_background(&s.background_color);
     let border = generate_border(&s.border_color, s.border_width, &s.border_radius);
     let shadow = generate_shadow(
         &s.shadow_color,
@@ -42,14 +35,7 @@ pub fn generate_container_style(s: &ContainerStyle) -> proc_macro2::TokenStream 
 }
 
 pub fn generate_checkbox_style_closure(s: &CheckboxStyle) -> proc_macro2::TokenStream {
-    let background = match &s.background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
-    };
-
+    let background = generate_background(&s.background_color, quote! { iced::Color::TRANSPARENT });
     let icon_color = generate_color_or(&s.icon_color, quote! { iced::Color::BLACK });
     let border = generate_border(&s.border_color, s.border_width, &s.border_radius);
     let text_color = generate_option_color(&s.text_color);
@@ -65,14 +51,7 @@ pub fn generate_checkbox_style_closure(s: &CheckboxStyle) -> proc_macro2::TokenS
 }
 
 pub fn generate_button_fields_tokens(fields: &ButtonStyleFields) -> proc_macro2::TokenStream {
-    let background = match &fields.background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { Some(iced::Background::Color(#c)) }
-        }
-        None => quote! { None },
-    };
-
+    let background = generate_option_background(&fields.background_color);
     let text_color = generate_color_or(&fields.text_color, quote! { iced::Color::BLACK });
     let border = generate_border(&fields.border_color, fields.border_width, &fields.border_radius);
     let shadow = generate_shadow(
@@ -103,18 +82,7 @@ pub fn merge_button_fields(
         background_color: overlay.background_color.or(base.background_color),
         border_color: overlay.border_color.or(base.border_color),
         border_width: overlay.border_width.or(base.border_width),
-        border_radius: BorderRadius {
-            top_left: overlay.border_radius.top_left.or(base.border_radius.top_left),
-            top_right: overlay.border_radius.top_right.or(base.border_radius.top_right),
-            bottom_right: overlay
-                .border_radius
-                .bottom_right
-                .or(base.border_radius.bottom_right),
-            bottom_left: overlay
-                .border_radius
-                .bottom_left
-                .or(base.border_radius.bottom_left),
-        },
+        border_radius: base.border_radius.merge(&overlay.border_radius),
         shadow_color: overlay.shadow_color.or(base.shadow_color),
         shadow_offset_x: overlay.shadow_offset_x.or(base.shadow_offset_x),
         shadow_offset_y: overlay.shadow_offset_y.or(base.shadow_offset_y),
@@ -168,14 +136,7 @@ pub fn generate_button_style_closure(bs: &ButtonStyle) -> proc_macro2::TokenStre
 pub fn generate_text_input_fields_tokens(
     fields: &TextInputStyleFields,
 ) -> proc_macro2::TokenStream {
-    let background = match &fields.background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
-    };
-
+    let background = generate_background(&fields.background_color, quote! { iced::Color::TRANSPARENT });
     let border = generate_border(&fields.border_color, fields.border_width, &fields.border_radius);
     let icon_color = generate_color_or(&fields.icon_color, quote! { iced::Color::BLACK });
     let placeholder_color = generate_color_or(
@@ -208,18 +169,7 @@ pub fn merge_text_input_fields(
         background_color: overlay.background_color.or(base.background_color),
         border_color: overlay.border_color.or(base.border_color),
         border_width: overlay.border_width.or(base.border_width),
-        border_radius: BorderRadius {
-            top_left: overlay.border_radius.top_left.or(base.border_radius.top_left),
-            top_right: overlay.border_radius.top_right.or(base.border_radius.top_right),
-            bottom_right: overlay
-                .border_radius
-                .bottom_right
-                .or(base.border_radius.bottom_right),
-            bottom_left: overlay
-                .border_radius
-                .bottom_left
-                .or(base.border_radius.bottom_left),
-        },
+        border_radius: base.border_radius.merge(&overlay.border_radius),
         icon_color: overlay.icon_color.or(base.icon_color),
         placeholder_color: overlay.placeholder_color.or(base.placeholder_color),
         value_color: overlay.value_color.or(base.value_color),
@@ -228,24 +178,11 @@ pub fn merge_text_input_fields(
 }
 
 pub fn generate_toggler_style_closure(s: &TogglerStyle) -> proc_macro2::TokenStream {
-    let background = match &s.background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
-    };
+    let background = generate_background(&s.background_color, quote! { iced::Color::TRANSPARENT });
     let background_border_width = s.background_border_width.unwrap_or(0.0);
     let background_border_color =
         generate_color_or(&s.background_border_color, quote! { iced::Color::TRANSPARENT });
-
-    let foreground = match &s.foreground_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
-    };
+    let foreground = generate_background(&s.foreground_color, quote! { iced::Color::TRANSPARENT });
     let foreground_border_width = s.foreground_border_width.unwrap_or(0.0);
     let foreground_border_color =
         generate_color_or(&s.foreground_border_color, quote! { iced::Color::TRANSPARENT });
@@ -289,25 +226,12 @@ pub fn generate_toggler_style_closure(s: &TogglerStyle) -> proc_macro2::TokenStr
 }
 
 pub fn generate_overlay_menu_style_closure(s: &OverlayMenuStyle) -> proc_macro2::TokenStream {
-    let background = match &s.background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
-    };
-
+    let background = generate_background(&s.background_color, quote! { iced::Color::TRANSPARENT });
     let border = generate_border(&s.border_color, s.border_width, &s.border_radius);
     let text_color = generate_color_or(&s.text_color, quote! { iced::Color::BLACK });
     let selected_text_color =
         generate_color_or(&s.selected_text_color, quote! { iced::Color::WHITE });
-    let selected_background = match &s.selected_background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
-    };
+    let selected_background = generate_background(&s.selected_background_color, quote! { iced::Color::TRANSPARENT });
     let shadow = generate_shadow(
         &s.shadow_color,
         s.shadow_offset_x,
@@ -330,14 +254,7 @@ pub fn generate_overlay_menu_style_closure(s: &OverlayMenuStyle) -> proc_macro2:
 pub fn generate_text_editor_fields_tokens(
     fields: &TextEditorStyleFields,
 ) -> proc_macro2::TokenStream {
-    let background = match &fields.background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
-    };
-
+    let background = generate_background(&fields.background_color, quote! { iced::Color::TRANSPARENT });
     let border = generate_border(&fields.border_color, fields.border_width, &fields.border_radius);
     let placeholder_color = generate_color_or(
         &fields.placeholder_color,
@@ -368,18 +285,7 @@ pub fn merge_text_editor_fields(
         background_color: overlay.background_color.or(base.background_color),
         border_color: overlay.border_color.or(base.border_color),
         border_width: overlay.border_width.or(base.border_width),
-        border_radius: BorderRadius {
-            top_left: overlay.border_radius.top_left.or(base.border_radius.top_left),
-            top_right: overlay.border_radius.top_right.or(base.border_radius.top_right),
-            bottom_right: overlay
-                .border_radius
-                .bottom_right
-                .or(base.border_radius.bottom_right),
-            bottom_left: overlay
-                .border_radius
-                .bottom_left
-                .or(base.border_radius.bottom_left),
-        },
+        border_radius: base.border_radius.merge(&overlay.border_radius),
         placeholder_color: overlay.placeholder_color.or(base.placeholder_color),
         value_color: overlay.value_color.or(base.value_color),
         selection_color: overlay.selection_color.or(base.selection_color),
@@ -393,13 +299,7 @@ pub fn generate_pick_list_style_fields_tokens(
     let placeholder_color =
         generate_color_or(&fields.placeholder_color, quote! { iced::Color { r: 0.4, g: 0.4, b: 0.4, a: 1.0 } });
     let handle_color = generate_color_or(&fields.handle_color, quote! { iced::Color::BLACK });
-    let background = match &fields.background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::WHITE) },
-    };
+    let background = generate_background(&fields.background_color, quote! { iced::Color::WHITE });
     let border = generate_border(&fields.border_color, fields.border_width, &fields.border_radius);
     quote! {
         iced::widget::pick_list::Style {
@@ -423,18 +323,7 @@ pub fn merge_pick_list_fields(
         background_color: overlay.background_color.or(base.background_color),
         border_color: overlay.border_color.or(base.border_color),
         border_width: overlay.border_width.or(base.border_width),
-        border_radius: BorderRadius {
-            top_left: overlay.border_radius.top_left.or(base.border_radius.top_left),
-            top_right: overlay.border_radius.top_right.or(base.border_radius.top_right),
-            bottom_right: overlay
-                .border_radius
-                .bottom_right
-                .or(base.border_radius.bottom_right),
-            bottom_left: overlay
-                .border_radius
-                .bottom_left
-                .or(base.border_radius.bottom_left),
-        },
+        border_radius: base.border_radius.merge(&overlay.border_radius),
     }
 }
 
@@ -470,20 +359,8 @@ pub fn generate_pick_list_style_closure(s: &PickListStyle) -> proc_macro2::Token
 }
 
 pub fn generate_progress_bar_style_closure(s: &ProgressBarStyle) -> proc_macro2::TokenStream {
-    let background = match &s.background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
-    };
-    let bar = match &s.bar_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
-    };
+    let background = generate_background(&s.background_color, quote! { iced::Color::TRANSPARENT });
+    let bar = generate_background(&s.bar_color, quote! { iced::Color::TRANSPARENT });
     let border = generate_border(&s.border_color, s.border_width, &s.border_radius);
     quote! {
         |_theme| iced::widget::progress_bar::Style {
@@ -495,13 +372,7 @@ pub fn generate_progress_bar_style_closure(s: &ProgressBarStyle) -> proc_macro2:
 }
 
 pub fn generate_radio_style_closure(s: &RadioStyle) -> proc_macro2::TokenStream {
-    let background = match &s.background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::TRANSPARENT) },
-    };
+    let background = generate_background(&s.background_color, quote! { iced::Color::TRANSPARENT });
     let dot_color = generate_color_or(&s.dot_color, quote! { iced::Color::BLACK });
     let border_width = s.border_width.unwrap_or(1.0);
     let border_color = generate_color_or(&s.border_color, quote! { iced::Color::BLACK });
@@ -525,15 +396,11 @@ pub fn generate_float_style_closure(s: &FloatStyle) -> proc_macro2::TokenStream 
         s.shadow_offset_y,
         s.shadow_blur_radius,
     );
-    let br = &s.shadow_border_radius;
-    let tl = br.top_left.unwrap_or(0.0);
-    let tr = br.top_right.unwrap_or(0.0);
-    let brr = br.bottom_right.unwrap_or(0.0);
-    let bl = br.bottom_left.unwrap_or(0.0);
+    let shadow_border_radius = generate_border_radius(&s.shadow_border_radius);
     quote! {
         |_theme| iced::widget::float::Style {
             shadow: #shadow,
-            shadow_border_radius: iced::border::Radius { top_left: #tl, top_right: #tr, bottom_right: #brr, bottom_left: #bl },
+            shadow_border_radius: #shadow_border_radius,
         }
     }
 }
@@ -594,27 +461,17 @@ fn generate_slider_style_fields_tokens(fields: &SliderStyleFields) -> proc_macro
         }
         Some(HandleShapeType::Rectangle) => {
             let width = fields.handle_shape_rectangle_width.unwrap_or(8u16);
-            let br = &fields.handle_shape_rectangle_border_radius;
-            let tl = br.top_left.unwrap_or(0.0);
-            let tr = br.top_right.unwrap_or(0.0);
-            let brr = br.bottom_right.unwrap_or(0.0);
-            let bl = br.bottom_left.unwrap_or(0.0);
+            let border_radius = generate_border_radius(&fields.handle_shape_rectangle_border_radius);
             quote! {
                 iced::widget::slider::HandleShape::Rectangle {
                     width: #width,
-                    border_radius: iced::border::Radius { top_left: #tl, top_right: #tr, bottom_right: #brr, bottom_left: #bl },
+                    border_radius: #border_radius,
                 }
             }
         }
     };
 
-    let handle_background = match &fields.handle_background_color {
-        Some(c) => {
-            let c = generate_color(c);
-            quote! { iced::Background::Color(#c) }
-        }
-        None => quote! { iced::Background::Color(iced::Color::BLACK) },
-    };
+    let handle_background = generate_background(&fields.handle_background_color, quote! { iced::Color::BLACK });
     let handle_border_width = fields.handle_border_width.unwrap_or(0.0);
     let handle_border_color =
         generate_color_or(&fields.handle_border_color, quote! { iced::Color::TRANSPARENT });
@@ -644,18 +501,7 @@ fn merge_slider_fields(base: &SliderStyleFields, overlay: &SliderStyleFields) ->
         rail_width: overlay.rail_width.or(base.rail_width),
         rail_border_color: overlay.rail_border_color.or(base.rail_border_color),
         rail_border_width: overlay.rail_border_width.or(base.rail_border_width),
-        rail_border_radius: BorderRadius {
-            top_left: overlay.rail_border_radius.top_left.or(base.rail_border_radius.top_left),
-            top_right: overlay.rail_border_radius.top_right.or(base.rail_border_radius.top_right),
-            bottom_right: overlay
-                .rail_border_radius
-                .bottom_right
-                .or(base.rail_border_radius.bottom_right),
-            bottom_left: overlay
-                .rail_border_radius
-                .bottom_left
-                .or(base.rail_border_radius.bottom_left),
-        },
+        rail_border_radius: base.rail_border_radius.merge(&overlay.rail_border_radius),
         handle_shape: overlay.handle_shape.or(base.handle_shape),
         handle_shape_circle_radius: overlay
             .handle_shape_circle_radius
@@ -663,24 +509,9 @@ fn merge_slider_fields(base: &SliderStyleFields, overlay: &SliderStyleFields) ->
         handle_shape_rectangle_width: overlay
             .handle_shape_rectangle_width
             .or(base.handle_shape_rectangle_width),
-        handle_shape_rectangle_border_radius: BorderRadius {
-            top_left: overlay
-                .handle_shape_rectangle_border_radius
-                .top_left
-                .or(base.handle_shape_rectangle_border_radius.top_left),
-            top_right: overlay
-                .handle_shape_rectangle_border_radius
-                .top_right
-                .or(base.handle_shape_rectangle_border_radius.top_right),
-            bottom_right: overlay
-                .handle_shape_rectangle_border_radius
-                .bottom_right
-                .or(base.handle_shape_rectangle_border_radius.bottom_right),
-            bottom_left: overlay
-                .handle_shape_rectangle_border_radius
-                .bottom_left
-                .or(base.handle_shape_rectangle_border_radius.bottom_left),
-        },
+        handle_shape_rectangle_border_radius: base
+            .handle_shape_rectangle_border_radius
+            .merge(&overlay.handle_shape_rectangle_border_radius),
         handle_background_color: overlay.handle_background_color.or(base.handle_background_color),
         handle_border_width: overlay.handle_border_width.or(base.handle_border_width),
         handle_border_color: overlay.handle_border_color.or(base.handle_border_color),
@@ -720,16 +551,8 @@ pub fn generate_slider_style_closure(s: &SliderStyle) -> proc_macro2::TokenStrea
 }
 
 pub fn generate_rule_style_closure(s: &RuleStyle) -> proc_macro2::TokenStream {
-    let color = crate::types::generate_color_or(&s.color, quote! { iced::Color::BLACK });
-
-    let br = &s.radius;
-    let tl = br.top_left.unwrap_or(0.0);
-    let tr = br.top_right.unwrap_or(0.0);
-    let brr = br.bottom_right.unwrap_or(0.0);
-    let bl = br.bottom_left.unwrap_or(0.0);
-    let radius = quote! {
-        iced::border::Radius { top_left: #tl, top_right: #tr, bottom_right: #brr, bottom_left: #bl }
-    };
+    let color = generate_color_or(&s.color, quote! { iced::Color::BLACK });
+    let radius = generate_border_radius(&s.radius);
 
     let fill_mode = match &s.fill_mode {
         RuleFillMode::Full => quote! { iced::widget::rule::FillMode::Full },

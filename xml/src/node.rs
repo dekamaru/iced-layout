@@ -4,6 +4,20 @@ use quick_xml::Reader;
 
 use crate::attr::*;
 
+fn parse_text_content(reader: &mut Reader<&[u8]>, closing_tag: &[u8]) -> String {
+    let mut content = String::new();
+    loop {
+        match reader.read_event().expect("failed to read XML") {
+            Event::Text(t) => {
+                content.push_str(&t.unescape().expect("failed to unescape text"));
+            }
+            Event::End(end) if end.name().as_ref() == closing_tag => break,
+            _ => {}
+        }
+    }
+    content
+}
+
 fn parse_children(reader: &mut Reader<&[u8]>) -> Vec<Node> {
     let mut children = Vec::new();
     loop {
@@ -45,20 +59,11 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
             b"text" => {
                 let style = parse_string_attr(&e, b"style");
                 let attrs = parse_text_attrs(&e);
-                let mut content = String::new();
-                if has_closing_tag {
-                    loop {
-                        match reader.read_event().expect("failed to read XML") {
-                            Event::Text(e) => {
-                                content.push_str(
-                                    &e.unescape().expect("failed to unescape text"),
-                                );
-                            }
-                            Event::End(e) if e.name().as_ref() == b"text" => break,
-                            _ => {}
-                        }
-                    }
-                }
+                let content = if has_closing_tag {
+                    parse_text_content(reader, b"text")
+                } else {
+                    String::new()
+                };
                 Node::Text { content, style, attrs }
             }
             b"row" => {
@@ -153,20 +158,11 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 let font = parse_string_attr(&e, b"font");
                 let icon = parse_string_attr(&e, b"icon");
 
-                let mut label = String::new();
-                if has_closing_tag {
-                    loop {
-                        match reader.read_event().expect("failed to read XML") {
-                            Event::Text(t) => {
-                                label.push_str(
-                                    &t.unescape().expect("failed to unescape text"),
-                                );
-                            }
-                            Event::End(end) if end.name().as_ref() == b"checkbox" => break,
-                            _ => {}
-                        }
-                    }
-                }
+                let label = if has_closing_tag {
+                    parse_text_content(reader, b"checkbox")
+                } else {
+                    String::new()
+                };
                 Node::Checkbox {
                     label, is_checked, on_toggle, on_toggle_maybe,
                     size, width, spacing, text_size, text_line_height,
@@ -482,20 +478,11 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 let font = parse_string_attr(&e, b"font");
                 let style = parse_string_attr(&e, b"style");
 
-                let mut label = String::new();
-                if has_closing_tag {
-                    loop {
-                        match reader.read_event().expect("failed to read XML") {
-                            Event::Text(t) => {
-                                label.push_str(
-                                    &t.unescape().expect("failed to unescape text"),
-                                );
-                            }
-                            Event::End(end) if end.name().as_ref() == b"radio" => break,
-                            _ => {}
-                        }
-                    }
-                }
+                let label = if has_closing_tag {
+                    parse_text_content(reader, b"radio")
+                } else {
+                    String::new()
+                };
                 Node::Radio {
                     label, value, selected, on_select,
                     size, width, spacing, text_size, text_line_height,

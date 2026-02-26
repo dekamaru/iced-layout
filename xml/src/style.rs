@@ -1,5 +1,5 @@
 use iced_layout_core::{
-    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxIcon, CheckboxStyle, ContainerStyle,
+    ButtonStyle, ButtonStyleFields, CheckboxIcon, CheckboxStyle, ContainerStyle,
     FloatStyle, FontDef, HandleShapeType, OverlayMenuStyle, PickListIcon, PickListStyle,
     PickListStyleFields, ProgressBarStyle, RadioStyle, RuleFillMode, RuleStyle, SliderStyle,
     SliderStyleFields, TextEditorStyle, TextEditorStyleFields, TextInputIcon, TextInputStyle,
@@ -10,6 +10,7 @@ use quick_xml::Reader;
 
 use crate::attr::*;
 
+#[derive(Default)]
 pub struct ParsedStyles {
     pub container: Vec<(String, ContainerStyle)>,
     pub text: Vec<(String, TextStyle)>,
@@ -29,31 +30,6 @@ pub struct ParsedStyles {
     pub checkbox_icons: Vec<(String, CheckboxIcon)>,
     pub text_input_icons: Vec<(String, TextInputIcon)>,
     pub pick_list_icons: Vec<(String, PickListIcon)>,
-}
-
-impl Default for ParsedStyles {
-    fn default() -> Self {
-        Self {
-            container: Vec::new(),
-            text: Vec::new(),
-            button: Vec::new(),
-            checkbox: Vec::new(),
-            text_input: Vec::new(),
-            toggler: Vec::new(),
-            text_editor: Vec::new(),
-            overlay_menu: Vec::new(),
-            float: Vec::new(),
-            pick_list: Vec::new(),
-            progress_bar: Vec::new(),
-            radio: Vec::new(),
-            rule: Vec::new(),
-            slider: Vec::new(),
-            font: Vec::new(),
-            checkbox_icons: Vec::new(),
-            text_input_icons: Vec::new(),
-            pick_list_icons: Vec::new(),
-        }
-    }
 }
 
 fn parse_container_style(e: &BytesStart) -> (String, ContainerStyle) {
@@ -349,22 +325,7 @@ fn parse_radio_style(e: &BytesStart) -> (String, RadioStyle) {
 fn parse_rule_style(e: &BytesStart) -> (String, RuleStyle) {
     let id = parse_string_attr(e, b"id").expect("<rule-style> requires an 'id' attribute");
 
-    // Radius: supports uniform `radius` or per-corner variants
-    let radius = if let Some(all) = parse_f32_attr(e, b"radius") {
-        BorderRadius {
-            top_left: Some(all),
-            top_right: Some(all),
-            bottom_right: Some(all),
-            bottom_left: Some(all),
-        }
-    } else {
-        BorderRadius {
-            top_left: parse_f32_attr(e, b"radius-top-left"),
-            top_right: parse_f32_attr(e, b"radius-top-right"),
-            bottom_right: parse_f32_attr(e, b"radius-bottom-right"),
-            bottom_left: parse_f32_attr(e, b"radius-bottom-left"),
-        }
-    };
+    let radius = parse_border_radius_with_prefix(e, "radius");
 
     // FillMode: at most one of these groups should be set
     let fill_mode = if let Some(pct) = parse_f32_attr(e, b"fill-mode-percent") {
@@ -510,44 +471,9 @@ fn parse_slider_style_fields(e: &BytesStart) -> SliderStyleFields {
         other => panic!("invalid handle-shape: {}", other),
     });
 
-    let rail_border_radius = if let Some(all) = parse_f32_attr(e, b"rail-border-radius") {
-        BorderRadius {
-            top_left: Some(all),
-            top_right: Some(all),
-            bottom_right: Some(all),
-            bottom_left: Some(all),
-        }
-    } else {
-        BorderRadius {
-            top_left: parse_f32_attr(e, b"rail-border-radius-top-left"),
-            top_right: parse_f32_attr(e, b"rail-border-radius-top-right"),
-            bottom_right: parse_f32_attr(e, b"rail-border-radius-bottom-right"),
-            bottom_left: parse_f32_attr(e, b"rail-border-radius-bottom-left"),
-        }
-    };
-
+    let rail_border_radius = parse_border_radius_with_prefix(e, "rail-border-radius");
     let handle_shape_rectangle_border_radius =
-        if let Some(all) = parse_f32_attr(e, b"handle-shape-rectangle-border-radius") {
-            BorderRadius {
-                top_left: Some(all),
-                top_right: Some(all),
-                bottom_right: Some(all),
-                bottom_left: Some(all),
-            }
-        } else {
-            BorderRadius {
-                top_left: parse_f32_attr(e, b"handle-shape-rectangle-border-radius-top-left"),
-                top_right: parse_f32_attr(e, b"handle-shape-rectangle-border-radius-top-right"),
-                bottom_right: parse_f32_attr(
-                    e,
-                    b"handle-shape-rectangle-border-radius-bottom-right",
-                ),
-                bottom_left: parse_f32_attr(
-                    e,
-                    b"handle-shape-rectangle-border-radius-bottom-left",
-                ),
-            }
-        };
+        parse_border_radius_with_prefix(e, "handle-shape-rectangle-border-radius");
 
     SliderStyleFields {
         rail_width: parse_f32_attr(e, b"rail-width"),

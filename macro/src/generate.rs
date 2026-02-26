@@ -89,6 +89,27 @@ fn generate_event_handler(
     }
 }
 
+/// Generates a callback expression for use as a constructor argument.
+///
+/// If `value` contains `::`, treat as a direct expression (e.g. `Msg::Selected`).
+/// Otherwise treat as a method name and wrap as `|param| self.method(param)`.
+fn generate_constructor_callback(
+    value: &str,
+    attr_name: &str,
+    param_name: &str,
+) -> proc_macro2::TokenStream {
+    if value.contains("::") {
+        let msg: syn::Expr = syn::parse_str(value)
+            .unwrap_or_else(|e| panic!("invalid {} expression '{}': {}", attr_name, value, e));
+        quote! { #msg }
+    } else {
+        let handler: syn::Ident = syn::parse_str(value)
+            .unwrap_or_else(|e| panic!("invalid {} method name '{}': {}", attr_name, value, e));
+        let param: syn::Ident = syn::parse_str(param_name).unwrap();
+        quote! { |#param| self.#handler(#param) }
+    }
+}
+
 fn generate_condition(condition: &str, ctx: &GenerateContext) -> proc_macro2::TokenStream {
     let stripped = condition.trim();
     if let Some(inner) = stripped.strip_prefix('!') {
@@ -677,15 +698,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             style,
         } => {
             let value_expr = resolve_field_path(value, ctx);
-            let on_change_ts = if on_change.contains("::") {
-                let msg: syn::Expr = syn::parse_str(on_change)
-                    .unwrap_or_else(|e| panic!("invalid on-change expression '{}': {}", on_change, e));
-                quote! { #msg }
-            } else {
-                let handler: syn::Ident = syn::parse_str(on_change)
-                    .unwrap_or_else(|e| panic!("invalid on-change method name '{}': {}", on_change, e));
-                quote! { |v| self.#handler(v) }
-            };
+            let on_change_ts = generate_constructor_callback(on_change, "on-change", "v");
             let mut expr = quote! { iced::widget::vertical_slider(#range_start..=#range_end, #value_expr, #on_change_ts) };
             if let Some(d) = default {
                 expr = quote! { #expr.default(#d) };
@@ -730,15 +743,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             style,
         } => {
             let value_expr = resolve_field_path(value, ctx);
-            let on_change_ts = if on_change.contains("::") {
-                let msg: syn::Expr = syn::parse_str(on_change)
-                    .unwrap_or_else(|e| panic!("invalid on-change expression '{}': {}", on_change, e));
-                quote! { #msg }
-            } else {
-                let handler: syn::Ident = syn::parse_str(on_change)
-                    .unwrap_or_else(|e| panic!("invalid on-change method name '{}': {}", on_change, e));
-                quote! { |v| self.#handler(v) }
-            };
+            let on_change_ts = generate_constructor_callback(on_change, "on-change", "v");
             let mut expr = quote! { iced::widget::slider(#range_start..=#range_end, #value_expr, #on_change_ts) };
             if let Some(d) = default {
                 expr = quote! { #expr.default(#d) };
@@ -967,15 +972,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
         } => {
             let state_expr = resolve_field_path(state, ctx);
             let selection_expr = resolve_field_path(selection, ctx);
-            let on_selected_ts = if on_selected.contains("::") {
-                let msg: syn::Expr = syn::parse_str(on_selected)
-                    .unwrap_or_else(|e| panic!("invalid on-selected expression '{}': {}", on_selected, e));
-                quote! { #msg }
-            } else {
-                let handler: syn::Ident = syn::parse_str(on_selected)
-                    .unwrap_or_else(|e| panic!("invalid on-selected method name '{}': {}", on_selected, e));
-                quote! { |item| self.#handler(item) }
-            };
+            let on_selected_ts = generate_constructor_callback(on_selected, "on-selected", "item");
             let mut expr = quote! {
                 iced::widget::combo_box(&#state_expr, #placeholder, #selection_expr.as_ref(), #on_selected_ts)
             };
@@ -1275,15 +1272,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
         } => {
             let options_expr = resolve_field_path(options, ctx);
             let selected_expr = resolve_field_path(selected, ctx);
-            let on_select_ts = if on_select.contains("::") {
-                let msg: syn::Expr = syn::parse_str(on_select)
-                    .unwrap_or_else(|e| panic!("invalid on-select expression '{}': {}", on_select, e));
-                quote! { #msg }
-            } else {
-                let handler: syn::Ident = syn::parse_str(on_select)
-                    .unwrap_or_else(|e| panic!("invalid on-select method name '{}': {}", on_select, e));
-                quote! { |item| self.#handler(item) }
-            };
+            let on_select_ts = generate_constructor_callback(on_select, "on-select", "item");
             let mut expr = quote! {
                 iced::widget::pick_list(#options_expr.clone(), #selected_expr.clone(), #on_select_ts)
             };
@@ -1465,15 +1454,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             let value_expr: syn::Expr = syn::parse_str(value)
                 .unwrap_or_else(|e| panic!("invalid radio value expression \"{}\": {}", value, e));
             let selected_expr = resolve_field_path(selected, ctx);
-            let on_select_ts = if on_select.contains("::") {
-                let msg: syn::Expr = syn::parse_str(on_select)
-                    .unwrap_or_else(|e| panic!("invalid on-select expression '{}': {}", on_select, e));
-                quote! { #msg }
-            } else {
-                let handler: syn::Ident = syn::parse_str(on_select)
-                    .unwrap_or_else(|e| panic!("invalid on-select method name '{}': {}", on_select, e));
-                quote! { |v| self.#handler(v) }
-            };
+            let on_select_ts = generate_constructor_callback(on_select, "on-select", "v");
             let label_arg = generate_text_arg(label, ctx);
             let mut expr = quote! {
                 iced::widget::radio(#label_arg, #value_expr, #selected_expr, #on_select_ts)

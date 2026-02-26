@@ -122,6 +122,29 @@ pub fn generate_tooltip_position(p: &TooltipPosition) -> proc_macro2::TokenStrea
     }
 }
 
+pub fn generate_background(
+    color: &Option<Color>,
+    fallback: proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
+    match color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(#fallback) },
+    }
+}
+
+pub fn generate_option_background(color: &Option<Color>) -> proc_macro2::TokenStream {
+    match color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { Some(iced::Background::Color(#c)) }
+        }
+        None => quote! { None },
+    }
+}
+
 pub fn generate_border_radius(br: &BorderRadius) -> proc_macro2::TokenStream {
     let tl = br.top_left.unwrap_or(0.0);
     let tr = br.top_right.unwrap_or(0.0);

@@ -365,8 +365,8 @@ pub fn parse_text_input_side_attr(e: &BytesStart, name: &[u8]) -> Option<TextInp
     })
 }
 
-pub fn parse_border_radius(e: &BytesStart) -> BorderRadius {
-    if let Some(all) = parse_f32_attr(e, b"border-radius") {
+pub fn parse_border_radius_with_prefix(e: &BytesStart, prefix: &str) -> BorderRadius {
+    if let Some(all) = parse_f32_attr(e, prefix.as_bytes()) {
         return BorderRadius {
             top_left: Some(all),
             top_right: Some(all),
@@ -375,28 +375,19 @@ pub fn parse_border_radius(e: &BytesStart) -> BorderRadius {
         };
     }
     BorderRadius {
-        top_left: parse_f32_attr(e, b"border-radius-top-left"),
-        top_right: parse_f32_attr(e, b"border-radius-top-right"),
-        bottom_right: parse_f32_attr(e, b"border-radius-bottom-right"),
-        bottom_left: parse_f32_attr(e, b"border-radius-bottom-left"),
+        top_left: parse_f32_attr(e, format!("{}-top-left", prefix).as_bytes()),
+        top_right: parse_f32_attr(e, format!("{}-top-right", prefix).as_bytes()),
+        bottom_right: parse_f32_attr(e, format!("{}-bottom-right", prefix).as_bytes()),
+        bottom_left: parse_f32_attr(e, format!("{}-bottom-left", prefix).as_bytes()),
     }
 }
 
+pub fn parse_border_radius(e: &BytesStart) -> BorderRadius {
+    parse_border_radius_with_prefix(e, "border-radius")
+}
+
 pub fn parse_shadow_border_radius(e: &BytesStart) -> BorderRadius {
-    if let Some(all) = parse_f32_attr(e, b"shadow-border-radius") {
-        return BorderRadius {
-            top_left: Some(all),
-            top_right: Some(all),
-            bottom_right: Some(all),
-            bottom_left: Some(all),
-        };
-    }
-    BorderRadius {
-        top_left: parse_f32_attr(e, b"shadow-border-radius-top-left"),
-        top_right: parse_f32_attr(e, b"shadow-border-radius-top-right"),
-        bottom_right: parse_f32_attr(e, b"shadow-border-radius-bottom-right"),
-        bottom_left: parse_f32_attr(e, b"shadow-border-radius-bottom-left"),
-    }
+    parse_border_radius_with_prefix(e, "shadow-border-radius")
 }
 
 pub fn consume_closing_tag(reader: &mut Reader<&[u8]>, tag: &[u8]) {
