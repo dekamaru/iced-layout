@@ -51,7 +51,7 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 | Responsive     | ✅ Done (0.0.2) |
 | Rule           | ✅ Done (0.0.2) |
 | Scrollable     | 🔲 Planned     |
-| Slider         | 🔲 Planned     |
+| Slider         | ✅ Done (0.0.2) |
 
 ## Feature-gated widgets
 

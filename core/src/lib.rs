@@ -329,6 +329,35 @@ pub struct PickListStyle {
 }
 
 #[derive(Clone, Copy)]
+pub enum HandleShapeType {
+    Circle,
+    Rectangle,
+}
+
+#[derive(Default)]
+pub struct SliderStyleFields {
+    pub rail_width: Option<f32>,
+    pub rail_border_color: Option<Color>,
+    pub rail_border_width: Option<f32>,
+    pub rail_border_radius: BorderRadius,
+    pub handle_shape: Option<HandleShapeType>,
+    pub handle_shape_circle_radius: Option<f32>,
+    pub handle_shape_rectangle_width: Option<u16>,
+    pub handle_shape_rectangle_border_radius: BorderRadius,
+    pub handle_background_color: Option<Color>,
+    pub handle_border_width: Option<f32>,
+    pub handle_border_color: Option<Color>,
+}
+
+#[derive(Default)]
+pub struct SliderStyle {
+    pub base: SliderStyleFields,
+    pub active: Option<SliderStyleFields>,
+    pub hovered: Option<SliderStyleFields>,
+    pub dragged: Option<SliderStyleFields>,
+}
+
+#[derive(Clone, Copy)]
 pub enum RuleFillMode {
     Full,
     Percent(f32),
@@ -395,6 +424,7 @@ pub struct Layout {
     pub progress_bar_styles: Vec<(String, ProgressBarStyle)>,
     pub radio_styles: Vec<(String, RadioStyle)>,
     pub rule_styles: Vec<(String, RuleStyle)>,
+    pub slider_styles: Vec<(String, SliderStyle)>,
     pub font_defs: Vec<(String, FontDef)>,
     pub checkbox_icons: Vec<(String, CheckboxIcon)>,
     pub text_input_icons: Vec<(String, TextInputIcon)>,
@@ -522,6 +552,20 @@ pub enum Node {
         height: Option<Length>,
         step: Option<String>,
         shift_step: Option<f32>,
+        style: Option<String>,
+    },
+    Slider {
+        range_start: f32,
+        range_end: f32,
+        value: String,
+        on_change: String,
+        default: Option<f32>,
+        on_release: Option<String>,
+        width: Option<Length>,
+        height: Option<f32>,
+        step: Option<f32>,
+        shift_step: Option<f32>,
+        style: Option<String>,
     },
     Tooltip {
         position: TooltipPosition,

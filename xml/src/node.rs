@@ -252,10 +252,32 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 let height = parse_length_attr(&e, b"height");
                 let step = parse_string_attr(&e, b"step");
                 let shift_step = parse_f32_attr(&e, b"shift-step");
+                let style = parse_string_attr(&e, b"style");
                 if has_closing_tag {
                     consume_closing_tag(reader, b"vertical-slider");
                 }
-                Node::VerticalSlider { range_start, range_end, value, on_change, default, on_release, width, height, step, shift_step }
+                Node::VerticalSlider { range_start, range_end, value, on_change, default, on_release, width, height, step, shift_step, style }
+            }
+            b"slider" => {
+                let range_start = parse_f32_attr(&e, b"range-start")
+                    .expect("<slider> requires a 'range-start' attribute");
+                let range_end = parse_f32_attr(&e, b"range-end")
+                    .expect("<slider> requires a 'range-end' attribute");
+                let value = parse_string_attr(&e, b"value")
+                    .expect("<slider> requires a 'value' attribute");
+                let on_change = parse_string_attr(&e, b"on-change")
+                    .expect("<slider> requires an 'on-change' attribute");
+                let default = parse_f32_attr(&e, b"default");
+                let on_release = parse_string_attr(&e, b"on-release");
+                let width = parse_length_attr(&e, b"width");
+                let height = parse_f32_attr(&e, b"height");
+                let step = parse_f32_attr(&e, b"step");
+                let shift_step = parse_f32_attr(&e, b"shift-step");
+                let style = parse_string_attr(&e, b"style");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"slider");
+                }
+                Node::Slider { range_start, range_end, value, on_change, default, on_release, width, height, step, shift_step, style }
             }
             b"tooltip" => {
                 let position = parse_tooltip_position_attr(&e, b"position")

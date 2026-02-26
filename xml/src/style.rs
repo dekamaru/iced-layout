@@ -1,8 +1,9 @@
 use iced_layout_core::{
     BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxIcon, CheckboxStyle, ContainerStyle,
-    FloatStyle, FontDef, OverlayMenuStyle, PickListIcon, PickListStyle, PickListStyleFields,
-    ProgressBarStyle, RadioStyle, RuleFillMode, RuleStyle, TextEditorStyle, TextEditorStyleFields,
-    TextInputIcon, TextInputStyle, TextInputStyleFields, TextStyle, TogglerStyle,
+    FloatStyle, FontDef, HandleShapeType, OverlayMenuStyle, PickListIcon, PickListStyle,
+    PickListStyleFields, ProgressBarStyle, RadioStyle, RuleFillMode, RuleStyle, SliderStyle,
+    SliderStyleFields, TextEditorStyle, TextEditorStyleFields, TextInputIcon, TextInputStyle,
+    TextInputStyleFields, TextStyle, TogglerStyle,
 };
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::Reader;
@@ -23,6 +24,7 @@ pub struct ParsedStyles {
     pub progress_bar: Vec<(String, ProgressBarStyle)>,
     pub radio: Vec<(String, RadioStyle)>,
     pub rule: Vec<(String, RuleStyle)>,
+    pub slider: Vec<(String, SliderStyle)>,
     pub font: Vec<(String, FontDef)>,
     pub checkbox_icons: Vec<(String, CheckboxIcon)>,
     pub text_input_icons: Vec<(String, TextInputIcon)>,
@@ -45,6 +47,7 @@ impl Default for ParsedStyles {
             progress_bar: Vec::new(),
             radio: Vec::new(),
             rule: Vec::new(),
+            slider: Vec::new(),
             font: Vec::new(),
             checkbox_icons: Vec::new(),
             text_input_icons: Vec::new(),
@@ -500,6 +503,95 @@ fn parse_pick_list_style_empty(e: &BytesStart) -> (String, PickListStyle) {
     (id, PickListStyle { base, ..Default::default() })
 }
 
+fn parse_slider_style_fields(e: &BytesStart) -> SliderStyleFields {
+    let handle_shape = parse_string_attr(e, b"handle-shape").map(|s| match s.as_str() {
+        "circle" => HandleShapeType::Circle,
+        "rectangle" => HandleShapeType::Rectangle,
+        other => panic!("invalid handle-shape: {}", other),
+    });
+
+    let rail_border_radius = if let Some(all) = parse_f32_attr(e, b"rail-border-radius") {
+        BorderRadius {
+            top_left: Some(all),
+            top_right: Some(all),
+            bottom_right: Some(all),
+            bottom_left: Some(all),
+        }
+    } else {
+        BorderRadius {
+            top_left: parse_f32_attr(e, b"rail-border-radius-top-left"),
+            top_right: parse_f32_attr(e, b"rail-border-radius-top-right"),
+            bottom_right: parse_f32_attr(e, b"rail-border-radius-bottom-right"),
+            bottom_left: parse_f32_attr(e, b"rail-border-radius-bottom-left"),
+        }
+    };
+
+    let handle_shape_rectangle_border_radius =
+        if let Some(all) = parse_f32_attr(e, b"handle-shape-rectangle-border-radius") {
+            BorderRadius {
+                top_left: Some(all),
+                top_right: Some(all),
+                bottom_right: Some(all),
+                bottom_left: Some(all),
+            }
+        } else {
+            BorderRadius {
+                top_left: parse_f32_attr(e, b"handle-shape-rectangle-border-radius-top-left"),
+                top_right: parse_f32_attr(e, b"handle-shape-rectangle-border-radius-top-right"),
+                bottom_right: parse_f32_attr(
+                    e,
+                    b"handle-shape-rectangle-border-radius-bottom-right",
+                ),
+                bottom_left: parse_f32_attr(
+                    e,
+                    b"handle-shape-rectangle-border-radius-bottom-left",
+                ),
+            }
+        };
+
+    SliderStyleFields {
+        rail_width: parse_f32_attr(e, b"rail-width"),
+        rail_border_color: parse_color_attr(e, b"rail-border-color"),
+        rail_border_width: parse_f32_attr(e, b"rail-border-width"),
+        rail_border_radius,
+        handle_shape,
+        handle_shape_circle_radius: parse_f32_attr(e, b"handle-shape-circle-radius"),
+        handle_shape_rectangle_width: parse_u16_attr(e, b"handle-shape-rectangle-width"),
+        handle_shape_rectangle_border_radius,
+        handle_background_color: parse_color_attr(e, b"handle-background-color"),
+        handle_border_width: parse_f32_attr(e, b"handle-border-width"),
+        handle_border_color: parse_color_attr(e, b"handle-border-color"),
+    }
+}
+
+fn assign_slider_status_fields(style: &mut SliderStyle, tag: &[u8], fields: SliderStyleFields) {
+    match tag {
+        b"active" => style.active = Some(fields),
+        b"hovered" => style.hovered = Some(fields),
+        b"dragged" => style.dragged = Some(fields),
+        other => panic!(
+            "unexpected element in <slider-style>: {}",
+            String::from_utf8_lossy(other)
+        ),
+    }
+}
+
+fn parse_slider_style(e: &BytesStart, reader: &mut Reader<&[u8]>) -> (String, SliderStyle) {
+    let id = parse_string_attr(e, b"id").expect("<slider-style> requires an 'id' attribute");
+    let base = parse_slider_style_fields(e);
+    let mut style = SliderStyle { base, ..Default::default() };
+    parse_stateful_children(reader, b"slider-style", &mut style, |s, tag, e| {
+        assign_slider_status_fields(s, tag, parse_slider_style_fields(e))
+    });
+    (id, style)
+}
+
+fn parse_slider_style_empty(e: &BytesStart) -> (String, SliderStyle) {
+    let id = parse_string_attr(e, b"id").expect("<slider-style> requires an 'id' attribute");
+    let base = parse_slider_style_fields(e);
+    (id, SliderStyle { base, ..Default::default() })
+}
+
 pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
     let mut styles = ParsedStyles::default();
 
@@ -560,6 +652,9 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                         styles.rule.push(parse_rule_style(&e));
                         consume_closing_tag(reader, &tag);
                     }
+                    b"slider-style" => {
+                        styles.slider.push(parse_slider_style(&e, reader));
+                    }
                     b"checkbox-icon" => {
                         styles.checkbox_icons.push(parse_checkbox_icon(&e));
                         consume_closing_tag(reader, &tag);
@@ -592,6 +687,7 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                 b"progress-bar-style" => styles.progress_bar.push(parse_progress_bar_style(&e)),
                 b"radio-style" => styles.radio.push(parse_radio_style(&e)),
                 b"rule-style" => styles.rule.push(parse_rule_style(&e)),
+                b"slider-style" => styles.slider.push(parse_slider_style_empty(&e)),
                 b"font" => styles.font.push(parse_font_def(&e)),
                 b"checkbox-icon" => styles.checkbox_icons.push(parse_checkbox_icon(&e)),
                 b"text-input-icon" => styles.text_input_icons.push(parse_text_input_icon(&e)),

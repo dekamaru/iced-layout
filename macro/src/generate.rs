@@ -674,6 +674,7 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             height,
             step,
             shift_step,
+            style,
         } => {
             let value_expr = resolve_field_path(value, ctx);
             let on_change_ts = if on_change.contains("::") {
@@ -707,6 +708,62 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             if let Some(val) = on_release {
                 let handler = generate_event_handler(val, "on-release", "on_release", HandlerStyle::SelfCall);
                 expr = quote! { #expr #handler };
+            }
+            if let Some(s) = style {
+                assert!(styles.slider.contains_key(s.as_str()), "unknown slider-style: \"{}\"", s);
+                let var = style_var_name("slider", s);
+                expr = quote! { #expr.style(#var) };
+            }
+            Generated::Widget(expr)
+        }
+        Node::Slider {
+            range_start,
+            range_end,
+            value,
+            on_change,
+            default,
+            on_release,
+            width,
+            height,
+            step,
+            shift_step,
+            style,
+        } => {
+            let value_expr = resolve_field_path(value, ctx);
+            let on_change_ts = if on_change.contains("::") {
+                let msg: syn::Expr = syn::parse_str(on_change)
+                    .unwrap_or_else(|e| panic!("invalid on-change expression '{}': {}", on_change, e));
+                quote! { #msg }
+            } else {
+                let handler: syn::Ident = syn::parse_str(on_change)
+                    .unwrap_or_else(|e| panic!("invalid on-change method name '{}': {}", on_change, e));
+                quote! { |v| self.#handler(v) }
+            };
+            let mut expr = quote! { iced::widget::slider(#range_start..=#range_end, #value_expr, #on_change_ts) };
+            if let Some(d) = default {
+                expr = quote! { #expr.default(#d) };
+            }
+            if let Some(w) = width {
+                let w = generate_length(w);
+                expr = quote! { #expr.width(#w) };
+            }
+            if let Some(h) = height {
+                expr = quote! { #expr.height(#h) };
+            }
+            if let Some(s) = step {
+                expr = quote! { #expr.step(#s) };
+            }
+            if let Some(ss) = shift_step {
+                expr = quote! { #expr.shift_step(#ss) };
+            }
+            if let Some(val) = on_release {
+                let handler = generate_event_handler(val, "on-release", "on_release", HandlerStyle::SelfCall);
+                expr = quote! { #expr #handler };
+            }
+            if let Some(s) = style {
+                assert!(styles.slider.contains_key(s.as_str()), "unknown slider-style: \"{}\"", s);
+                let var = style_var_name("slider", s);
+                expr = quote! { #expr.style(#var) };
             }
             Generated::Widget(expr)
         }

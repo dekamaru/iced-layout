@@ -206,6 +206,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -283,6 +284,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -329,6 +331,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -376,6 +379,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -424,6 +428,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -540,6 +545,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -629,6 +635,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -699,6 +706,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -738,6 +746,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -817,6 +826,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -884,6 +894,24 @@
             <xs:attribute name="style" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="slider">
+        <xs:annotation>
+            <xs:documentation>Sliders let users set a value by moving an indicator.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="range-start" type="xs:float" use="required"/>
+            <xs:attribute name="range-end" type="xs:float" use="required"/>
+            <xs:attribute name="value" type="xs:string" use="required"/>
+            <xs:attribute name="on-change" type="xs:string" use="required"/>
+            <xs:attribute name="default" type="xs:float" use="optional"/>
+            <xs:attribute name="on-release" type="xs:string" use="optional"/>
+            <xs:attribute name="width" type="Length" use="optional"/>
+            <xs:attribute name="height" type="xs:float" use="optional"/>
+            <xs:attribute name="step" type="xs:float" use="optional"/>
+            <xs:attribute name="shift-step" type="xs:float" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="if">
         <xs:complexType>
             <xs:all>
@@ -914,6 +942,7 @@
                             <xs:element ref="responsive"/>
                             <xs:element ref="rule-horizontal"/>
                             <xs:element ref="rule-vertical"/>
+                            <xs:element ref="slider"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -947,6 +976,7 @@
                             <xs:element ref="responsive"/>
                             <xs:element ref="rule-horizontal"/>
                             <xs:element ref="rule-vertical"/>
+                            <xs:element ref="slider"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -984,6 +1014,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1027,6 +1058,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1483,6 +1515,105 @@
             <xs:attribute name="snap" type="xs:boolean" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="slider-style">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="active">
+                    <xs:complexType>
+                        <xs:attribute name="rail-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="rail-border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-shape-circle-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-width" type="xs:unsignedShort" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-border-color" type="xs:string" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="hovered">
+                    <xs:complexType>
+                        <xs:attribute name="rail-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="rail-border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-shape-circle-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-width" type="xs:unsignedShort" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-border-color" type="xs:string" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="dragged">
+                    <xs:complexType>
+                        <xs:attribute name="rail-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="rail-border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="rail-border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-shape-circle-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-width" type="xs:unsignedShort" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-top-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-top-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-bottom-right" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-shape-rectangle-border-radius-bottom-left" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-background-color" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-background-gradient" type="xs:string" use="optional"/>
+                        <xs:attribute name="handle-border-width" type="xs:float" use="optional"/>
+                        <xs:attribute name="handle-border-color" type="xs:string" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="rail-width" type="xs:float" use="optional"/>
+            <xs:attribute name="rail-border-color" type="xs:string" use="optional"/>
+            <xs:attribute name="rail-border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="rail-border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="rail-border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="rail-border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="rail-border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="rail-border-radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="handle-shape" type="xs:string" use="optional"/>
+            <xs:attribute name="handle-shape-circle-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="handle-shape-rectangle-width" type="xs:unsignedShort" use="optional"/>
+            <xs:attribute name="handle-shape-rectangle-border-radius" type="xs:float" use="optional"/>
+            <xs:attribute name="handle-shape-rectangle-border-radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="handle-shape-rectangle-border-radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="handle-shape-rectangle-border-radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="handle-shape-rectangle-border-radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="handle-background-color" type="xs:string" use="optional"/>
+            <xs:attribute name="handle-background-gradient" type="xs:string" use="optional"/>
+            <xs:attribute name="handle-border-width" type="xs:float" use="optional"/>
+            <xs:attribute name="handle-border-color" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="overlay-menu-style">
         <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
@@ -1532,6 +1663,7 @@
                 <xs:element ref="responsive"/>
                 <xs:element ref="rule-horizontal"/>
                 <xs:element ref="rule-vertical"/>
+                <xs:element ref="slider"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1554,6 +1686,7 @@
                 <xs:element ref="progress-bar-style"/>
                 <xs:element ref="radio-style"/>
                 <xs:element ref="rule-style"/>
+                <xs:element ref="slider-style"/>
                 <xs:element ref="font"/>
                 <xs:element ref="checkbox-icon"/>
                 <xs:element ref="pick-list-icon"/>

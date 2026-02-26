@@ -1,8 +1,8 @@
 use iced_layout_core::{
     BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FloatStyle,
-    OverlayMenuStyle, PickListStyle, PickListStyleFields, ProgressBarStyle, RadioStyle,
-    RuleFillMode, RuleStyle, TextEditorStyle, TextEditorStyleFields, TextInputStyle,
-    TextInputStyleFields, TogglerStyle,
+    HandleShapeType, OverlayMenuStyle, PickListStyle, PickListStyleFields, ProgressBarStyle,
+    RadioStyle, RuleFillMode, RuleStyle, SliderStyle, SliderStyleFields, TextEditorStyle,
+    TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TogglerStyle,
 };
 use quote::quote;
 
@@ -560,6 +560,146 @@ pub fn generate_text_editor_style_closure(tes: &TextEditorStyle) -> proc_macro2:
         opt.as_ref().map(|fields| {
             let merged = merge_text_editor_fields(&tes.base, fields);
             let style = generate_text_editor_fields_tokens(&merged);
+            quote! { #status_token => #style }
+        })
+    })
+    .collect();
+
+    if status_overrides.is_empty() {
+        quote! {
+            |_theme, _status| #base_style
+        }
+    } else {
+        quote! {
+            |_theme, status| match status {
+                #(#status_overrides,)*
+                _ => #base_style
+            }
+        }
+    }
+}
+
+fn generate_slider_style_fields_tokens(fields: &SliderStyleFields) -> proc_macro2::TokenStream {
+    let rail_width = fields.rail_width.unwrap_or(4.0);
+    let rail_border = generate_border(
+        &fields.rail_border_color,
+        fields.rail_border_width,
+        &fields.rail_border_radius,
+    );
+
+    let handle_shape = match &fields.handle_shape {
+        Some(HandleShapeType::Circle) | None => {
+            let radius = fields.handle_shape_circle_radius.unwrap_or(7.0);
+            quote! { iced::widget::slider::HandleShape::Circle { radius: #radius } }
+        }
+        Some(HandleShapeType::Rectangle) => {
+            let width = fields.handle_shape_rectangle_width.unwrap_or(8u16);
+            let br = &fields.handle_shape_rectangle_border_radius;
+            let tl = br.top_left.unwrap_or(0.0);
+            let tr = br.top_right.unwrap_or(0.0);
+            let brr = br.bottom_right.unwrap_or(0.0);
+            let bl = br.bottom_left.unwrap_or(0.0);
+            quote! {
+                iced::widget::slider::HandleShape::Rectangle {
+                    width: #width,
+                    border_radius: iced::border::Radius { top_left: #tl, top_right: #tr, bottom_right: #brr, bottom_left: #bl },
+                }
+            }
+        }
+    };
+
+    let handle_background = match &fields.handle_background_color {
+        Some(c) => {
+            let c = generate_color(c);
+            quote! { iced::Background::Color(#c) }
+        }
+        None => quote! { iced::Background::Color(iced::Color::BLACK) },
+    };
+    let handle_border_width = fields.handle_border_width.unwrap_or(0.0);
+    let handle_border_color =
+        generate_color_or(&fields.handle_border_color, quote! { iced::Color::TRANSPARENT });
+
+    quote! {
+        iced::widget::slider::Style {
+            rail: iced::widget::slider::Rail {
+                backgrounds: (
+                    iced::Background::Color(iced::Color { r: 0.5, g: 0.5, b: 0.5, a: 1.0 }),
+                    iced::Background::Color(iced::Color { r: 0.8, g: 0.8, b: 0.8, a: 1.0 }),
+                ),
+                width: #rail_width,
+                border: #rail_border,
+            },
+            handle: iced::widget::slider::Handle {
+                shape: #handle_shape,
+                background: #handle_background,
+                border_width: #handle_border_width,
+                border_color: #handle_border_color,
+            },
+        }
+    }
+}
+
+fn merge_slider_fields(base: &SliderStyleFields, overlay: &SliderStyleFields) -> SliderStyleFields {
+    SliderStyleFields {
+        rail_width: overlay.rail_width.or(base.rail_width),
+        rail_border_color: overlay.rail_border_color.or(base.rail_border_color),
+        rail_border_width: overlay.rail_border_width.or(base.rail_border_width),
+        rail_border_radius: BorderRadius {
+            top_left: overlay.rail_border_radius.top_left.or(base.rail_border_radius.top_left),
+            top_right: overlay.rail_border_radius.top_right.or(base.rail_border_radius.top_right),
+            bottom_right: overlay
+                .rail_border_radius
+                .bottom_right
+                .or(base.rail_border_radius.bottom_right),
+            bottom_left: overlay
+                .rail_border_radius
+                .bottom_left
+                .or(base.rail_border_radius.bottom_left),
+        },
+        handle_shape: overlay.handle_shape.or(base.handle_shape),
+        handle_shape_circle_radius: overlay
+            .handle_shape_circle_radius
+            .or(base.handle_shape_circle_radius),
+        handle_shape_rectangle_width: overlay
+            .handle_shape_rectangle_width
+            .or(base.handle_shape_rectangle_width),
+        handle_shape_rectangle_border_radius: BorderRadius {
+            top_left: overlay
+                .handle_shape_rectangle_border_radius
+                .top_left
+                .or(base.handle_shape_rectangle_border_radius.top_left),
+            top_right: overlay
+                .handle_shape_rectangle_border_radius
+                .top_right
+                .or(base.handle_shape_rectangle_border_radius.top_right),
+            bottom_right: overlay
+                .handle_shape_rectangle_border_radius
+                .bottom_right
+                .or(base.handle_shape_rectangle_border_radius.bottom_right),
+            bottom_left: overlay
+                .handle_shape_rectangle_border_radius
+                .bottom_left
+                .or(base.handle_shape_rectangle_border_radius.bottom_left),
+        },
+        handle_background_color: overlay.handle_background_color.or(base.handle_background_color),
+        handle_border_width: overlay.handle_border_width.or(base.handle_border_width),
+        handle_border_color: overlay.handle_border_color.or(base.handle_border_color),
+    }
+}
+
+pub fn generate_slider_style_closure(s: &SliderStyle) -> proc_macro2::TokenStream {
+    let base_style = generate_slider_style_fields_tokens(&s.base);
+
+    let status_overrides: Vec<_> = [
+        (&s.active, quote! { iced::widget::slider::Status::Active }),
+        (&s.hovered, quote! { iced::widget::slider::Status::Hovered }),
+        (&s.dragged, quote! { iced::widget::slider::Status::Dragged }),
+    ]
+    .into_iter()
+    .filter_map(|(opt, status_token)| {
+        opt.as_ref().map(|fields| {
+            let merged = merge_slider_fields(&s.base, fields);
+            let style = generate_slider_style_fields_tokens(&merged);
             quote! { #status_token => #style }
         })
     })
