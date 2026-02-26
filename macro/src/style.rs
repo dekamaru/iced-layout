@@ -1,7 +1,8 @@
 use iced_layout_core::{
     BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxStyle, ContainerStyle, FloatStyle,
     OverlayMenuStyle, PickListStyle, PickListStyleFields, ProgressBarStyle, RadioStyle,
-    TextEditorStyle, TextEditorStyleFields, TextInputStyle, TextInputStyleFields, TogglerStyle,
+    RuleFillMode, RuleStyle, TextEditorStyle, TextEditorStyleFields, TextInputStyle,
+    TextInputStyleFields, TogglerStyle,
 };
 use quote::quote;
 
@@ -574,6 +575,39 @@ pub fn generate_text_editor_style_closure(tes: &TextEditorStyle) -> proc_macro2:
                 #(#status_overrides,)*
                 _ => #base_style
             }
+        }
+    }
+}
+
+pub fn generate_rule_style_closure(s: &RuleStyle) -> proc_macro2::TokenStream {
+    let color = crate::types::generate_color_or(&s.color, quote! { iced::Color::BLACK });
+
+    let br = &s.radius;
+    let tl = br.top_left.unwrap_or(0.0);
+    let tr = br.top_right.unwrap_or(0.0);
+    let brr = br.bottom_right.unwrap_or(0.0);
+    let bl = br.bottom_left.unwrap_or(0.0);
+    let radius = quote! {
+        iced::border::Radius { top_left: #tl, top_right: #tr, bottom_right: #brr, bottom_left: #bl }
+    };
+
+    let fill_mode = match &s.fill_mode {
+        RuleFillMode::Full => quote! { iced::widget::rule::FillMode::Full },
+        RuleFillMode::Percent(pct) => quote! { iced::widget::rule::FillMode::Percent(#pct) },
+        RuleFillMode::Padded(pad) => quote! { iced::widget::rule::FillMode::Padded(#pad) },
+        RuleFillMode::AsymmetricPadding(p1, p2) => {
+            quote! { iced::widget::rule::FillMode::AsymmetricPadding(#p1, #p2) }
+        }
+    };
+
+    let snap = s.snap.unwrap_or(true);
+
+    quote! {
+        |_theme| iced::widget::rule::Style {
+            color: #color,
+            radius: #radius,
+            fill_mode: #fill_mode,
+            snap: #snap,
         }
     }
 }

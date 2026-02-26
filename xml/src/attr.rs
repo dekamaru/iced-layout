@@ -7,6 +7,23 @@ use quick_xml::events::BytesStart;
 use quick_xml::events::Event;
 use quick_xml::Reader;
 
+pub fn parse_u16_attr(e: &BytesStart, name: &[u8]) -> Option<u16> {
+    e.attributes()
+        .filter_map(|a| a.ok())
+        .find(|a| a.key.as_ref() == name)
+        .map(|a| {
+            String::from_utf8_lossy(&a.value)
+                .parse::<u16>()
+                .unwrap_or_else(|err| {
+                    panic!(
+                        "invalid u16 for {:?}: {}",
+                        String::from_utf8_lossy(name),
+                        err
+                    )
+                })
+        })
+}
+
 pub fn parse_f32_attr(e: &BytesStart, name: &[u8]) -> Option<f32> {
     e.attributes()
         .filter_map(|a| a.ok())

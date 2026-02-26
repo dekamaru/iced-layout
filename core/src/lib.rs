@@ -329,6 +329,28 @@ pub struct PickListStyle {
 }
 
 #[derive(Clone, Copy)]
+pub enum RuleFillMode {
+    Full,
+    Percent(f32),
+    Padded(u16),
+    AsymmetricPadding(u16, u16),
+}
+
+impl Default for RuleFillMode {
+    fn default() -> Self {
+        RuleFillMode::Full
+    }
+}
+
+#[derive(Default)]
+pub struct RuleStyle {
+    pub color: Option<Color>,
+    pub radius: BorderRadius,
+    pub fill_mode: RuleFillMode,
+    pub snap: Option<bool>,
+}
+
+#[derive(Clone, Copy)]
 pub enum Interaction {
     None,
     Hidden,
@@ -372,6 +394,7 @@ pub struct Layout {
     pub pick_list_styles: Vec<(String, PickListStyle)>,
     pub progress_bar_styles: Vec<(String, ProgressBarStyle)>,
     pub radio_styles: Vec<(String, RadioStyle)>,
+    pub rule_styles: Vec<(String, RuleStyle)>,
     pub font_defs: Vec<(String, FontDef)>,
     pub checkbox_icons: Vec<(String, CheckboxIcon)>,
     pub text_input_icons: Vec<(String, TextInputIcon)>,
@@ -643,5 +666,13 @@ pub enum Node {
         view: String,
         width: Option<Length>,
         height: Option<Length>,
+    },
+    RuleHorizontal {
+        thickness: f32,
+        style: Option<String>,
+    },
+    RuleVertical {
+        thickness: f32,
+        style: Option<String>,
     },
 }

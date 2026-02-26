@@ -490,6 +490,24 @@ pub fn parse_node(reader: &mut Reader<&[u8]>) -> Node {
                 }
                 Node::Responsive { view, width, height }
             }
+            b"rule-horizontal" => {
+                let thickness = parse_f32_attr(&e, b"height")
+                    .expect("<rule-horizontal> requires a 'height' attribute");
+                let style = parse_string_attr(&e, b"style");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"rule-horizontal");
+                }
+                Node::RuleHorizontal { thickness, style }
+            }
+            b"rule-vertical" => {
+                let thickness = parse_f32_attr(&e, b"width")
+                    .expect("<rule-vertical> requires a 'width' attribute");
+                let style = parse_string_attr(&e, b"style");
+                if has_closing_tag {
+                    consume_closing_tag(reader, b"rule-vertical");
+                }
+                Node::RuleVertical { thickness, style }
+            }
             b"progress-bar" => {
                 let range_start = parse_f32_attr(&e, b"range-start")
                     .expect("<progress-bar> requires a 'range-start' attribute");

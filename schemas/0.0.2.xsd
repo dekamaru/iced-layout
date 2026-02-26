@@ -204,6 +204,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -279,6 +281,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -323,6 +327,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -368,6 +374,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -414,6 +422,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -528,6 +538,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -615,6 +627,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -683,6 +697,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -720,6 +736,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -797,6 +815,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -846,6 +866,24 @@
             <xs:attribute name="height" type="Length" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="rule-horizontal">
+        <xs:annotation>
+            <xs:documentation>Rules divide space horizontally or vertically.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="height" type="xs:float" use="required"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rule-vertical">
+        <xs:annotation>
+            <xs:documentation>Rules divide space horizontally or vertically.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="width" type="xs:float" use="required"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="if">
         <xs:complexType>
             <xs:all>
@@ -874,6 +912,8 @@
                             <xs:element ref="progress-bar"/>
                             <xs:element ref="radio"/>
                             <xs:element ref="responsive"/>
+                            <xs:element ref="rule-horizontal"/>
+                            <xs:element ref="rule-vertical"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -905,6 +945,8 @@
                             <xs:element ref="progress-bar"/>
                             <xs:element ref="radio"/>
                             <xs:element ref="responsive"/>
+                            <xs:element ref="rule-horizontal"/>
+                            <xs:element ref="rule-vertical"/>
                             <xs:element ref="if"/>
                             <xs:element ref="foreach"/>
                             <xs:element ref="widget"/>
@@ -940,6 +982,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -981,6 +1025,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1421,6 +1467,22 @@
             <xs:attribute name="text-color" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="rule-style">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="color" type="xs:string" use="optional"/>
+            <xs:attribute name="radius" type="xs:float" use="optional"/>
+            <xs:attribute name="radius-top-left" type="xs:float" use="optional"/>
+            <xs:attribute name="radius-top-right" type="xs:float" use="optional"/>
+            <xs:attribute name="radius-bottom-right" type="xs:float" use="optional"/>
+            <xs:attribute name="radius-bottom-left" type="xs:float" use="optional"/>
+            <xs:attribute name="fill-mode-percent" type="xs:float" use="optional"/>
+            <xs:attribute name="fill-mode-padded" type="xs:unsignedShort" use="optional"/>
+            <xs:attribute name="fill-mode-asymmetric-padding-value-1" type="xs:unsignedShort" use="optional"/>
+            <xs:attribute name="fill-mode-asymmetric-padding-value-2" type="xs:unsignedShort" use="optional"/>
+            <xs:attribute name="snap" type="xs:boolean" use="optional"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="overlay-menu-style">
         <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
@@ -1468,6 +1530,8 @@
                 <xs:element ref="progress-bar"/>
                 <xs:element ref="radio"/>
                 <xs:element ref="responsive"/>
+                <xs:element ref="rule-horizontal"/>
+                <xs:element ref="rule-vertical"/>
                 <xs:element ref="if"/>
                 <xs:element ref="foreach"/>
                 <xs:element ref="widget"/>
@@ -1489,6 +1553,7 @@
                 <xs:element ref="pick-list-style"/>
                 <xs:element ref="progress-bar-style"/>
                 <xs:element ref="radio-style"/>
+                <xs:element ref="rule-style"/>
                 <xs:element ref="font"/>
                 <xs:element ref="checkbox-icon"/>
                 <xs:element ref="pick-list-icon"/>

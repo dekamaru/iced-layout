@@ -1,8 +1,8 @@
 use iced_layout_core::{
-    ButtonStyle, ButtonStyleFields, CheckboxIcon, CheckboxStyle, ContainerStyle, FloatStyle,
-    FontDef, OverlayMenuStyle, PickListIcon, PickListStyle, PickListStyleFields,
-    ProgressBarStyle, RadioStyle, TextEditorStyle, TextEditorStyleFields, TextInputIcon,
-    TextInputStyle, TextInputStyleFields, TextStyle, TogglerStyle,
+    BorderRadius, ButtonStyle, ButtonStyleFields, CheckboxIcon, CheckboxStyle, ContainerStyle,
+    FloatStyle, FontDef, OverlayMenuStyle, PickListIcon, PickListStyle, PickListStyleFields,
+    ProgressBarStyle, RadioStyle, RuleFillMode, RuleStyle, TextEditorStyle, TextEditorStyleFields,
+    TextInputIcon, TextInputStyle, TextInputStyleFields, TextStyle, TogglerStyle,
 };
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::Reader;
@@ -22,6 +22,7 @@ pub struct ParsedStyles {
     pub pick_list: Vec<(String, PickListStyle)>,
     pub progress_bar: Vec<(String, ProgressBarStyle)>,
     pub radio: Vec<(String, RadioStyle)>,
+    pub rule: Vec<(String, RuleStyle)>,
     pub font: Vec<(String, FontDef)>,
     pub checkbox_icons: Vec<(String, CheckboxIcon)>,
     pub text_input_icons: Vec<(String, TextInputIcon)>,
@@ -43,6 +44,7 @@ impl Default for ParsedStyles {
             pick_list: Vec::new(),
             progress_bar: Vec::new(),
             radio: Vec::new(),
+            rule: Vec::new(),
             font: Vec::new(),
             checkbox_icons: Vec::new(),
             text_input_icons: Vec::new(),
@@ -341,6 +343,48 @@ fn parse_radio_style(e: &BytesStart) -> (String, RadioStyle) {
     (id, style)
 }
 
+fn parse_rule_style(e: &BytesStart) -> (String, RuleStyle) {
+    let id = parse_string_attr(e, b"id").expect("<rule-style> requires an 'id' attribute");
+
+    // Radius: supports uniform `radius` or per-corner variants
+    let radius = if let Some(all) = parse_f32_attr(e, b"radius") {
+        BorderRadius {
+            top_left: Some(all),
+            top_right: Some(all),
+            bottom_right: Some(all),
+            bottom_left: Some(all),
+        }
+    } else {
+        BorderRadius {
+            top_left: parse_f32_attr(e, b"radius-top-left"),
+            top_right: parse_f32_attr(e, b"radius-top-right"),
+            bottom_right: parse_f32_attr(e, b"radius-bottom-right"),
+            bottom_left: parse_f32_attr(e, b"radius-bottom-left"),
+        }
+    };
+
+    // FillMode: at most one of these groups should be set
+    let fill_mode = if let Some(pct) = parse_f32_attr(e, b"fill-mode-percent") {
+        RuleFillMode::Percent(pct)
+    } else if let Some(pad) = parse_u16_attr(e, b"fill-mode-padded") {
+        RuleFillMode::Padded(pad)
+    } else if let Some(p1) = parse_u16_attr(e, b"fill-mode-asymmetric-padding-value-1") {
+        let p2 = parse_u16_attr(e, b"fill-mode-asymmetric-padding-value-2")
+            .expect("<rule-style fill-mode-asymmetric-padding-value-1> requires 'fill-mode-asymmetric-padding-value-2'");
+        RuleFillMode::AsymmetricPadding(p1, p2)
+    } else {
+        RuleFillMode::Full
+    };
+
+    let style = RuleStyle {
+        color: parse_color_attr(e, b"color"),
+        radius,
+        fill_mode,
+        snap: parse_bool_attr(e, b"snap"),
+    };
+    (id, style)
+}
+
 fn parse_font_def(e: &BytesStart) -> (String, FontDef) {
     let id = parse_string_attr(e, b"id").expect("<font> requires an 'id' attribute");
     let def = FontDef {
@@ -512,6 +556,10 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                         styles.radio.push(parse_radio_style(&e));
                         consume_closing_tag(reader, &tag);
                     }
+                    b"rule-style" => {
+                        styles.rule.push(parse_rule_style(&e));
+                        consume_closing_tag(reader, &tag);
+                    }
                     b"checkbox-icon" => {
                         styles.checkbox_icons.push(parse_checkbox_icon(&e));
                         consume_closing_tag(reader, &tag);
@@ -543,6 +591,7 @@ pub fn parse_styles(reader: &mut Reader<&[u8]>) -> ParsedStyles {
                 b"pick-list-style" => styles.pick_list.push(parse_pick_list_style_empty(&e)),
                 b"progress-bar-style" => styles.progress_bar.push(parse_progress_bar_style(&e)),
                 b"radio-style" => styles.radio.push(parse_radio_style(&e)),
+                b"rule-style" => styles.rule.push(parse_rule_style(&e)),
                 b"font" => styles.font.push(parse_font_def(&e)),
                 b"checkbox-icon" => styles.checkbox_icons.push(parse_checkbox_icon(&e)),
                 b"text-input-icon" => styles.text_input_icons.push(parse_text_input_icon(&e)),

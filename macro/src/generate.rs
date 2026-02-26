@@ -1480,5 +1480,31 @@ pub fn generate(node: &Node, styles: &StyleMaps, ctx: &GenerateContext) -> Gener
             }
             Generated::Widget(expr)
         }
+        Node::RuleHorizontal { thickness, style } => {
+            let mut expr = quote! { iced::widget::rule::horizontal(#thickness) };
+            if let Some(style_name) = style {
+                assert!(
+                    styles.rule.contains_key(style_name.as_str()),
+                    "unknown rule-style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("rule", style_name);
+                expr = quote! { #expr.style(#var) };
+            }
+            Generated::Widget(expr)
+        }
+        Node::RuleVertical { thickness, style } => {
+            let mut expr = quote! { iced::widget::rule::vertical(#thickness) };
+            if let Some(style_name) = style {
+                assert!(
+                    styles.rule.contains_key(style_name.as_str()),
+                    "unknown rule-style: \"{}\"",
+                    style_name
+                );
+                let var = style_var_name("rule", style_name);
+                expr = quote! { #expr.style(#var) };
+            }
+            Generated::Widget(expr)
+        }
     }
 }
