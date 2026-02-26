@@ -19,6 +19,7 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 | Components                          | 🔲 Planned     |
 | Checkbox `checked` in styles        | 🔲 Planned     |
 | Text editor highlight support       | 🔲 Planned     |
+| Hot-reload                          | 🔲 Planned     |
 
 ## Widget coverage
 
@@ -48,7 +49,7 @@ That said, missing widgets are not a blocker. You can use the [`<widget>`](/guid
 | ProgressBar    | ✅ Done (0.0.2) |
 | Radio          | ✅ Done (0.0.2) |
 | Responsive     | ✅ Done (0.0.2) |
-| Rule           | 🔲 Planned     |
+| Rule           | ✅ Done (0.0.2) |
 | Scrollable     | 🔲 Planned     |
 | Slider         | 🔲 Planned     |
 
